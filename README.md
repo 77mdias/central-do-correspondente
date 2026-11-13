@@ -11,10 +11,17 @@ App web para o correspondente bancário Caixa controlar cada financiamento habit
 | Perfil | Quantos por escritório | Acesso |
 |---|---|---|
 | Gestor (correspondente) | 1 | Tudo, inclusive VGV, comissões e percentual |
-| Funcionária | 1 | Tudo, menos valores de receita |
-| Corretor parceiro | Ilimitado | Só os clientes vinculados a ele |
+| Funcionária | 1 (só no plano Com corretores) | Tudo, menos valores de receita |
+| Corretor parceiro | Ilimitado (só no plano Com corretores) | Só os clientes vinculados a ele |
 
-Plano único: **R$ 99,00/mês por escritório**, cobrado por assinatura recorrente no Asaas.
+## Planos
+
+Assinatura mensal recorrente no Asaas, por escritório:
+
+| Plano | Preço | Quem entra |
+|---|---|---|
+| **Simples** | R$ 99,00/mês | Só o gestor. Ele cadastra corretores como origem dos clientes, mas os corretores não têm login |
+| **Com corretores** | R$ 149,00/mês | Gestor + 1 funcionária + corretores ilimitados no portal |
 
 ## Stack
 

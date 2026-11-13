@@ -27,6 +27,7 @@ erDiagram
 
 ```sql
 create type perfil as enum ('gestor', 'funcionaria', 'corretor');
+create type plano as enum ('simples', 'com_corretores');
 create type status_membro as enum ('convidado', 'ativo', 'desativado');
 create type status_assinatura as enum ('pendente', 'ativa', 'em_atraso', 'suspensa', 'cancelada');
 create type modalidade as enum ('mcmv', 'sbpe', 'pro_cotista', 'outra');
@@ -47,6 +48,7 @@ create type acao_auditoria as enum ('ver', 'criar', 'alterar', 'excluir', 'baixa
 | id | uuid pk | |
 | nome_escritorio | text not null | |
 | documento_titular | text | CPF ou CNPJ para o Asaas |
+| plano | plano not null | `simples` (R$ 99) ou `com_corretores` (R$ 149). Muda só pelo Worker |
 | percentual_atual | numeric(6,3) | 0 a 100. **Leitura só do gestor** (ver nota em RLS) |
 | status_assinatura | status_assinatura | default `pendente` |
 | ativa_ate | date | cortesia manual |
@@ -87,6 +89,7 @@ Restrições:
 - índice único parcial `(conta_id) where perfil = 'gestor' and status <> 'desativado'`
 - idem para `'funcionaria'`
 - `check (perfil <> 'corretor' or corretor_id is not null)`
+- gatilho `tg_limite_plano`: em conta `simples`, só aceita o perfil `gestor` (RN-18)
 
 ### corretores
 | Campo | Tipo |
@@ -235,7 +238,7 @@ hoje_br() returns date  -- (now() at time zone 'America/Sao_Paulo')::date
 
 | Tabela | Ler | Gravar |
 |---|---|---|
-| contas | membro ativo (campos de receita só gestor) | gestor (nome); status só pelo Worker |
+| contas | membro ativo (campos de receita só gestor) | gestor (nome); status e plano só pelo Worker |
 | membros | gestor e funcionária da conta; o próprio usuário | só pelo Worker (convites) |
 | corretores | gestor, funcionária | gestor, funcionária + `conta_ativa` |
 | clientes | gestor, funcionária; corretor onde `corretor_id = meu_corretor_id` | gestor, funcionária + `conta_ativa` |
@@ -261,6 +264,7 @@ Storage (`documentos`): inserir quando o primeiro segmento do caminho é uma con
 | `tg_percentual` | contas (update de percentual_atual) | Insere em `historico_percentual` |
 | `tg_auditoria` | clientes, corretores, arquivos, membros | Grava criar/alterar/excluir em `auditoria` |
 | `tg_novo_usuario` | auth.users (insert) | Cria a linha em `usuarios` |
+| `tg_limite_plano` | membros (insert/update) | Recusa funcionária e corretor, convidados ou ativos, em conta do plano `simples` (RN-18) |
 
 ## 7. Views (só gestor)
 

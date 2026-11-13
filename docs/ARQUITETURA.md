@@ -67,11 +67,12 @@ Um único Worker serve a SPA e expõe:
 
 | Rota | Função | Auth |
 |---|---|---|
-| `POST /api/convites` | Convidar funcionária/corretor; aplica limite de perfis | JWT do usuário |
+| `POST /api/convites` | Convidar funcionária/corretor; aplica o limite do plano (RN-18) | JWT do usuário |
 | `POST /api/convites/:id/reenviar` | Reenviar convite | JWT |
 | `GET /api/arquivos/:id/link` | Confere permissão, grava auditoria, devolve link temporário (até 5 min) | JWT |
 | `POST /api/push/inscrever` | Salvar inscrição de push do aparelho | JWT |
-| `POST /api/assinatura` | Criar cliente e assinatura no Asaas | JWT (gestor) |
+| `POST /api/assinatura` | Criar cliente e assinatura no Asaas no valor do plano | JWT (gestor) |
+| `POST /api/assinatura/plano` | Trocar de plano: atualiza o valor da assinatura no Asaas e `contas.plano`; ao voltar para o Simples, desativa funcionária e corretores antes de mudar o plano | JWT (gestor) |
 | `POST /api/webhooks/asaas` | Receber eventos de pagamento | Token do webhook |
 | `POST /api/importar` | Importar JSON do protótipo | JWT (gestor) |
 
@@ -89,7 +90,7 @@ O Worker valida o JWT do Supabase em toda chamada autenticada e, para conferir p
 
 - **Postgres:** schema em `supabase/migrations`, versionado no repositório. Detalhes em [MODELO-DE-DADOS.md](MODELO-DE-DADOS.md).
 - **RLS em todas as tabelas**, com funções auxiliares (`meu_perfil`, `meu_corretor_id`, `conta_ativa`).
-- **Gatilhos** para as regras de integridade: RN-06, RN-07, RN-11, RN-12, RF-23 (anexo marca recebido), histórico de etapa, auditoria de alterações.
+- **Gatilhos** para as regras de integridade: RN-06, RN-07, RN-11, RN-12, RN-18 (limite do plano), RF-23 (anexo marca recebido), histórico de etapa, auditoria de alterações.
 - **Views** de remuneração (RN-08 a RN-10) acessíveis só ao gestor.
 - **Auth:** e-mail e senha, convite e recuperação. SMTP próprio em produção (o SMTP padrão do Supabase tem limite baixo de envio).
 - **Storage:** bucket `documentos` privado. Caminho `conta_id/cliente_id/arquivo_id.ext`. Política de upload por perfil e por cliente; **sem política de leitura direta**: download só via Worker.
@@ -101,7 +102,8 @@ O Worker valida o JWT do Supabase em toda chamada autenticada e, para conferir p
 - Toda tabela de negócio tem `conta_id`.
 - `membros` liga usuário ↔ conta ↔ perfil. O corretor também tem `corretor_id`, que o liga ao cadastro de corretor daquela conta.
 - O front guarda o escritório escolhido e filtra por `conta_id`; a RLS impede ler qualquer conta da qual a pessoa não é membro, mesmo que o filtro seja adulterado.
-- Limite de 1 gestor e 1 funcionária ativos por conta: índice único parcial no banco.
+- Limites por plano (RN-18): no Simples, só o gestor; no Com corretores, 1 gestor e 1 funcionária ativos e corretores ilimitados. Índice único parcial (1 gestor, 1 funcionária) + gatilho `tg_limite_plano` em `membros`, que recusa funcionária e corretor em conta Simples.
+- Como a RLS só reconhece membros ativos, desativar funcionária e corretores na volta para o Simples já corta o acesso deles, sem apagar nada.
 
 ## 4. Segurança e LGPD
 
@@ -123,7 +125,8 @@ Papel na LGPD: a correspondente é a **controladora** dos dados dos clientes del
 ## 5. Integrações
 
 ### Asaas
-- Na assinatura: criar o cliente (customer) com CPF/CNPJ do gestor e uma assinatura mensal de R$ 99,00; guardar os ids na conta.
+- Na assinatura: criar o cliente (customer) com CPF/CNPJ do gestor e uma assinatura mensal no valor do plano (R$ 99,00 ou R$ 149,00); guardar os ids na conta.
+- Troca de plano: atualizar o valor da assinatura existente, sem criar outra. Conferir na documentação do Asaas como aplicar o valor novo só às próximas faturas (P-11).
 - Webhook em `/api/webhooks/asaas`, autenticado pelo token configurado no painel do Asaas.
 - Eventos de pagamento confirmado/recebido → `ativa`; vencido → `em_atraso`. Conferir os nomes exatos dos eventos na documentação do Asaas.
 - Idempotência: cada evento é gravado em `eventos_asaas` pelo id; evento repetido é ignorado.
@@ -155,7 +158,7 @@ Papel na LGPD: a correspondente é a **controladora** dos dados dos clientes del
 | Camada | O quê |
 |---|---|
 | Regras (Vitest) | Ativo, parado, cobrança, percentual usado, remuneração, cota, mensagens |
-| Gatilhos (SQL) | RN-06, RN-07, RN-11, RN-12, anexo marca recebido |
+| Gatilhos (SQL) | RN-06, RN-07, RN-11, RN-12, RN-18 (conta Simples recusa funcionária e corretor), anexo marca recebido |
 | RLS (SQL) | Para cada perfil e para um usuário de outra conta: o que lê e o que grava em cada tabela. Inclui "funcionária não lê `clientes_remuneracao`" e "corretor não lê cliente de outro corretor" |
 | Ponta a ponta | Rotina diária e convite, nas fases 2 e 3 |
 

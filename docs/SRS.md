@@ -18,12 +18,12 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RF-60 | Entrar com e-mail e senha; recuperar senha por e-mail | Novo |
 | RF-61 | Cada escritório é uma conta; todo registro pertence a uma conta | Novo |
 | RF-62 | Perfis gestor, funcionária e corretor, com as permissões da seção 3 | Novo |
-| RF-63 | Máximo de 1 gestor e 1 funcionária ativos por conta; corretores ilimitados | Novo |
-| RF-64 | Convidar pessoa por e-mail: o app cria o acesso e envia link para ela definir a senha. G convida F e C; F convida C | Novo |
+| RF-63 | Limite de usuários conforme o plano (RN-18): no Simples, só o gestor; no Com corretores, 1 gestor e 1 funcionária ativos e corretores ilimitados | Alterado |
+| RF-64 | Convidar pessoa por e-mail: o app cria o acesso e envia link para ela definir a senha. G convida F e C; F convida C. Só no plano Com corretores | Novo |
 | RF-65 | Reenviar convite e desativar acesso (o histórico da pessoa permanece) | Novo |
 | RF-66 | Uma pessoa pode pertencer a várias contas; ao entrar, escolhe o escritório e pode trocar depois | Novo |
 | RF-67 | Aceitar termo de uso e política de privacidade antes do primeiro uso; registrar versão e data do aceite | Novo |
-| RF-68 | Painel do sistema (só administradores do sistema): listar contas, status da assinatura e definir "ativa até" para cortesia | Novo |
+| RF-68 | Painel do sistema (só administradores do sistema): listar contas, plano e status da assinatura; definir plano e "ativa até" para cortesia | Novo |
 
 ### 1.2 Início
 
@@ -84,7 +84,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RF-42 | Card fixo "Clientes diretos" para clientes sem corretor | Protótipo |
 | RF-43 | Mensagem para o corretor com a situação e documentos faltando de cada cliente dele | Protótipo |
 | RF-44 | Impedir remover corretor que ainda tem clientes | Protótipo |
-| RF-45 | Botão "Convidar para o portal" no cadastro do corretor (exige e-mail) e indicação de status: sem acesso, convidado, ativo | Novo |
+| RF-45 | Botão "Convidar para o portal" no cadastro do corretor (exige e-mail) e indicação de status: sem acesso, convidado, ativo. Só no plano Com corretores; no Simples, o botão indica que o portal faz parte desse plano | Novo |
 
 ### 1.7 VGV e comissões (só gestor)
 
@@ -99,7 +99,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RF-56 | Marcar remuneração como recebida por cliente | Protótipo |
 | RF-57 | Exportar relatório do período em PDF e planilha | Novo |
 
-### 1.8 Portal do corretor
+### 1.8 Portal do corretor (plano Com corretores)
 
 | Código | Requisito | Origem |
 |---|---|---|
@@ -113,10 +113,11 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RF-70 | Criar cliente e assinatura recorrente no Asaas para a conta (R$ 99,00/mês) | Novo |
+| RF-70 | Criar cliente e assinatura recorrente no Asaas para a conta, no valor do plano: Simples R$ 99,00/mês, Com corretores R$ 149,00/mês | Novo |
 | RF-71 | Receber webhook do Asaas e atualizar o status da conta (ativa, em atraso, suspensa, cancelada) | Novo |
-| RF-72 | Tela de assinatura para o gestor: status, próximo vencimento e link da fatura | Novo |
+| RF-72 | Tela de assinatura para o gestor: plano, status, próximo vencimento e link da fatura | Novo |
 | RF-73 | Conta suspensa fica somente leitura para todos os perfis, com aviso fixo | Novo |
+| RF-74 | Gestor troca de plano na tela de assinatura, e o valor da assinatura no Asaas muda junto. Ao voltar para o Simples, funcionária e corretores perdem o acesso (ficam desativados, histórico mantido). Cobrança da troca conforme P-11 | Novo |
 
 ### 1.10 Migração
 
@@ -147,6 +148,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RN-15 | Se a data de assinatura for apagada ou o processo voltar a uma etapa ativa, o agendamento de exclusão é cancelado |
 | RN-16 | Conta com pagamento vencido há mais de 7 dias fica somente leitura até a confirmação do pagamento |
 | RN-17 | Funcionária e corretor nunca recebem do banco os campos de percentual e remuneração (garantido por RLS, não só pela tela) |
+| RN-18 | Plano Simples: só o perfil gestor tem acesso. Plano Com corretores: 1 gestor, 1 funcionária e corretores ilimitados. Garantido no banco, não só pelo convite |
 
 ---
 
@@ -176,6 +178,8 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | Receber lembrete diário | ✓ | ✓ | — |
 
 Com a conta suspensa (RN-16), todas as ações de escrita ficam bloqueadas para todos.
+
+No plano Simples só existe o perfil G; as colunas F e C valem para o plano Com corretores (RN-18).
 
 ---
 

@@ -14,13 +14,18 @@ Formato: cada decisão tem código (D-xx), o que foi decidido e por quê.
 
 **D-03 · Multi-escritório:** um único sistema atende vários correspondentes. Cada escritório é uma conta isolada; nenhum dado cruza contas.
 
-**D-04 · Plano e preço:** valor fixo de **R$ 99,00/mês por escritório**. Inclui 1 gestor, 1 funcionária e corretores ilimitados. Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
+**D-04 · Planos e preço:** dois planos por escritório (revisto em 13/11/2026; antes era um plano único de R$ 99,00 com tudo incluído).
+
+- **Simples — R$ 99,00/mês:** só o gestor (1 login). Ele cadastra corretores como origem dos clientes, vê o ranking e manda mensagem pelo WhatsApp, mas os corretores não têm login.
+- **Com corretores — R$ 149,00/mês:** 1 gestor, 1 funcionária e corretores ilimitados com acesso ao portal.
+
+Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-05 · O app não cobra ninguém em nome da correspondente:** é só organização de processos. A única cobrança é a assinatura que a correspondente paga a nós.
 
 **D-06 · Gateway:** **Asaas**, assinatura recorrente (o William já tem conta). Status do pagamento chega por webhook.
 
-**D-07 · Sem teste grátis:** a venda é feita pelo William em conversa direta, e a demonstração substitui o teste. A conta ativa no primeiro pagamento. Para cortesias (ex.: as 2 correspondentes que já usam o protótipo), o painel do sistema tem o campo "ativa até", preenchido à mão.
+**D-07 · Sem teste grátis:** a venda é feita pelo William em conversa direta, e a demonstração substitui o teste. A conta ativa no primeiro pagamento. Para cortesias (ex.: as 2 correspondentes que já usam o protótipo), o painel do sistema define à mão o plano e o campo "ativa até".
 
 **D-08 · Inadimplência:** 7 dias de tolerância depois do vencimento; em seguida a conta fica **somente leitura** até pagar. Nada é apagado por falta de pagamento.
 
@@ -28,9 +33,9 @@ Formato: cada decisão tem código (D-xx), o que foi decidido e por quê.
 
 **D-09 · Perfis:** gestor, funcionária e corretor. O Briefing (que pede perfis) vale sobre a Documentação (que os punha fora do escopo).
 
-**D-10 · Funcionária:** vê e edita tudo, inclusive valor do imóvel e valor financiado, mas **não vê** percentual, remuneração, remuneração recebida nem a tela VGV e comissões. Pode cadastrar corretores e enviar convites a eles.
+**D-10 · Funcionária (plano Com corretores):** vê e edita tudo, inclusive valor do imóvel e valor financiado, mas **não vê** percentual, remuneração, remuneração recebida nem a tela VGV e comissões. Pode cadastrar corretores e enviar convites a eles.
 
-**D-11 · Portal do corretor entra na v1:** o corretor tem login próprio e vê só os clientes vinculados a ele. Pode **acompanhar e anexar documentos**. Não cadastra cliente, não edita a ficha, não remove anexo.
+**D-11 · Portal do corretor entra na v1, no plano Com corretores:** o corretor tem login próprio e vê só os clientes vinculados a ele. Pode **acompanhar e anexar documentos**. Não cadastra cliente, não edita a ficha, não remove anexo.
 
 **D-12 · Valores para o corretor:** vê etapa, documentos pendentes, valor do imóvel e valor do financiamento. **Nunca** vê percentual nem comissão.
 
@@ -83,10 +88,11 @@ Formato: cada decisão tem código (D-xx), o que foi decidido e por quê.
 | P-01 | Nomes dos 12 documentos (8 do comprador, 4 do imóvel e vendedor) | Copiar do código do protótipo | Dev (precisa do código ou do JSON) |
 | P-02 | Confirmação de envio do WhatsApp | Ao voltar para o app, perguntar "Enviou?"; só registra a cobrança se a resposta for sim | Dev + William |
 | P-03 | Corretor vê o histórico do cliente? | Vê mudanças de etapa e anexos; não vê observações internas | William |
-| P-04 | Como a correspondente nova se cadastra | Página de venda → cadastro do gestor → aceite dos termos → pagamento no Asaas → conta ativa | William |
+| P-04 | Como a correspondente nova se cadastra | Página de venda → escolha do plano → cadastro do gestor → aceite dos termos → pagamento no Asaas → conta ativa | William |
 | P-05 | Formas de pagamento aceitas no Asaas | Cartão, Pix e boleto | William |
 | P-06 | Horário do lembrete diário | 8h (horário de Brasília) | William |
 | P-07 | Quantos dias antes de apagar anexos avisar | 5 dias | William |
 | P-08 | Provedor de e-mail (convites, recuperação de senha, lembretes) | SMTP próprio (ex.: Resend) configurado no Supabase | Dev |
 | P-09 | Domínio do app | — | William |
 | P-10 | Acordo por escrito entre os sócios (código, receita, saída) | — | Sócios |
+| P-11 | Cobrança na troca de plano | Subir para Com corretores libera na hora; voltar para o Simples desativa funcionária e corretores na hora. Nos dois casos o valor novo vale a partir da próxima fatura, sem cobrar nem devolver diferença | William |

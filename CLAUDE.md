@@ -38,7 +38,7 @@ Multi-escritório e perfis:
 - Funções auxiliares `security definer`: `meu_perfil(conta)`, `meu_corretor_id(conta)`, `conta_ativa(conta)`, `hoje_br()`.
 - **Funcionária e corretor nunca recebem percentual/remuneração do banco** (RN-17): por isso esses campos ficam em `clientes_remuneracao` (e possivelmente `contas_config`), com RLS só do gestor.
 - Corretor só lê clientes com `corretor_id = meu_corretor_id(conta_id)`; pode anexar, não edita ficha nem remove anexo.
-- Limite de 1 gestor + 1 funcionária ativos por conta via índice único parcial.
+- Dois planos (D-04, RN-18): **Simples** (R$ 99) só o gestor, corretores só como cadastro, sem login; **Com corretores** (R$ 149) gestor + 1 funcionária + corretores ilimitados no portal. O limite vale no banco (índice único parcial + gatilho `tg_limite_plano` em `membros`), não só no convite.
 - Escrita exige `conta_ativa`: conta suspensa (RN-16) fica somente leitura para todos.
 
 Arquivos: bucket privado `documentos`, caminho `conta_id/cliente_id/arquivo_id.ext`. Há política de upload, mas **nenhuma de leitura**: download só via `GET /api/arquivos/:id/link` (link de até 5 min + registro em `auditoria`).

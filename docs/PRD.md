@@ -17,8 +17,8 @@ O correspondente Caixa toca dezenas de processos ao mesmo tempo, quase todos tra
 | Perfil | Quem é | O que precisa |
 |---|---|---|
 | Gestor | O correspondente bancário Caixa, dono do escritório e pagante | Ver o que fazer hoje, cobrar documentos, acompanhar etapas e saber quanto vai receber |
-| Funcionária | Assistente do escritório | Cadastrar clientes e corretores, anexar documentos, registrar andamento |
-| Corretor parceiro | Indica clientes ao correspondente | Acompanhar sozinho a situação dos clientes dele e mandar documentos |
+| Funcionária (plano Com corretores) | Assistente do escritório | Cadastrar clientes e corretores, anexar documentos, registrar andamento |
+| Corretor parceiro (login só no plano Com corretores) | Indica clientes ao correspondente | Acompanhar sozinho a situação dos clientes dele e mandar documentos |
 
 Cliente final (comprador do imóvel) não usa o app.
 
@@ -46,8 +46,10 @@ Ainda não há metas numéricas.
 
 ## 5. Modelo de negócio
 
-- Plano único de **R$ 99,00/mês por escritório**: 1 gestor + 1 funcionária + corretores ilimitados.
-- Assinatura recorrente no **Asaas**.
+- Dois planos, cobrados por escritório:
+  - **Simples — R$ 99,00/mês:** só o gestor. Corretores entram como cadastro (origem do cliente, ranking, mensagem pelo WhatsApp), sem login.
+  - **Com corretores — R$ 149,00/mês:** gestor + 1 funcionária + corretores ilimitados com acesso ao portal.
+- Assinatura recorrente no **Asaas**; o gestor pode trocar de plano (regras de cobrança da troca em P-11).
 - Sem teste grátis; cortesias são liberadas manualmente.
 - Inadimplência: 7 dias de tolerância, depois somente leitura.
 - Venda conduzida pelo William, com página de venda de apoio.
@@ -72,11 +74,11 @@ Ainda não há metas numéricas.
 | Login com e-mail e senha, recuperação de senha | Alta |
 | Contas separadas por escritório, perfis gestor / funcionária / corretor | Alta |
 | Convite por link | Alta |
-| Portal do corretor (acompanhar e anexar) | Alta |
+| Portal do corretor (acompanhar e anexar), no plano Com corretores | Alta |
 | Validação de CPF, telefone e e-mail | Alta |
 | Confirmação de envio da cobrança | Alta |
 | Adequação à LGPD (termos, auditoria, prazo dos anexos, backup) | Alta |
-| Assinatura no Asaas e bloqueio por inadimplência | Alta (fase 4) |
+| Assinatura no Asaas (2 planos e troca de plano) e bloqueio por inadimplência | Alta (fase 4) |
 | Lembrete das cobranças do dia (push + e-mail) | Média |
 | Exportar relatório de VGV e comissões (PDF e planilha) | Média |
 | Importador do JSON do protótipo | Média |
@@ -90,7 +92,7 @@ Ainda não há metas numéricas.
 - Portal do cliente final.
 - Login de imobiliária.
 - Checklist diferente por modalidade.
-- Segunda funcionária ou planos por usuário.
+- Segunda funcionária ou cobrança por usuário.
 - Teste grátis automático.
 
 ## 7. Fases
@@ -111,3 +113,4 @@ Ainda não há metas numéricas.
 | Cobrança registrada sem envio real | Confirmação "Enviou?" (P-02) |
 | Corretor ver dado de outro corretor | Política RLS por `corretor_id` + teste dedicado |
 | Página de venda prometer o que o app não faz | Revisar a página antes da fase 4 |
+| Escritório no Simples divide a senha do gestor com a funcionária | Termos de uso proíbem dividir acesso; a auditoria deixa de distinguir quem fez cada ação |

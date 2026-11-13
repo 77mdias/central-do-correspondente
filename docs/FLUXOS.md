@@ -50,7 +50,7 @@ flowchart LR
         COBH[Cobrar hoje]
         COR[Corretores parceiros]
         VGV[VGV e comissões<br/><i>só G</i>]
-        EQ[Equipe e acessos]
+        EQ[Equipe e acessos<br/><i>plano Com corretores</i>]
         ASS[Assinatura<br/><i>só G</i>]
     end
 
@@ -60,7 +60,7 @@ flowchart LR
         FCOR[Ficha do corretor]
     end
 
-    subgraph Portal["Portal do corretor (C)"]
+    subgraph Portal["Portal do corretor (C), plano Com corretores"]
         MEUS[Meus clientes]
         FLEIT[Ficha em leitura<br/>+ anexar]
     end
@@ -128,7 +128,7 @@ sequenceDiagram
     G->>App: Cadastra funcionária ou corretor com e-mail
     G->>App: "Convidar"
     App->>API: POST /api/convites
-    API->>API: Confere perfil de quem convida<br/>e limite de 1 funcionária
+    API->>API: Confere perfil de quem convida,<br/>plano Com corretores e limite de 1 funcionária
     alt E-mail ainda não tem conta
         API->>Auth: Cria usuário e envia link de convite
     else E-mail já existe (corretor de outro escritório)
@@ -166,13 +166,15 @@ stateDiagram-v2
     note right of Suspensa: Somente leitura,<br/>nada é apagado
 ```
 
-Cortesia: o administrador do sistema preenche "ativa até"; enquanto a data não passar, a conta é tratada como ativa.
+Cortesia: o administrador do sistema define o plano e preenche "ativa até"; enquanto a data não passar, a conta é tratada como ativa.
+
+Troca de plano (RF-74): o gestor muda na tela Assinatura e o Worker atualiza o valor no Asaas. Ao voltar para o Simples, funcionária e corretores são desativados antes da troca (nada é apagado). Cobrança da troca: P-11.
 
 ---
 
 ## 8. Cadastro de escritório novo (proposta P-04)
 
-1. Página de venda → "Assinar".
+1. Página de venda → escolhe o plano (Simples ou Com corretores) → "Assinar".
 2. Formulário: nome, e-mail, senha, nome do escritório, CPF ou CNPJ (o Asaas exige).
 3. Aceite dos termos.
 4. Link de pagamento do Asaas.
