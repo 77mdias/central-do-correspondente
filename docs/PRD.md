@@ -49,7 +49,7 @@ Ainda não há metas numéricas.
 - Dois planos, cobrados por escritório:
   - **Simples — R$ 99,00/mês:** só o gestor. Corretores entram como cadastro (origem do cliente, ranking, mensagem pelo WhatsApp), sem login.
   - **Com corretores — R$ 149,00/mês:** gestor + 1 funcionária + corretores ilimitados com acesso ao portal.
-- Assinatura recorrente no **Asaas**; o gestor pode trocar de plano (regras de cobrança da troca em P-11).
+- Assinatura recorrente no **Asaas**; o gestor pode trocar de plano (vale na hora; o valor novo só a partir da próxima fatura, D-30).
 - Sem teste grátis; cortesias são liberadas manualmente.
 - Inadimplência: 7 dias de tolerância, depois somente leitura.
 - Venda conduzida pelo William, com página de venda de apoio.

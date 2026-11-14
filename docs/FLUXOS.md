@@ -168,7 +168,7 @@ stateDiagram-v2
 
 Cortesia: o administrador do sistema define o plano e preenche "ativa até"; enquanto a data não passar, a conta é tratada como ativa.
 
-Troca de plano (RF-74): o gestor muda na tela Assinatura e o Worker atualiza o valor no Asaas. Ao voltar para o Simples, funcionária e corretores são desativados antes da troca (nada é apagado). Cobrança da troca: P-11.
+Troca de plano (RF-74): o gestor muda na tela Assinatura e o Worker atualiza o valor no Asaas. Ao voltar para o Simples, funcionária e corretores são desativados antes da troca (nada é apagado). A troca vale na hora; o valor novo só a partir da próxima fatura (D-30).
 
 ---
 

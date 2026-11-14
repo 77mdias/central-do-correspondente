@@ -117,7 +117,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RF-71 | Receber webhook do Asaas e atualizar o status da conta (ativa, em atraso, suspensa, cancelada) | Novo |
 | RF-72 | Tela de assinatura para o gestor: plano, status, próximo vencimento e link da fatura | Novo |
 | RF-73 | Conta suspensa fica somente leitura para todos os perfis, com aviso fixo | Novo |
-| RF-74 | Gestor troca de plano na tela de assinatura, e o valor da assinatura no Asaas muda junto. Ao voltar para o Simples, funcionária e corretores perdem o acesso (ficam desativados, histórico mantido). Cobrança da troca conforme P-11 | Novo |
+| RF-74 | Gestor troca de plano na tela de assinatura, e o valor da assinatura no Asaas muda junto. Ao voltar para o Simples, funcionária e corretores perdem o acesso (ficam desativados, histórico mantido). A troca vale na hora; o valor novo só a partir da próxima fatura, sem cobrar nem devolver diferença (D-30) | Novo |
 
 ### 1.10 Migração
 

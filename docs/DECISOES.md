@@ -79,6 +79,8 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-29 · Download só pelo Worker:** o usuário não lê o bucket direto. O link temporário é gerado por um endpoint que confere a permissão e grava na auditoria quem baixou.
 
+**D-30 · Troca de plano** (decidido em 14/11/2026): a troca vale **na hora** nos dois sentidos. Subir para Com corretores libera funcionária e corretores na hora; voltar para o Simples desativa os dois na hora (nada é apagado). O valor novo só entra **a partir da próxima fatura**, sem cobrar nem devolver diferença.
+
 ---
 
 ## Pendências
@@ -95,4 +97,3 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 | P-08 | Provedor de e-mail (convites, recuperação de senha, lembretes) | SMTP próprio (ex.: Resend) configurado no Supabase | Dev |
 | P-09 | Domínio do app | — | William |
 | P-10 | Acordo por escrito entre os sócios (código, receita, saída) | — | Sócios |
-| P-11 | Cobrança na troca de plano | Subir para Com corretores libera na hora; voltar para o Simples desativa funcionária e corretores na hora. Nos dois casos o valor novo vale a partir da próxima fatura, sem cobrar nem devolver diferença | William |

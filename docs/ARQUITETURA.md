@@ -126,7 +126,7 @@ Papel na LGPD: a correspondente é a **controladora** dos dados dos clientes del
 
 ### Asaas
 - Na assinatura: criar o cliente (customer) com CPF/CNPJ do gestor e uma assinatura mensal no valor do plano (R$ 99,00 ou R$ 149,00); guardar os ids na conta.
-- Troca de plano: atualizar o valor da assinatura existente, sem criar outra. Conferir na documentação do Asaas como aplicar o valor novo só às próximas faturas (P-11).
+- Troca de plano: atualizar o valor da assinatura existente, sem criar outra. Conferir na documentação do Asaas como aplicar o valor novo só às próximas faturas, sem mexer na fatura já gerada (D-30).
 - Webhook em `/api/webhooks/asaas`, autenticado pelo token configurado no painel do Asaas.
 - Eventos de pagamento confirmado/recebido → `ativa`; vencido → `em_atraso`. Conferir os nomes exatos dos eventos na documentação do Asaas.
 - Idempotência: cada evento é gravado em `eventos_asaas` pelo id; evento repetido é ignorado.
