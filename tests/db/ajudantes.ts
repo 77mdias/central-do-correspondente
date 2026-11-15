@@ -78,3 +78,14 @@ export async function criarCenario(): Promise<Cenario> {
     cliente1B: await criarCliente(contaB, "Cliente B", null),
   };
 }
+
+/** Roda uma consulta como `usuario`, sob RLS (o mesmo withUser do Worker). */
+export async function como(usuario: string, sql: string, params: unknown[] = []) {
+  const { withUser } = await import("../../worker/db");
+  return withUser(poolApp, usuario, (c) => c.query(sql, params));
+}
+
+/** Uma linha lida sem RLS (app_system). */
+export async function linha<T = Record<string, unknown>>(sql: string, params: unknown[] = []): Promise<T> {
+  return (await poolSystem.query(sql, params)).rows[0] as T;
+}
