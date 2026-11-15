@@ -28,9 +28,11 @@ Assinatura mensal recorrente no Asaas, por escritório:
 | Parte | Escolha |
 |---|---|
 | Front-end | React + Vite + TypeScript (SPA, PWA instalável) |
-| Hospedagem | Cloudflare Workers (assets estáticos + rotas `/api`) |
-| Banco e login | Supabase (Postgres + Auth + RLS + Realtime), região São Paulo |
-| Arquivos | Supabase Storage, bucket privado, links temporários |
+| API e hospedagem | Cloudflare Workers com Hono: serve a SPA e a API inteira (`/api`) |
+| Login | Better Auth (e-mail e senha) |
+| Banco | Postgres 18 com RLS e gatilhos; migrations com dbmate. Produção no Supabase (São Paulo) via Hyperdrive |
+| Arquivos | Supabase Storage (API S3), bucket privado, links temporários |
+| Desenvolvimento | Docker (Postgres, Mailpit, s3mock e o app); segredos no CriptEnv |
 | Rotinas agendadas | Cloudflare Cron Triggers |
 | Pagamento | Asaas (assinatura recorrente + webhook) |
 | WhatsApp | Link `wa.me` com mensagem pronta |
@@ -49,35 +51,40 @@ O motivo de cada escolha está em [docs/DECISOES.md](docs/DECISOES.md).
 | [docs/ARQUITETURA.md](docs/ARQUITETURA.md) | Componentes, segurança, rotinas, integrações, ambientes |
 | [docs/MODELO-DE-DADOS.md](docs/MODELO-DE-DADOS.md) | Tabelas, campos, gatilhos e regras de acesso (RLS) |
 
-## Estrutura do repositório (planejada)
+## Estrutura do repositório
 
 ```
 central-do-correspondente/
-├── src/                  # front-end React (telas, componentes, regras de exibição)
-│   ├── regras/           # funções puras das regras de negócio (testadas)
-│   ├── telas/
-│   └── lib/supabase.ts
-├── worker/               # Cloudflare Worker: /api, webhooks, cron
-├── supabase/
-│   ├── migrations/       # schema, gatilhos e políticas RLS
-│   └── tests/            # testes de RLS por perfil
-├── public/               # manifest e ícones do PWA
+├── src/                  # SPA React (telas, componentes)
+│   └── regras/           # funções puras e esquemas Zod, usados também pelo Worker
+├── worker/               # Cloudflare Worker (Hono): Better Auth, rotas /api
+├── db/migrations/        # schema, RLS e gatilhos (dbmate)
+├── tests/                # db (RLS, gatilhos), worker (rotas), e2e (Playwright)
+├── scripts/              # comandos (conta:liberar)
+├── docker/               # compose.sh e entrypoint com CriptEnv
 ├── docs/
 └── wrangler.jsonc
 ```
 
-## Rodando localmente (quando o código existir)
+## Rodando localmente
+
+Segredos e primeira configuração em [docs/SEGREDOS.md](docs/SEGREDOS.md).
 
 ```bash
 pnpm install
-supabase start            # Postgres, Auth e Storage locais
-pnpm dev                  # Vite + Worker local
-pnpm test                 # regras de negócio e RLS
+pnpm docker:up                               # Postgres, Mailpit, s3mock e o app em http://localhost:3002
+pnpm test                                    # regras (unidade)
+pnpm test:db                                 # RLS e gatilhos (precisa do Postgres do compose)
+pnpm test:worker                             # rotas da API
+pnpm test:e2e                                # ponta a ponta (Postgres e Mailpit do compose)
+pnpm conta:liberar <email|id> <AAAA-MM-DD>   # libera uma conta pendente
 ```
+
+E-mails locais: Mailpit em http://localhost:8028.
 
 ## Fases
 
-1. **Base:** login, contas, perfis, convites e banco com RLS.
+1. **Base:** login, cadastro aberto de escritório, contas, perfis, convites e banco com RLS.
 2. **Migração:** todas as telas do protótipo no banco novo, com anexos e importador do JSON do protótipo.
 3. **Portal do corretor e uso real:** acesso do corretor; teste com os 2 correspondentes atuais.
 4. **Venda:** assinatura Asaas, lembretes, relatórios e página de venda ligada ao cadastro.

@@ -43,7 +43,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-14 · Corretor em vários escritórios:** o mesmo e-mail pode estar ligado a várias contas; ao entrar, ele escolhe qual escritório ver. Cada escritório só enxerga os próprios dados.
 
-**D-15 · Acesso por convite:** gestor (ou funcionária, para corretores) cadastra a pessoa → o app envia um link por e-mail → a pessoa cria a própria senha. Todos entram com e-mail e senha, com recuperação de senha.
+**D-15 · Acesso por convite:** gestor (ou funcionária, para corretores) cadastra a pessoa → o app envia um link por e-mail (token só com o hash no banco, validade de 7 dias) → a pessoa cria a própria senha. Todos entram com e-mail e senha, com recuperação de senha.
 
 ## Regras de negócio
 
@@ -69,7 +69,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 ## Técnica
 
-**D-25 · Banco, login e arquivos:** Supabase (Postgres, Auth, Storage privado, Realtime), região São Paulo. Plano pago em produção (o gratuito pausa por inatividade e não tem backup diário).
+**D-25 · Banco e arquivos:** Postgres gerenciado e Storage privado no Supabase, região São Paulo, **só como hospedagem**: o login fica fora do Supabase (D-31) e não usamos o Realtime (D-32). Plano pago em produção (o gratuito pausa por inatividade e não tem backup diário). *Revista em 15/11/2026; antes incluía Supabase Auth e Realtime.*
 
 **D-26 · Hospedagem:** **Cloudflare Workers**, não Vercel (o plano gratuito da Vercel não permite uso comercial).
 
@@ -81,6 +81,16 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-30 · Troca de plano** (decidido em 14/11/2026): a troca vale **na hora** nos dois sentidos. Subir para Com corretores libera funcionária e corretores na hora; voltar para o Simples desativa os dois na hora (nada é apagado). O valor novo só entra **a partir da próxima fatura**, sem cobrar nem devolver diferença.
 
+**D-31 · Login com Better Auth** (15/11/2026, decisão do Jean): Better Auth 1.7.16, e-mail e senha com e-mail confirmado, no lugar do Supabase Auth. Sem o plugin `organization`: escritórios (`contas`), `membros` e `convites` são tabelas nossas, no padrão do AtelieSys.
+
+**D-32 · Worker como API inteira** (15/11/2026, decisão do Jean): o navegador só fala com `/api`. Toda rota de domínio roda como `app_user` com o usuário da sessão em `set_config`, e a RLS do Postgres decide. Sem Realtime: as listas atualizam ao voltar para a aba, depois de gravar e a cada 30 s (muda RNF-03).
+
+**D-33 · Cadastro aberto já na fase 1** (15/11/2026, decisão do Jean): tela "Criar escritório" com plano, CPF/CNPJ e aceite dos termos. A conta nasce `pendente` (somente leitura) até ser liberada com `pnpm conta:liberar`, enquanto não existem o Asaas e o painel do sistema.
+
+**D-34 · Dinheiro em centavos:** valores em `bigint` com sufixo `_centavos`, como no padrão dos projetos 77. Percentual continua `numeric(6,3)`; remuneração arredonda para centavos inteiros.
+
+**D-35 · Segredos no CriptEnv:** nenhum `.env` com valores no disco. No container de desenvolvimento os segredos chegam por `criptenv run`; testes e CI usam valores fixos de desenvolvimento. Ver [SEGREDOS.md](SEGREDOS.md).
+
 ---
 
 ## Pendências
@@ -90,10 +100,10 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 | P-01 | Nomes dos 12 documentos (8 do comprador, 4 do imóvel e vendedor) | Copiar do código do protótipo | Dev (precisa do código ou do JSON) |
 | P-02 | Confirmação de envio do WhatsApp | Ao voltar para o app, perguntar "Enviou?"; só registra a cobrança se a resposta for sim | Dev + William |
 | P-03 | Corretor vê o histórico do cliente? | Vê mudanças de etapa e anexos; não vê observações internas | William |
-| P-04 | Como a correspondente nova se cadastra | Página de venda → escolha do plano → cadastro do gestor → aceite dos termos → pagamento no Asaas → conta ativa | William |
+| P-04 | Como a correspondente nova se cadastra | Cadastro feito na fase 1 (D-33). Falta: página de venda → escolha do plano → cadastro → pagamento no Asaas → conta ativa | William |
 | P-05 | Formas de pagamento aceitas no Asaas | Cartão, Pix e boleto | William |
 | P-06 | Horário do lembrete diário | 8h (horário de Brasília) | William |
 | P-07 | Quantos dias antes de apagar anexos avisar | 5 dias | William |
-| P-08 | Provedor de e-mail (convites, recuperação de senha, lembretes) | SMTP próprio (ex.: Resend) configurado no Supabase | Dev |
+| P-08 | Provedor de e-mail (convites, recuperação de senha, lembretes) | Provedor com API HTTP (ex.: Resend), usado pelo Worker | Dev |
 | P-09 | Domínio do app | — | William |
 | P-10 | Acordo por escrito entre os sócios (código, receita, saída) | — | Sócios |
