@@ -48,7 +48,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RF-16 | Mudar a etapa entre as 10 etapas, com registro no histórico | Protótipo |
 | RF-17 | Anotar atualizações livres no histórico, **sem limite de entradas** | Alterado |
 | RF-18 | Excluir cliente com confirmação em dois cliques | Protótipo |
-| RF-19 | Validar CPF (dígitos verificadores), telefone brasileiro (10 ou 11 dígitos, com DDD) e e-mail | Novo |
+| RF-19 | Validar CPF e CNPJ (dígitos verificadores; CNPJ alfanumérico da IN RFB 2.229/2024 aceito), telefone brasileiro (10 ou 11 dígitos, com DDD) e e-mail | Novo |
 
 ### 1.4 Documentos
 
@@ -177,7 +177,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | Gerenciar assinatura | ✓ | — | — |
 | Receber lembrete diário | ✓ | ✓ | — |
 
-Com a conta suspensa (RN-16), todas as ações de escrita ficam bloqueadas para todos.
+Com a conta suspensa (RN-16), todas as ações de escrita ficam bloqueadas para todos, exceto **desativar o acesso** de alguém (só reduz acesso; decidido na revisão da fase 1).
 
 No plano Simples só existe o perfil G; as colunas F e C valem para o plano Com corretores (RN-18).
 
