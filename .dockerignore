@@ -1,0 +1,7 @@
+node_modules
+.git
+.superpowers
+.wrangler
+dist
+playwright-report
+test-results

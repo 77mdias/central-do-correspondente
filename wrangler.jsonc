@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "central-do-correspondente",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
+  // ids reais do Hyperdrive na fase 3 (deploy); no local a conexão vem de
+  // CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_<BINDING> (docs/SEGREDOS.md)
+  "hyperdrive": [
+    { "binding": "DB_APP", "id": "00000000000000000000000000000000" },
+    { "binding": "DB_SYSTEM", "id": "00000000000000000000000000000001" }
+  ],
+  "vars": {
+    "APP_URL": "http://localhost:3002",
+    "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>"
+  },
+  "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_URL"] }
+}

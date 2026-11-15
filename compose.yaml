@@ -1,0 +1,43 @@
+# Ambiente de desenvolvimento do Central do Correspondente.
+# Portas do host deslocadas (5435, 1028, 8028, 9093, 3002) para conviver com outros projetos locais.
+name: central-do-correspondente
+
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres # só desenvolvimento
+      POSTGRES_DB: central
+    ports:
+      - "127.0.0.1:5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d central"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "127.0.0.1:1028:1025"
+      - "127.0.0.1:8028:8025"
+
+  # Emulador da API S3 para os anexos (fase 2); em produção, Supabase Storage via S3.
+  s3:
+    image: adobe/s3mock:5.2.3
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: documentos
+      COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /home/cnb/s3
+      COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: "true"
+    ports:
+      - "127.0.0.1:9093:9090"
+    volumes:
+      - s3data:/home/cnb
+
+volumes:
+  pgdata:
+  s3data:

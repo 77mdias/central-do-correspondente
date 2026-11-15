@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.wrangler/
+.superpowers/
+playwright-report/
+test-results/
+*.tsbuildinfo
+# nunca segredos no disco (docs/SEGREDOS.md)
+.env*
+.dev.vars*
