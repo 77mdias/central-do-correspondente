@@ -1,10 +1,51 @@
 import { Hono } from "hono";
-import type { Env } from "./env";
+import { criarAuth } from "./auth";
+import type { AppTipos } from "./contexto";
+import { abrirPools } from "./db";
+import { criarEnvioMailpit, type Email, type EnviarEmail } from "./email";
+import { rotasCadastro } from "./rotas/cadastro";
+import { rotasConvites } from "./rotas/convites";
+import { rotasEquipe } from "./rotas/equipe";
+import { rotasEu } from "./rotas/eu";
 
-export type AppTipos = { Bindings: Env };
-
-export function criarApp() {
+export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   const app = new Hono<AppTipos>();
+
   app.get("/api/saude", (c) => c.json({ ok: true }));
+
+  // Por pedido: conexões, Better Auth, envio de e-mail (depois da resposta) e a sessão.
+  app.use("/api/*", async (c, next) => {
+    const pools = abrirPools(c.env);
+    const enviarEmail = deps.enviarEmail ?? criarEnvioMailpit(c.env.EMAIL_API_URL, c.env.EMAIL_REMETENTE);
+    const enviar = (e: Email) =>
+      c.executionCtx.waitUntil(enviarEmail(e).catch((err) => console.error("e-mail não enviado", e.assunto, err)));
+    const auth = criarAuth(c.env, pools.system, enviar);
+    c.set("pools", pools);
+    c.set("enviar", enviar);
+    c.set("auth", auth);
+    try {
+      if (c.req.path.startsWith("/api/auth/")) {
+        c.set("usuario", null);
+      } else {
+        const s = await auth.api.getSession({ headers: c.req.raw.headers });
+        c.set("usuario", s ? { id: s.user.id, email: s.user.email, nome: s.user.name } : null);
+      }
+      await next();
+    } finally {
+      c.executionCtx.waitUntil(pools.fechar());
+    }
+  });
+
+  app.on(["GET", "POST"], "/api/auth/*", (c) => c.var.auth.handler(c.req.raw));
+  app.route("/api", rotasCadastro);
+  app.route("/api", rotasEu);
+  app.route("/api", rotasEquipe);
+  app.route("/api", rotasConvites);
+
+  app.onError((err, c) => {
+    console.error(err);
+    return c.json({ erro: "interno" }, 500);
+  });
+
   return app;
 }
