@@ -21,17 +21,20 @@
     "conta:liberar": "tsx scripts/conta-liberar.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "5.107.1",
     "better-auth": "1.7.16",
     "hono": "4.13.18",
     "pg": "8.23.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "react-router": "7.18.5",
     "zod": "4.6.7"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.69.1",
     "@cloudflare/workers-types": "5.20261115.1",
     "@eslint/js": "9.39.5",
+    "@playwright/test": "1.64.0",
     "@tailwindcss/vite": "4.3.5",
     "@types/node": "24.19.2",
     "@types/pg": "8.23.1",
