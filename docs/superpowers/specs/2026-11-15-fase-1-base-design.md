@@ -1,6 +1,6 @@
 # Fase 1 — Base: design
 
-Central do Correspondente · 15/11/2026 · status: **aguardando aprovação do Jean**
+Central do Correspondente · 15/11/2026 · status: **aprovado pelo Jean em 15/11/2026**
 
 Este documento manda sobre os outros de `docs/` onde eles divergem; a atualização deles faz parte da fase (seção 10).
 
@@ -78,7 +78,7 @@ A fase 1 monta o chão das fases 2 a 4: escritórios isolados, perfis, convites 
 └───────────────────────────────────────┘
 ```
 
-O cadastro é uma rota nossa, `POST /api/cadastro`. Ela cria a credencial pela API interna do Better Auth e, como `app_system`, cria a conta e o gestor. O `createOrganization` do plugin fica desligado para o navegador (seção 7.4), para ninguém criar escritório sem CPF/CNPJ e sem termos.
+O cadastro é uma rota nossa, `POST /api/cadastro`. Ela cria a credencial pela API interna do Better Auth e, como `app_system`, cria a conta e o gestor. Escritório só nasce por essa rota, para ninguém criar escritório sem CPF/CNPJ e sem termos.
 
 Se a criação da conta falhar depois que o usuário já existe, quem entra sem escritório cai de novo na tela de criar escritório, só com a parte do escritório. Nenhum usuário fica preso sem saída.
 
@@ -140,19 +140,20 @@ São três papéis no Postgres, como no AtelieSys:
 
 ### 7.4 Better Auth
 
-- Versão exata **1.7.16** (a mesma do AtelieSys), com o plugin `organization`:
-  - perfis próprios `gestor`, `funcionaria` e `corretor`; quem cria o escritório entra como `gestor`;
-  - escritório = `contas`, membro = `membros`, convite = `convites`;
-  - campos extras:
-    - `contas`: `plano`, `status_assinatura`, `ativa_ate`, `documento_titular` etc.;
-    - `membros`: `corretor_id` e `status` (`ativo` / `desativado`);
-    - usuário: `termos_versao`, `termos_aceitos_em`, `admin_sistema`.
-- **O navegador só usa do Better Auth o que é sessão:** cadastro de credencial, entrar, sair, confirmar e-mail, recuperar senha, aceitar convite e trocar o escritório ativo. Os outros endpoints do plugin ficam **desligados**: eles rodam como `app_system`, por fora da RLS, e devolveriam a funcionária e ao corretor tudo o que estiver em `contas` (*o builder confere na 1.7.16 a opção de desligar rotas*). Ler escritório e membros, convidar, reenviar, cancelar convite e desativar viram rotas nossas, sob `withUser` e RLS. No servidor, essas rotas podem chamar a API interna do Better Auth para criar convites.
-- **Desativar acesso** grava `membros.status = 'desativado'` e não apaga a linha (RF-65). O plugin não conhece esse status, mas `meu_perfil` só vale para membro ativo, então a sessão de um desativado não abre dado nenhum.
-- **Campos que só o sistema grava** (`plano`, `status_assinatura`, `ativa_ate`, `admin_sistema`) ficam marcados como não editáveis pelo cliente. O endpoint de atualizar escritório do plugin **não pode** deixar o gestor mudar o próprio plano ou o "ativa até". Isso tem teste.
-- **Limites do plano (RN-18):** nossa rota de convite recusa com mensagem clara, e a garantia de verdade fica no banco: índices únicos parciais e o gatilho `tg_limite_plano`. **Convite pendente de funcionária conta no limite**, para que dois convites não virem duas funcionárias. Conta pendente ou suspensa não convida, porque convidar é gravar.
-- **Tabelas do Better Auth:** criadas por migration do dbmate, com o SQL gerado pela CLI do Better Auth e versionado. É uma fonte de verdade só. Ids `uuid`.
-- **Nomes em português**, mapeados pelas opções de nome de tabela e de campo do Better Auth: `usuarios`, `sessoes`, `credenciais`, `verificacoes`, `contas`, `membros`, `convites`. *Fica com o builder:* se o mapeamento brigar com o plugin, usar os nomes padrão nas tabelas do Better Auth e registrar a escolha em DECISOES.
+*Revisto em 15/11/2026, ao planejar: sai o plugin `organization`.* Com a regra de que o navegador só usa a sessão, o plugin sobraria quase todo desligado e ainda exigiria mapear tabelas e travar campos. O AtelieSys já resolve equipe e convites com tabelas próprias sobre o Better Auth 1.7.16, e este projeto segue esse padrão.
+
+- Versão exata **1.7.16**, com a mesma configuração de e-mail e senha do AtelieSys:
+  - e-mail confirmado obrigatório, sem login automático ao confirmar;
+  - aviso para quem tenta se cadastrar com e-mail que já tem conta (`onExistingUserSignUp`);
+  - limite de tentativas guardado no banco;
+  - uuid como id.
+- **Tabelas do Better Auth com os nomes padrão** (`user`, `session`, `account`, `verification`, `rateLimit`), como no AtelieSys. O usuário ganha os campos `termosVersao`, `termosAceitosEm` e `adminSistema` (`input: false`). Só o nosso código grava esses campos, como `app_system`.
+- **`contas`, `membros` e `convites` são tabelas nossas** (seção 8), lidas e gravadas só pelas nossas rotas, sob `withUser` e RLS. A exceção é o código de sistema (cadastro e aceite de convite), que roda como `app_system` com a conta explícita.
+- **Escritório ativo:** vem na URL (`/api/contas/:contaId/...`) e o navegador guarda o último usado. Quem barra é a RLS por `membros`: trocar o id na URL não abre nada.
+- **Convite:** o token vai no link e o banco guarda só o hash, com validade de 7 dias. Quem entra pelo convite tem o e-mail confirmado pelo próprio link, como no AtelieSys. O aceite é uma função do banco, `aceitar_convite`, que confere validade e e-mail e cria o membro.
+- **Desativar acesso** grava `membros.status = 'desativado'` e não apaga a linha (RF-65). `meu_perfil` só vale para membro ativo, então a sessão de um desativado não abre dado nenhum.
+- **Limites do plano (RN-18):** nossa rota de convite recusa com mensagem clara, e a garantia de verdade fica no banco: índices únicos parciais, `tg_limite_plano` em `membros` e a checagem no insert de `convites`. **Convite pendente de funcionária conta no limite**, para que dois convites não virem duas funcionárias. Conta pendente ou suspensa não convida, porque convidar é gravar.
+- **Campos que só o sistema grava** (`plano`, `status_assinatura`, `ativa_ate`, `adminSistema`): `app_user` não tem permissão de update neles. Isso tem teste.
 
 ### 7.5 E-mail
 
@@ -193,10 +194,10 @@ O container aplica as migrations ao subir. As portas são deslocadas para não b
 
 - **Dinheiro em centavos** (`bigint`), no padrão do Jean: `valor_imovel`, `valor_financiado`, `valor_avaliacao`, `entrada`, `fgts`, `subsidio`. O driver devolve `bigint` como texto; o código converte para `number` (os valores ficam bem abaixo de 2^53).
 - **Percentual** continua `numeric(6,3)`. RN-09 fica: remuneração = `round(valor_financiado_centavos × percentual ÷ 100)`, em centavos inteiros, arredondando meio para cima.
-- **`usuarios`** passa a ser a tabela de usuário do Better Auth com os campos extras. Saem a ligação com `auth.users` e o gatilho `tg_novo_usuario`.
-- **Convites** vivem na tabela do Better Auth. O status `convidado` sai de `status_membro`: convite pendente é uma linha em `convites`, e `membros.status` é `ativo` ou `desativado`.
+- **`usuarios`** passa a ser a tabela `"user"` do Better Auth (nome padrão) com os campos extras. Saem a ligação com `auth.users` e o gatilho `tg_novo_usuario`.
+- **`convites`** é tabela nova: `conta_id`, `email`, `perfil` (funcionária ou corretor), `corretor_id`, `token_hash`, `expira_em`, `aceito_em`, `revogado_em`, `convidado_por`. O status `convidado` sai de `status_membro`: convite pendente é uma linha em `convites`, e `membros.status` é `ativo` ou `desativado`.
 - **`percentual_atual` sai de `contas`** e vai para `contas_config (conta_id, percentual_atual)`, com RLS só do gestor. `contas` fica legível por todo membro ativo e não guarda nada de receita.
-- `contas` e `membros` são as tabelas do plugin com os campos extras do modelo. Valem as mesmas restrições: único `(conta_id, usuario_id)`, um gestor e uma funcionária ativos, `check` do corretor e `tg_limite_plano`.
+- `contas` e `membros` seguem o modelo, com `membros.usuario_id` apontando para `"user".id` do Better Auth. Valem as mesmas restrições: único `(conta_id, usuario_id)`, um gestor e uma funcionária ativos, `check` do corretor e `tg_limite_plano`.
 - O resto do modelo (`clientes`, `clientes_remuneracao`, `documentos`, `tipos_documento`, `arquivos`, `historico`, `historico_percentual`, `auditoria`, `push_inscricoes`, `eventos_asaas`, views) entra como está. `tipos_documento` nasce vazia até a P-01.
 
 ## 9. Testes e CI
@@ -232,7 +233,6 @@ O container aplica as migrations ao subir. As portas são deslocadas para não b
 - Usar Hono, que é o que a documentação do Better Auth mostra para Workers, e Drizzle só para consultas, com migrations no dbmate, como no AtelieSys.
 - O driver Postgres no Worker e a configuração local do Hyperdrive.
 - A ferramenta dos testes de rota: o pool de Workers do Vitest ou `app.request` contra o banco de teste.
-- O mapeamento de nomes do Better Auth (seção 7.4).
 - A ordem das tarefas e a divisão em PRs, um por assunto, como o Jean prefere.
 
 ## 12. Escolhas minhas para o Jean conferir
@@ -245,7 +245,7 @@ O container aplica as migrations ao subir. As portas são deslocadas para não b
 6. Tailwind + shadcn; visual do protótipo na fase 2 (seção 7.7).
 7. Atualização a cada 30 s no lugar do tempo real (seção 7.6).
 8. Dinheiro em centavos (seção 8).
-9. No Better Auth, o navegador só usa a sessão. Equipe e convites são rotas nossas sob RLS, e os outros endpoints do plugin ficam desligados (seção 7.4).
+9. Sem o plugin `organization`: o Better Auth cuida só do login; escritórios, membros e convites são tabelas e rotas nossas sob RLS, no padrão do AtelieSys (seção 7.4).
 10. Desativar acesso marca o membro como desativado e não apaga a linha (seção 7.4).
 11. `percentual_atual` vai para `contas_config`, só do gestor (seção 8).
 12. Convite pendente de funcionária conta no limite do plano (seção 7.4).
