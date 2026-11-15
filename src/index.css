@@ -1,1 +1,70 @@
 @import "tailwindcss";
+
+/* Tokens claro e escuro (RNF-02). Componentes usam só estes tokens, nada de cor solta. */
+:root {
+  color-scheme: light;
+  --fundo: oklch(0.985 0.004 240);
+  --superficie: oklch(1 0 0);
+  --texto: oklch(0.23 0.02 250);
+  --texto-2: oklch(0.45 0.02 250);
+  --borda: oklch(0.9 0.01 250);
+  --marca: oklch(0.47 0.12 200);
+  --marca-forte: oklch(0.4 0.12 200);
+  --marca-texto: oklch(0.99 0 0);
+  --foco: oklch(0.6 0.15 200);
+  --perigo: oklch(0.52 0.2 27);
+  --aviso-fundo: oklch(0.95 0.06 85);
+  --aviso-texto: oklch(0.38 0.09 65);
+  --ok-fundo: oklch(0.95 0.05 155);
+  --ok-texto: oklch(0.36 0.09 155);
+  --raio: 0.6rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --fundo: oklch(0.18 0.01 250);
+    --superficie: oklch(0.23 0.012 250);
+    --texto: oklch(0.94 0.005 250);
+    --texto-2: oklch(0.75 0.01 250);
+    --borda: oklch(0.34 0.012 250);
+    --marca: oklch(0.72 0.11 200);
+    --marca-forte: oklch(0.8 0.1 200);
+    --marca-texto: oklch(0.18 0.02 250);
+    --foco: oklch(0.78 0.12 200);
+    --perigo: oklch(0.7 0.17 27);
+    --aviso-fundo: oklch(0.33 0.06 75);
+    --aviso-texto: oklch(0.92 0.06 85);
+    --ok-fundo: oklch(0.3 0.05 155);
+    --ok-texto: oklch(0.9 0.06 155);
+  }
+}
+
+@theme inline {
+  --color-fundo: var(--fundo);
+  --color-superficie: var(--superficie);
+  --color-texto: var(--texto);
+  --color-texto-2: var(--texto-2);
+  --color-borda: var(--borda);
+  --color-marca: var(--marca);
+  --color-marca-forte: var(--marca-forte);
+  --color-marca-texto: var(--marca-texto);
+  --color-foco: var(--foco);
+  --color-perigo: var(--perigo);
+  --color-aviso-fundo: var(--aviso-fundo);
+  --color-aviso-texto: var(--aviso-texto);
+  --color-ok-fundo: var(--ok-fundo);
+  --color-ok-texto: var(--ok-texto);
+  --radius-md: var(--raio);
+}
+
+body {
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}
