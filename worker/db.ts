@@ -1,4 +1,18 @@
-import type { Pool, PoolClient } from "pg";
+import pg, { type Pool, type PoolClient } from "pg";
+import type { Env } from "./env";
+
+// shortcut: bigint vira number; seguro até 2^53 (valores em centavos), revisar se somas passarem disso
+pg.types.setTypeParser(20, Number);
+
+export type Pools = { app: Pool; system: Pool; fechar(): Promise<void> };
+
+/** Conexões do pedido (o Hyperdrive guarda o pool de verdade; no Worker, I/O não passa de um pedido para outro). */
+export function abrirPools(env: Pick<Env, "DB_APP" | "DB_SYSTEM">): Pools {
+  const app = new pg.Pool({ connectionString: env.DB_APP.connectionString, max: 1 });
+  // o Better Auth segura uma conexão em transação enquanto chama os ganchos (ex.: e-mail), que consultam de novo
+  const system = new pg.Pool({ connectionString: env.DB_SYSTEM.connectionString, max: 3 });
+  return { app, system, fechar: async () => void (await Promise.all([app.end(), system.end()])) };
+}
 
 /**
  * Roda `fn` numa transação em que as políticas de RLS enxergam `usuarioId` (vem sempre da sessão).
