@@ -26,7 +26,7 @@ export function criarUsuario(email: string, nome = email): Promise<string> {
 export function criarConta(plano: "simples" | "com_corretores", status = "ativa"): Promise<string> {
   return um(
     `with c as (insert into contas (nome_escritorio, documento_titular, plano, status_assinatura)
-                values ('Escritório ' || $1, '12345678909', $1::plano, $2::status_assinatura) returning id)
+                values ('Escritório ' || $1::text, '12345678909', $1::text::plano, $2::text::status_assinatura) returning id)
      insert into contas_config (conta_id, percentual_atual) select id, 1.5 from c returning conta_id as id`,
     [plano, status],
   );
@@ -61,9 +61,18 @@ export async function criarCenario(): Promise<Cenario> {
   await criarMembro(contaA, c2A, "corretor", corretor2A);
   await criarMembro(contaB, gB, "gestor");
   await criarMembro(contaSimples, gS, "gestor");
+  const cliente1A = await criarCliente(contaA, "Cliente Um", corretor1A);
+  // um registro de cada tabela ligada ao cliente, para os testes de leitura não passarem com tabela vazia
+  await poolSystem.query(`insert into tipos_documento (codigo, nome, grupo, ordem) values ('rg', 'RG', 'comprador', 1)`);
+  await poolSystem.query(`insert into documentos (conta_id, cliente_id, tipo) values ($1, $2, 'rg')`, [contaA, cliente1A]);
+  await poolSystem.query(
+    `insert into arquivos (conta_id, cliente_id, nome, caminho, tamanho, mime) values ($1, $2, 'x.pdf', $3, 10, 'application/pdf')`,
+    [contaA, cliente1A, `${contaA}/${cliente1A}/x.pdf`],
+  );
+  await poolSystem.query(`insert into historico (conta_id, cliente_id, tipo, texto) values ($1, $2, 'nota', 'nota inicial')`, [contaA, cliente1A]);
+  await poolSystem.query(`insert into auditoria (conta_id, acao, entidade) values ($1, 'ver', 'cliente')`, [contaA]);
   return {
-    contaA, contaB, contaSimples, gA, fA, c1A, c2A, gB, gS, corretor1A, corretor2A,
-    cliente1A: await criarCliente(contaA, "Cliente Um", corretor1A),
+    contaA, contaB, contaSimples, gA, fA, c1A, c2A, gB, gS, corretor1A, corretor2A, cliente1A,
     cliente2A: await criarCliente(contaA, "Cliente Dois", corretor2A),
     clienteDiretoA: await criarCliente(contaA, "Cliente Direto", null),
     cliente1B: await criarCliente(contaB, "Cliente B", null),
