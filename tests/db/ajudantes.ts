@@ -48,7 +48,7 @@ export async function criarCliente(conta: string, nome: string, corretor: string
 
 /** Apaga tudo (como dono) e monta: conta A (com corretores, completa), conta B (só gestor) e conta Simples. */
 export async function criarCenario(): Promise<Cenario> {
-  await poolOwner.query(`truncate "user", contas, tipos_documento restart identity cascade`);
+  await poolOwner.query(`truncate "user", "rateLimit", contas, tipos_documento restart identity cascade`);
   const [contaA, contaB, contaSimples] = [await criarConta("com_corretores"), await criarConta("com_corretores"), await criarConta("simples")];
   const [gA, fA, c1A, c2A, gB, gS] = await Promise.all(
     ["ga@a.com", "fa@a.com", "c1@a.com", "c2@a.com", "gb@b.com", "gs@s.com"].map((e) => criarUsuario(e, e.split("@")[0])),

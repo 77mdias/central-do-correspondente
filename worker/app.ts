@@ -4,6 +4,8 @@ import type { AppTipos } from "./contexto";
 import { abrirPools } from "./db";
 import { criarEnvioMailpit, type Email, type EnviarEmail } from "./email";
 import { rotasCadastro } from "./rotas/cadastro";
+import { rotasConvites } from "./rotas/convites";
+import { rotasEquipe } from "./rotas/equipe";
 import { rotasEu } from "./rotas/eu";
 
 export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
@@ -37,6 +39,8 @@ export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   app.on(["GET", "POST"], "/api/auth/*", (c) => c.var.auth.handler(c.req.raw));
   app.route("/api", rotasCadastro);
   app.route("/api", rotasEu);
+  app.route("/api", rotasEquipe);
+  app.route("/api", rotasConvites);
 
   app.onError((err, c) => {
     console.error(err);

@@ -44,3 +44,24 @@ export async function entrar(req: ReturnType<typeof appDeTeste>["req"], email: s
   if (r.status !== 200) throw new Error(`login falhou: ${r.status} ${await r.text()}`);
   return r.headers.getSetCookie().map((c) => c.split(";")[0]).join("; ");
 }
+
+type Req = ReturnType<typeof appDeTeste>["req"];
+
+/** Gestora com senha, sessão e um escritório (liberado, salvo `ativa: false`). */
+export async function gestorComEscritorio(req: Req, plano: "simples" | "com_corretores" = "com_corretores", { ativa = true } = {}) {
+  const email = `g-${Math.random().toString(36).slice(2, 10)}@x.com`;
+  const usuarioId = await criarUsuarioVerificado(email, "senha-forte-1", "Gestora");
+  const cookie = await entrar(req, email, "senha-forte-1");
+  const r = await req("/api/cadastro", {
+    body: { nomeEscritorio: "Escritório Teste", documento: "123.456.789-09", plano, aceitouTermos: true },
+    cookie,
+  });
+  const { contaId } = (await r.json()) as { contaId: string };
+  if (ativa) await poolSystem.query("update contas set ativa_ate = '2099-12-31' where id = $1", [contaId]);
+  return { cookie, contaId, usuarioId, email };
+}
+
+export const tokenDoEmail = (e: Email | undefined) => /\/convite\/([A-Za-z0-9_-]+)/.exec(e?.texto ?? "")?.[1] ?? "";
+
+/** Cookie de sessão de uma resposta. */
+export const cookieDe = (r: Response) => r.headers.getSetCookie().map((c) => c.split(";")[0]).join("; ");

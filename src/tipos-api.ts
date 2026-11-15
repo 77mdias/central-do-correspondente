@@ -13,3 +13,13 @@ export type EscritorioResumo = {
 };
 
 export type Eu = { usuario: { id: string; nome: string; email: string }; escritorios: EscritorioResumo[] };
+
+export type Equipe = {
+  membros: { id: string; nome: string; email: string; perfil: Perfil; status: "ativo" | "desativado" }[];
+  convites: { id: string; email: string; perfil: Exclude<Perfil, "gestor">; expiraEm: string }[];
+};
+
+/** Convite visto pelo link. Fechado ou desconhecido não revela nada. */
+export type ConvitePublico =
+  | { estado: "invalido" }
+  | { estado: "aberto"; nomeEscritorio: string; email: string; perfil: Exclude<Perfil, "gestor">; temConta: boolean };

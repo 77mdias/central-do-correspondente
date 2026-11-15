@@ -33,3 +33,16 @@ export async function withUser<T>(pool: Pool, usuarioId: string, fn: (c: PoolCli
     c.release();
   }
 }
+
+const ERROS_409 = ["limite_plano", "limite_funcionaria", "ja_membro", "convite_invalido", "convite_email_diferente"] as const;
+export type ErroConhecido = (typeof ERROS_409)[number] | "sem_permissao";
+
+/** Erro do banco que vira resposta: regra de negócio (409) ou RLS (403). Outros: null (sobe como 500). */
+export function erroDoBanco(e: unknown): { status: 403 | 409; erro: ErroConhecido } | null {
+  const { code, message = "", constraint } = (e ?? {}) as { code?: string; message?: string; constraint?: string };
+  const regra = ERROS_409.find((x) => message === x);
+  if (regra) return { status: 409, erro: regra };
+  if (code === "23505" && constraint === "membros_uma_funcionaria") return { status: 409, erro: "limite_funcionaria" };
+  if (code === "42501" || message.includes("row-level security")) return { status: 403, erro: "sem_permissao" };
+  return null;
+}
