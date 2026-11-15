@@ -18,7 +18,8 @@
     "docker:down": "sh docker/compose.sh down",
     "docker:exec": "sh docker/compose.sh exec app entrypoint.sh",
     "docker:logs": "sh docker/compose.sh logs -f app",
-    "conta:liberar": "tsx scripts/conta-liberar.ts"
+    "conta:liberar": "tsx scripts/conta-liberar.ts",
+    "test:e2e": "playwright test --trace off"
   },
   "dependencies": {
     "@tanstack/react-query": "5.107.1",
