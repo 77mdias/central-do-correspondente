@@ -2,14 +2,16 @@
 
 Central do Correspondente · versão 0.1 · 13/11/2026
 
-Postgres (Supabase). Nomes em português, `snake_case`. Valores em `numeric(14,2)`, percentuais em `numeric(6,3)`, datas de negócio em `date`, momentos em `timestamptz`. Todo id é `uuid` (exceto onde indicado).
+Postgres 18 (local em container; produção no Supabase, só como hospedagem). Migrations em `db/migrations` (dbmate). Nomes em português, `snake_case`, exceto as tabelas do Better Auth (nomes padrão dele). Dinheiro em centavos, `bigint` com sufixo `_centavos` (D-34), percentuais em `numeric(6,3)`, datas de negócio em `date`, momentos em `timestamptz`. Todo id é `uuid` (exceto onde indicado).
 
 ## 1. Diagrama
 
 ```mermaid
 erDiagram
     contas ||--o{ membros : tem
-    usuarios ||--o{ membros : participa
+    user ||--o{ membros : participa
+    contas ||--o{ convites : envia
+    contas ||--|| contas_config : "só gestor"
     contas ||--o{ corretores : cadastra
     corretores ||--o| membros : "acesso do corretor"
     contas ||--o{ clientes : tem
@@ -20,7 +22,7 @@ erDiagram
     clientes ||--o{ historico : registra
     contas ||--o{ historico_percentual : "só gestor"
     contas ||--o{ auditoria : registra
-    usuarios ||--o{ push_inscricoes : aparelhos
+    user ||--o{ push_inscricoes : aparelhos
 ```
 
 ## 2. Tipos
@@ -28,7 +30,7 @@ erDiagram
 ```sql
 create type perfil as enum ('gestor', 'funcionaria', 'corretor');
 create type plano as enum ('simples', 'com_corretores');
-create type status_membro as enum ('convidado', 'ativo', 'desativado');
+create type status_membro as enum ('ativo', 'desativado');  -- convite pendente é uma linha em convites
 create type status_assinatura as enum ('pendente', 'ativa', 'em_atraso', 'suspensa', 'cancelada');
 create type modalidade as enum ('mcmv', 'sbpe', 'pro_cotista', 'outra');
 create type etapa as enum (
@@ -47,9 +49,8 @@ create type acao_auditoria as enum ('ver', 'criar', 'alterar', 'excluir', 'baixa
 |---|---|---|
 | id | uuid pk | |
 | nome_escritorio | text not null | |
-| documento_titular | text | CPF ou CNPJ para o Asaas |
+| documento_titular | text not null | CPF ou CNPJ (só dígitos), pedido no cadastro; o Asaas exige |
 | plano | plano not null | `simples` (R$ 99) ou `com_corretores` (R$ 149). Muda só pelo Worker |
-| percentual_atual | numeric(6,3) | 0 a 100. **Leitura só do gestor** (ver nota em RLS) |
 | status_assinatura | status_assinatura | default `pendente` |
 | ativa_ate | date | cortesia manual |
 | vencimento_em_aberto | date | preenchido pelo webhook quando atrasa |
@@ -58,38 +59,61 @@ create type acao_auditoria as enum ('ver', 'criar', 'alterar', 'excluir', 'baixa
 | importado_prototipo_em | timestamptz | impede importar duas vezes |
 | criado_em | timestamptz default now() | |
 
-> O percentual atual pode ir para uma tabela própria (`contas_config`) para facilitar a RLS só do gestor. Decidir na fase 1.
+`plano`, `status_assinatura` e `ativa_ate` não têm permissão de update para `app_user`: só o comando `conta:liberar`, o webhook e as rotinas do sistema mudam esses campos.
 
-### usuarios
-Espelho de `auth.users`, criado por gatilho.
+### contas_config (só gestor)
 | Campo | Tipo | Nota |
 |---|---|---|
-| id | uuid pk → auth.users | |
-| nome | text | |
-| email | text | |
-| termos_versao | text | |
-| termos_aceitos_em | timestamptz | |
-| admin_sistema | boolean default false | painel do sistema |
-| criado_em | timestamptz | |
+| conta_id | uuid pk → contas | |
+| percentual_atual | numeric(6,3) not null default 0 | 0 a 100 |
+
+Separada de `contas` para que `contas` seja legível por todo membro ativo sem expor receita.
+
+### user (Better Auth)
+Tabela de usuário do Better Auth 1.7.16 (nome padrão, colunas em camelCase), junto com `session`, `account`, `verification` e `rateLimit`, todas geradas pela CLI do Better Auth e versionadas como migration. Acesso só por `app_system`. Campos extras (`input: false`, gravados só pelo nosso código):
+| Campo | Tipo | Nota |
+|---|---|---|
+| id | uuid pk | |
+| name, email, emailVerified, … | | padrão do Better Auth |
+| termosVersao | text | versão aceita (`rascunho-1` na fase 1) |
+| termosAceitosEm | timestamptz | |
+| adminSistema | boolean default false | painel do sistema |
 
 ### membros
 | Campo | Tipo | Nota |
 |---|---|---|
 | id | uuid pk | |
 | conta_id | uuid → contas | |
-| usuario_id | uuid → usuarios | |
+| usuario_id | uuid → "user" | |
 | perfil | perfil | |
 | corretor_id | uuid → corretores null | obrigatório se perfil = corretor |
-| status | status_membro | |
-| convidado_por | uuid → usuarios | |
+| status | status_membro default 'ativo' | |
+| convidado_por | uuid → "user" | |
 | criado_em | timestamptz | |
 
 Restrições:
 - `unique (conta_id, usuario_id)`
-- índice único parcial `(conta_id) where perfil = 'gestor' and status <> 'desativado'`
+- índice único parcial `(conta_id) where perfil = 'gestor' and status = 'ativo'`
 - idem para `'funcionaria'`
 - `check (perfil <> 'corretor' or corretor_id is not null)`
 - gatilho `tg_limite_plano`: em conta `simples`, só aceita o perfil `gestor` (RN-18)
+
+### convites
+| Campo | Tipo | Nota |
+|---|---|---|
+| id | uuid pk | |
+| conta_id | uuid → contas | |
+| email | text | sempre em minúsculas (`check (email = lower(email))`) |
+| perfil | perfil | `funcionaria` ou `corretor` (`check (perfil <> 'gestor')`) |
+| corretor_id | uuid → corretores null | obrigatório se perfil = corretor |
+| token_hash | text unique not null | sha-256 do token do link; o token não fica no banco |
+| expira_em | timestamptz | 7 dias após criar ou reenviar |
+| aceito_em | timestamptz | |
+| revogado_em | timestamptz | |
+| convidado_por | uuid → "user" | |
+| criado_em | timestamptz | |
+
+Gatilho `tg_limite_convite` (RN-18): em conta `simples` recusa qualquer convite; convite de funcionária é recusado se já houver funcionária ativa ou convite de funcionária aberto. Aceite pela função `aceitar_convite(token_hash, usuario_id)` (só `app_system`), que confere validade e e-mail e cria (ou reativa) o membro.
 
 ### corretores
 | Campo | Tipo |
@@ -115,12 +139,12 @@ Restrições:
 | email | text | validado |
 | modalidade | modalidade | |
 | etapa | etapa | default `documentacao_pendente` (RF-11) |
-| valor_imovel | numeric(14,2) | |
-| valor_financiado | numeric(14,2) | |
-| valor_avaliacao | numeric(14,2) | |
-| entrada | numeric(14,2) | |
-| fgts | numeric(14,2) | |
-| subsidio | numeric(14,2) | |
+| valor_imovel_centavos | bigint | |
+| valor_financiado_centavos | bigint | |
+| valor_avaliacao_centavos | bigint | |
+| entrada_centavos | bigint | |
+| fgts_centavos | bigint | |
+| subsidio_centavos | bigint | |
 | numero_contrato | text | |
 | data_assinatura | date | |
 | proxima_cobranca | date | default hoje |
@@ -151,7 +175,7 @@ Restrições:
 | conta_id, cliente_id | uuid | |
 | tipo | text | código de um dos 12 (pendência P-01) |
 | recebido_em | date null | null = pendente |
-| marcado_por | uuid → usuarios | |
+| marcado_por | uuid → "user" | |
 
 `unique (cliente_id, tipo)`. Os 12 tipos ficam numa tabela fixa `tipos_documento (codigo, nome, grupo, ordem)` para a lista ser igual em todo lugar.
 
@@ -165,7 +189,7 @@ Restrições:
 | caminho | text | `conta_id/cliente_id/id.ext` |
 | tamanho | integer | bytes |
 | mime | text | |
-| enviado_por | uuid → usuarios | |
+| enviado_por | uuid → "user" | |
 | enviado_em | timestamptz | |
 | apagado_em | timestamptz | RN-14 |
 
@@ -174,7 +198,7 @@ Restrições:
 |---|---|
 | id | uuid pk |
 | conta_id, cliente_id | uuid |
-| usuario_id | uuid → usuarios (null = sistema) |
+| usuario_id | uuid → "user" (null = sistema) |
 | tipo | tipo_historico |
 | texto | text |
 | criado_em | timestamptz |
@@ -224,6 +248,8 @@ Sem limite de entradas (D-20). Visibilidade para o corretor conforme P-03 (filtr
 ## 4. Funções auxiliares (security definer)
 
 ```sql
+-- usuário da transação: set_config('app.usuario_id', <id da sessão>, true), feito pelo withUser do Worker
+meu_usuario_id() returns uuid  -- nullif(current_setting('app.usuario_id', true), '')::uuid
 -- perfil do usuário logado na conta (null se não for membro ativo)
 meu_perfil(conta uuid) returns perfil
 -- corretor_id do usuário logado na conta (null se não for corretor)
@@ -238,8 +264,10 @@ hoje_br() returns date  -- (now() at time zone 'America/Sao_Paulo')::date
 
 | Tabela | Ler | Gravar |
 |---|---|---|
-| contas | membro ativo (campos de receita só gestor) | gestor (nome); status e plano só pelo Worker |
-| membros | gestor e funcionária da conta; o próprio usuário | só pelo Worker (convites) |
+| contas | membro ativo | gestor (só `nome_escritorio`); plano, status e `ativa_ate` só pelo sistema |
+| contas_config | gestor | gestor + `conta_ativa` |
+| membros | gestor e funcionária da conta; o próprio usuário | update de `status`: gestor desativa F e C, funcionária desativa C, ninguém desativa gestor; insert só por `aceitar_convite` e pelo cadastro |
+| convites | gestor e funcionária (sem `token_hash`) | gestor convida F e C, funcionária convida C, + `conta_ativa` |
 | corretores | gestor, funcionária | gestor, funcionária + `conta_ativa` |
 | clientes | gestor, funcionária; corretor onde `corretor_id = meu_corretor_id` | gestor, funcionária + `conta_ativa` |
 | clientes_remuneracao | gestor | gestor + `conta_ativa` |
@@ -259,12 +287,12 @@ Storage (`documentos`): inserir quando o primeiro segmento do caminho é uma con
 |---|---|---|
 | `tg_atualizado_em` | clientes, documentos, arquivos, historico | Atualiza `clientes.atualizado_em` (RN-12) |
 | `tg_etapa` | clientes (update de etapa) | Histórico de etapa; RN-06 (data de hoje); `finalizado_em`; recalcula `anexos_apagar_em` (RN-14/15) |
-| `tg_assinatura` | clientes (update de data_assinatura) | RN-07 (congela `percentual_atual` em `pct_contrato`); RN-11 (apagar data limpa); histórico tipo `contrato` |
+| `tg_assinatura` | clientes (update de data_assinatura) | RN-07 (congela `contas_config.percentual_atual` em `pct_contrato`); RN-11 (apagar data limpa); histórico tipo `contrato` |
 | `tg_anexo_recebido` | arquivos (insert) | Marca o documento como recebido (RF-23) e escreve no histórico com o nome de quem anexou |
-| `tg_percentual` | contas (update de percentual_atual) | Insere em `historico_percentual` |
+| `tg_percentual` | contas_config (update de percentual_atual) | Insere em `historico_percentual` |
 | `tg_auditoria` | clientes, corretores, arquivos, membros | Grava criar/alterar/excluir em `auditoria` |
-| `tg_novo_usuario` | auth.users (insert) | Cria a linha em `usuarios` |
-| `tg_limite_plano` | membros (insert/update) | Recusa funcionária e corretor, convidados ou ativos, em conta do plano `simples` (RN-18) |
+| `tg_limite_plano` | membros (insert/update) | Recusa funcionária e corretor ativos em conta do plano `simples` (RN-18) |
+| `tg_limite_convite` | convites (insert) | Recusa convite em conta `simples` e segundo convite/funcionária (RN-18) |
 
 ## 7. Views (só gestor)
 
@@ -272,7 +300,7 @@ Storage (`documentos`): inserir quando o primeiro segmento do caminho é uma con
 - `vw_vgv_periodo`: VGV contratado por mês.
 - `vw_vgv_origem`: contratos, VGV, financiado, remuneração e em andamento por corretor/cliente direto.
 
-Criar as views com `security_invoker = on` para valer a RLS de quem consulta.
+As views filtram por `meu_perfil(conta_id) = 'gestor'`: um único papel (`app_user`) atende todos os perfis, então o filtro por perfil fica dentro da view.
 
 ## 8. Mapeamento do protótipo (importador)
 
@@ -280,13 +308,13 @@ Criar as views com `security_invoker = on` para valer a RLS de quem consulta.
 |---|---|
 | `clientes.telefone` | `clientes.whatsapp` |
 | `corretorId` | `corretor_id` (via mapa de ids importados) |
-| `valorImovel`, `valorFinanciado`, `valorAvaliacao` | `valor_imovel`, `valor_financiado`, `valor_avaliacao` |
-| `fgtsUsado` | `fgts` |
+| `valorImovel`, `valorFinanciado`, `valorAvaliacao` | `valor_imovel_centavos`, `valor_financiado_centavos`, `valor_avaliacao_centavos` (× 100) |
+| `fgtsUsado` | `fgts_centavos` (× 100) |
 | `contrato`, `dataContrato` | `numero_contrato`, `data_assinatura` |
 | `pctContrato`, `pctOverride`, `remRecebida` | `clientes_remuneracao.*` |
 | `docs` (data por documento) | linhas em `documentos` |
 | `arquivos` | **não importados** (arquivos do protótipo precisam ser reenviados, ou importados à parte se o storage do protótipo permitir exportar) |
 | `historico` | linhas em `historico` (tipo `nota`) |
-| `config/geral.percentual`, `historicoPct` | `contas.percentual_atual`, `historico_percentual` |
+| `config/geral.percentual`, `historicoPct` | `contas_config.percentual_atual`, `historico_percentual` |
 
 Gatilhos de RN-07 e RN-12 ficam desligados durante a importação, para preservar percentuais e datas originais.

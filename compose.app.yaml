@@ -1,0 +1,41 @@
+# App em desenvolvimento com hot reload, segredos do CriptEnv e nenhum .env no disco.
+#   pnpm docker:up      (foreground, com Compose Watch)
+#   pnpm docker:dev     (em segundo plano; edições não sincronizam: use docker:up para editar)
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    image: central-do-correspondente:dev
+    init: true
+    ports:
+      - "127.0.0.1:3002:3002"
+    environment:
+      CRIPTENV_PROJECT: ${CRIPTENV_PROJECT:-central-do-correspondente}
+      CRIPTENV_ENV: ${CRIPTENV_ENV:-development}
+    secrets:
+      - criptenv_api_key
+      - criptenv_vault_password
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      mailpit: { condition: service_started }
+      s3: { condition: service_started }
+    develop:
+      watch:
+        - { action: sync, path: ./src, target: /app/src }
+        - { action: sync+restart, path: ./worker, target: /app/worker }
+        - { action: sync+restart, path: ./db/migrations, target: /app/db/migrations }
+        - { action: sync+restart, path: ./wrangler.jsonc, target: /app/wrangler.jsonc }
+        - { action: sync+restart, path: ./vite.config.ts, target: /app/vite.config.ts }
+        - { action: rebuild, path: ./package.json }
+        - { action: rebuild, path: ./pnpm-lock.yaml }
+
+secrets:
+  criptenv_api_key:
+    environment: CRIPTENV_API_KEY
+  criptenv_vault_password:
+    environment: CRIPTENV_VAULT_PASSWORD

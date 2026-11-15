@@ -123,20 +123,23 @@ sequenceDiagram
     actor G as Gestor (ou F, para corretor)
     participant App
     participant API as Worker /api
-    participant Auth as Supabase Auth
+    participant DB as Postgres
     actor P as Pessoa convidada
-    G->>App: Cadastra funcionária ou corretor com e-mail
-    G->>App: "Convidar"
-    App->>API: POST /api/convites
-    API->>API: Confere perfil de quem convida,<br/>plano Com corretores e limite de 1 funcionária
+    G->>App: Informa e-mail e perfil e toca "Convidar"
+    App->>API: POST /api/contas/:contaId/convites
+    API->>DB: Grava o convite como o usuário (RLS + limite do plano)
+    API->>P: E-mail com o link /convite/<token> (vale 7 dias)
+    P->>App: Abre o link
     alt E-mail ainda não tem conta
-        API->>Auth: Cria usuário e envia link de convite
-    else E-mail já existe (corretor de outro escritório)
-        API->>API: Só cria o vínculo com a conta
-        API->>P: E-mail avisando do novo escritório
+        P->>App: Nome, senha e aceite dos termos
+        App->>API: POST /api/convites/:token/aceitar
+        API->>DB: Cria a conta de login (e-mail confirmado pelo link) e o membro
+    else E-mail já tem conta (ex.: corretor de outro escritório)
+        P->>App: Entra com a senha e aceita os termos
+        App->>API: POST /api/convites/:token/aceitar
+        API->>DB: Só cria o vínculo com o escritório
     end
-    P->>App: Abre o link, define a senha
-    App->>P: Aceitar termos → entra
+    App->>P: Entra no escritório
 ```
 
 ---

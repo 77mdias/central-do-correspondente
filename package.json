@@ -1,0 +1,47 @@
+{
+  "name": "central-do-correspondente",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.5.1",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --project unit",
+    "test:db": "vitest run --project db",
+    "test:worker": "vitest run --project worker",
+    "db:migrate": "dbmate --env DATABASE_URL_OWNER --migrations-dir db/migrations --no-dump-schema up",
+    "db:new": "dbmate --migrations-dir db/migrations new",
+    "docker:up": "sh docker/compose.sh up --build --watch",
+    "docker:dev": "sh docker/compose.sh up --build -d",
+    "docker:down": "sh docker/compose.sh down",
+    "docker:exec": "sh docker/compose.sh exec app entrypoint.sh",
+    "docker:logs": "sh docker/compose.sh logs -f app"
+  },
+  "dependencies": {
+    "hono": "4.13.18",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.69.1",
+    "@cloudflare/workers-types": "5.20261115.1",
+    "@eslint/js": "9.39.5",
+    "@tailwindcss/vite": "4.3.5",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "dbmate": "2.38.1",
+    "eslint": "9.39.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.14.0",
+    "tailwindcss": "4.3.5",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.2",
+    "vite": "8.3.8",
+    "vitest": "5.1.0",
+    "wrangler": "4.162.0"
+  }
+}

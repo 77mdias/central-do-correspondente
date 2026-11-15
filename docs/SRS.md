@@ -15,14 +15,14 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RF-60 | Entrar com e-mail e senha; recuperar senha por e-mail | Novo |
+| RF-60 | Entrar com e-mail e senha, com e-mail confirmado antes do primeiro acesso; recuperar senha por e-mail. Cadastro aberto de escritório (D-33) | Novo |
 | RF-61 | Cada escritório é uma conta; todo registro pertence a uma conta | Novo |
 | RF-62 | Perfis gestor, funcionária e corretor, com as permissões da seção 3 | Novo |
 | RF-63 | Limite de usuários conforme o plano (RN-18): no Simples, só o gestor; no Com corretores, 1 gestor e 1 funcionária ativos e corretores ilimitados | Alterado |
 | RF-64 | Convidar pessoa por e-mail: o app cria o acesso e envia link para ela definir a senha. G convida F e C; F convida C. Só no plano Com corretores | Novo |
 | RF-65 | Reenviar convite e desativar acesso (o histórico da pessoa permanece) | Novo |
 | RF-66 | Uma pessoa pode pertencer a várias contas; ao entrar, escolhe o escritório e pode trocar depois | Novo |
-| RF-67 | Aceitar termo de uso e política de privacidade antes do primeiro uso; registrar versão e data do aceite | Novo |
+| RF-67 | Aceitar termo de uso e política de privacidade antes do primeiro uso; registrar versão e data do aceite. Na fase 1 o texto é provisório (versão `rascunho-1`); o texto real precisa existir antes do uso real da fase 3 | Novo |
 | RF-68 | Painel do sistema (só administradores do sistema): listar contas, plano e status da assinatura; definir plano e "ativa até" para cortesia | Novo |
 
 ### 1.2 Início
@@ -189,7 +189,7 @@ No plano Simples só existe o perfil G; as colunas F e C valem para o plano Com 
 |---|---|---|
 | RNF-01 | Funcionar em celular e computador; menu lateral vira menu deslizante abaixo de 900 px | Protótipo |
 | RNF-02 | Tema claro e escuro conforme o aparelho | Protótipo |
-| RNF-03 | Atualização em tempo real entre usuários com o app aberto | Protótipo |
+| RNF-03 | Dados atualizados entre usuários com o app aberto: ao voltar para a aba, depois de gravar e a cada 30 s nas listas (D-32; sem tempo real na v1) | Alterado |
 | RNF-04 | Aviso quando os dados não carregam em 10 segundos | Protótipo |
 | RNF-05 | Valores em reais e datas no padrão brasileiro; fuso America/Sao_Paulo para "hoje" | Protótipo |
 | RNF-06 | Controle de acesso por conta e perfil aplicado no banco (RLS) | Novo |

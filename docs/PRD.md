@@ -99,7 +99,7 @@ Ainda não há metas numéricas.
 
 | Fase | Entrega | Pronto quando |
 |---|---|---|
-| 1. Base | Auth, contas, membros, convites, schema com RLS e gatilhos | Usuários de 2 contas diferentes não enxergam dados um do outro; testes de RLS passando |
+| 1. Base | Login (Better Auth), cadastro aberto de escritório, contas, membros, convites, schema com RLS e gatilhos | Usuários de 2 contas diferentes não enxergam dados um do outro; testes de RLS passando |
 | 2. Migração | Todas as telas do protótipo + anexos + importador | Correspondente consegue fazer a rotina diária inteira no app novo |
 | 3. Corretor e uso real | Portal do corretor; uso pelas 2 correspondentes atuais | 2 escritórios usando por 2 semanas sem bloqueio |
 | 4. Venda | Asaas, lembretes, relatórios, termos, página de venda ligada ao cadastro | Escritório novo assina e usa sem ajuda do dev |
