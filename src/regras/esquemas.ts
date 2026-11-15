@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { soDigitos, tipoDocumento } from "./documento";
+import { normalizarDocumento, tipoDocumento } from "./documento";
 
 // Os mesmos esquemas validam o formulário na SPA e o pedido no Worker.
 
@@ -14,7 +14,7 @@ export const esquemaEscritorio = z.object({
   documento: z
     .string()
     .refine((d) => tipoDocumento(d) !== null, "CPF ou CNPJ inválido")
-    .transform(soDigitos),
+    .transform(normalizarDocumento),
   plano: z.enum(["simples", "com_corretores"]),
   aceitouTermos: z.literal(true, "É preciso aceitar os termos"),
 });

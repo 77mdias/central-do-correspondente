@@ -49,7 +49,7 @@ create type acao_auditoria as enum ('ver', 'criar', 'alterar', 'excluir', 'baixa
 |---|---|---|
 | id | uuid pk | |
 | nome_escritorio | text not null | |
-| documento_titular | text not null | CPF ou CNPJ (só dígitos), pedido no cadastro; o Asaas exige |
+| documento_titular | text not null | CPF (11 dígitos) ou CNPJ, inclusive o alfanumérico da IN RFB 2.229/2024 (12 caracteres 0-9/A-Z + 2 dígitos), sem pontuação; pedido no cadastro; o Asaas exige |
 | plano | plano not null | `simples` (R$ 99) ou `com_corretores` (R$ 149). Muda só pelo Worker |
 | status_assinatura | status_assinatura | default `pendente` |
 | ativa_ate | date | cortesia manual |
@@ -300,7 +300,7 @@ Storage (`documentos`): inserir quando o primeiro segmento do caminho é uma con
 - `vw_vgv_periodo`: VGV contratado por mês.
 - `vw_vgv_origem`: contratos, VGV, financiado, remuneração e em andamento por corretor/cliente direto.
 
-As views filtram por `meu_perfil(conta_id) = 'gestor'`: um único papel (`app_user`) atende todos os perfis, então o filtro por perfil fica dentro da view.
+As views filtram por `meu_perfil(conta_id) = 'gestor'` (um único papel, `app_user`, atende todos os perfis) e são `security_invoker` + `security_barrier`: valem a RLS das tabelas de quem consulta e o filtro de perfil roda antes de qualquer filtro de quem consulta.
 
 ## 8. Mapeamento do protótipo (importador)
 
