@@ -1,21 +1,10 @@
 import { Hono } from "hono";
-import { createMiddleware } from "hono/factory";
-import { type Auth, criarAuth } from "./auth";
-import { abrirPools, type Pools } from "./db";
+import { criarAuth } from "./auth";
+import type { AppTipos } from "./contexto";
+import { abrirPools } from "./db";
 import { criarEnvioMailpit, type Email, type EnviarEmail } from "./email";
-import type { Env } from "./env";
-
-export type Usuario = { id: string; email: string; nome: string };
-
-export type AppTipos = {
-  Bindings: Env;
-  Variables: { pools: Pools; auth: Auth; enviar: (e: Email) => void; usuario: Usuario | null };
-};
-
-export const exigirUsuario = createMiddleware<AppTipos>(async (c, next) => {
-  if (!c.var.usuario) return c.json({ erro: "nao_autenticado" }, 401);
-  await next();
-});
+import { rotasCadastro } from "./rotas/cadastro";
+import { rotasEu } from "./rotas/eu";
 
 export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   const app = new Hono<AppTipos>();
@@ -46,6 +35,8 @@ export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   });
 
   app.on(["GET", "POST"], "/api/auth/*", (c) => c.var.auth.handler(c.req.raw));
+  app.route("/api", rotasCadastro);
+  app.route("/api", rotasEu);
 
   app.onError((err, c) => {
     console.error(err);
