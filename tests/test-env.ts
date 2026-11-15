@@ -4,8 +4,8 @@ import type { Env } from "../worker/env";
 const pg = (papel: string, banco: string) => `postgres://${papel}:${papel}@localhost:5435/${banco}`;
 const hd = (connectionString: string) => ({ connectionString }) as unknown as Hyperdrive;
 
-export const URL_OWNER_TEST = "postgres://postgres:postgres@localhost:5435/cc_test";
-export const URL_OWNER_E2E = "postgres://postgres:postgres@localhost:5435/cc_e2e";
+export const URL_OWNER_TEST = "postgres://postgres:postgres@localhost:5435/cc_test?sslmode=disable";
+export const URL_OWNER_E2E = "postgres://postgres:postgres@localhost:5435/cc_e2e?sslmode=disable";
 
 export const TEST_ENV: Omit<Env, "ASSETS"> = {
   DB_APP: hd(pg("app_user", "cc_test")),
