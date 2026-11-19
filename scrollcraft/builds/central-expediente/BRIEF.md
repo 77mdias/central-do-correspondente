@@ -140,3 +140,16 @@ O fechamento tinha ~1.100 px (histórico, escopo e dúvidas empilhados à esquer
 - À direita, o cadastro em pares (nome e escritório, e-mail e senha, CPF/CNPJ ao lado do aceite) e os planos só com a lista do que incluem.
 - As âncoras do relógio são limitadas ao fim real da página, para o fechamento curto ainda chegar às 18:00 ("Expediente encerrado").
 - Validação conferida de novo: 6 erros com o formulário vazio e nenhuma chamada a `/api/cadastro`. No celular a seção continua empilhada e rola.
+
+## Revisão do Jean (2026-11-19): quebras no celular
+
+O Jean abriu a landing no celular (Chrome no iPhone, 393×852) e viu faixas brancas embaixo dos palcos, títulos cortados e blocos que apareciam e sumiam ao rolar. Causas e correções:
+
+- **Vão embaixo dos palcos.** O palco tinha a altura da tela com a barra do navegador aberta (`100svh`, 661 px). Ao rolar, a barra recolhe e a tela passa a 761 px: sobravam 100 px sem fundo (branco embaixo da visão do gestor). Agora o palco tem `100lvh` (fundo sempre até o fim) e `padding-bottom: 100lvh − 100svh`, então o conteúdo é composto na tela pequena e não se mexe quando a barra vai e volta.
+- **Nada no palco depende de `@media (min-height)`.** No celular essa medida muda com a barra do navegador: os 3 passos da cobrança apareciam dentro do palco no meio da rolagem e empurravam o resto. Abaixo de 1024 px os passos (com o texto) e o parágrafo de abertura ficam numa seção em fluxo depois do palco, como a faixa do início.
+- **Cobranças.** Abaixo de 1024 px o título "Cobranças de hoje" fica parado acima do trilho; dentro do trilho ele passava cortado pela borda da tela.
+- **Gestor.** Mais compacto abaixo de 640 px (remuneração numa linha, respiros menores) e colunas fixas na tabela: o valor do imóvel não trunca mais.
+- **Fechamento.** Empilhado, o rodapé de direitos vai para depois do formulário (ficava no meio da página).
+- **Barra do app.** Entre 768 e 1023 px a pílula de pendências some: quebrava em duas linhas ao lado das abas.
+
+Conferido no navegador: 393×661 e 393×761 (barra do navegador aberta e recolhida, com a sobra simulada em 100 px), 360×560, 768×1024 e 1280×800. Em 360×560 a visão do gestor passa 74 px da tela pequena (última linha e nota): aparece inteira quando a barra recolhe, que é o estado normal ao rolar para baixo. Não conferido num iPhone de verdade.

@@ -5,15 +5,26 @@
   --ex-barra: 3.5rem; /* altura da barra do app (uma linha em toda largura) */
   --ex-respiro: 1.25rem; /* folga mínima entre a barra e o conteúdo do palco */
   --ex-gutter: clamp(1rem, 4vw, 3rem);
+  --ex-sobra: 0px; /* faixa de baixo que a barra do navegador cobre quando está aberta (celular) */
+}
+@supports (height: 100lvh) {
+  .ex { --ex-sobra: calc(100lvh - 100svh); }
 }
 
 /* Palco fixado pelo motor: conteúdo centrado abaixo da barra do app. `safe center` só centra
-   quando cabe; na tela baixa (celular com a barra do navegador) começa do topo e corta embaixo. */
+   quando cabe; na tela baixa (celular com a barra do navegador) começa do topo e corta embaixo.
+   No celular a barra do navegador recolhe ao rolar e a tela cresce: o palco tem a altura da tela
+   grande (lvh), para o fundo nunca deixar um vão embaixo, e o conteúdo é composto na tela pequena
+   (svh), para nada se mexer nem ficar atrás da barra quando ela volta. */
 .ex-palco {
   display: flex;
   align-items: safe center;
   padding-top: calc(var(--ex-barra) + var(--ex-respiro));
+  padding-bottom: var(--ex-sobra);
   background: #ffffff;
+}
+@supports (height: 100lvh) {
+  .ex .ex-palco { height: 100lvh; }
 }
 .ex-palco--coluna {
   flex-direction: column;
@@ -50,6 +61,7 @@
   display: flex;
   align-items: safe center;
   padding-top: calc(var(--ex-barra) + var(--ex-respiro));
+  padding-bottom: var(--ex-sobra);
   background-color: #0a0a0a;
   background-image:
     linear-gradient(to right, #1e1e1e 1px, transparent 1px),

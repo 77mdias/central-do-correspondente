@@ -33,6 +33,8 @@ type IdVista = (typeof VISTAS)[number]["id"];
 
 const h = (hh: number, mm = 0) => hh * 60 + mm;
 
+const DIREITOS = "© 2026 Central do Correspondente · Marcas e ícones pertencem aos respectivos titulares.";
+
 /** A ficha fica travada quando os dois painéis cabem lado a lado na altura da tela. */
 const FICHA_FIXADA = "(min-width: 1024px) and (min-height: 760px)";
 
@@ -197,7 +199,7 @@ export function Landing() {
             <time className="font-mono-tabular text-sm font-medium text-[#111111]" aria-label={`Horário da demonstração: ${e.relogio}`}>
               {e.relogio}
             </time>
-            <span className="font-mono-tabular hidden rounded-full bg-[#f4f4f4] px-2.5 py-0.5 text-xs text-[#4a4a4a] sm:inline">
+            <span className="font-mono-tabular hidden rounded-full bg-[#f4f4f4] px-2.5 py-0.5 text-xs whitespace-nowrap text-[#4a4a4a] sm:max-md:inline lg:inline">
               {e.pendentes > 0 ? `${e.pendentes} cobranças pendentes` : "0 pendências"}
             </span>
             <Link to="/entrar" className="px-1 py-2 text-sm font-medium text-[#4a4a4a] hover:text-[#111111]">
@@ -230,6 +232,8 @@ export function Landing() {
 
         <section id="cobrancas" data-sc-act="pan" data-sc-span="3" aria-label="Cobranças de hoje">
           <div data-sc-stage className="sc-stage ex-palco ex-palco--coluna">
+            {/* Abaixo de 1024 px o título fica parado em cima do trilho: dentro dele, passaria cortado pela borda. */}
+            <h2 className="ex-conteudo text-2xl font-medium tracking-[-0.03em] text-[#111111] lg:hidden">Cobranças de hoje</h2>
             <div className="ex-conteudo flex items-center gap-3 text-xs text-[#4a4a4a]">
               <span className="font-medium text-[#111111]">Fila de hoje</span>
               <span className="flex gap-1" aria-hidden="true">
@@ -244,11 +248,19 @@ export function Landing() {
             <div className="ex-trilho" data-sc-pan="0.04">
               <TrilhoCobrancas e={e} />
             </div>
-            {/* Some só onde a tela é baixa demais para o palco fixado (celular pequeno). */}
-            <div className="ex-conteudo hidden lg:block [@media(min-height:760px)]:block">
-              <Fatos itens={PASSOS_COBRANCA} className="grid-cols-1 sm:grid-cols-3 max-sm:[&_dd]:hidden" />
+            <div className="ex-conteudo hidden lg:block">
+              <Fatos itens={PASSOS_COBRANCA} className="grid-cols-3" />
             </div>
           </div>
+        </section>
+
+        {/* Abaixo de 1024 px os passos não cabem no palco fixado: entram aqui, como a faixa do início.
+            Nada no palco depende da altura da tela, que no celular muda quando a barra do navegador recolhe. */}
+        <section className="ex-conteudo flex flex-col gap-5 py-10 lg:hidden" aria-label="Como funciona a cobrança">
+          <p className="max-w-[60ch] text-sm leading-relaxed text-[#4a4a4a]">
+            Abra o WhatsApp com a mensagem pronta e confirme ao voltar. O próximo retorno sai do intervalo de cada cliente: 1, 2, 3, 5 ou 7 dias.
+          </p>
+          <Fatos itens={PASSOS_COBRANCA} className="grid-cols-1 sm:grid-cols-3" />
         </section>
 
         <section
@@ -274,11 +286,11 @@ export function Landing() {
         <section id="gestor" data-sc-act="pin" data-sc-span="3.4" aria-label="Visão do gestor">
           <div data-sc-stage className="sc-stage ex-palco">
             {/* Antes do pico: a agenda da tarde, mais calma que a virada que vem. */}
-            <div className="ex-conteudo grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
+            <div className="ex-conteudo grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-12">
               <div>
                 <p className="font-mono-tabular text-sm text-[#4a4a4a]">Próximo · 16:00</p>
                 <p className="mt-1 max-w-[30ch] text-2xl font-medium tracking-[-0.03em] text-[#111111] sm:text-3xl">Assinatura do contrato · Bruno Costa</p>
-                <ul className="mt-4 flex flex-col gap-2 text-sm text-[#4a4a4a]">
+                <ul className="mt-3 flex flex-col gap-2 text-sm text-[#4a4a4a] sm:mt-4">
                   {["A data da assinatura fica gravada no contrato.", "A taxa vigente, 1,400%, fica congelada nele.", "O valor do imóvel entra no VGV do mês do gestor."].map((t) => (
                     <li key={t} className="flex gap-2">
                       <span className="text-[#1a4be0]" aria-hidden="true">·</span>
@@ -322,9 +334,11 @@ export function Landing() {
           <div className="ex-conteudo grid gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start lg:gap-10">
             <div className="flex flex-col gap-5">
               <ResumoExpediente e={e} />
-              <p className="text-[11px] text-[#4a4a4a]">© 2026 Central do Correspondente · Marcas e ícones pertencem aos respectivos titulares.</p>
+              <p className="hidden text-[11px] text-[#4a4a4a] lg:block">{DIREITOS}</p>
             </div>
             <FormularioCadastro />
+            {/* Empilhado, o rodapé fecha a página: na coluna do resumo ficaria no meio dela. */}
+            <p className="text-[11px] text-[#4a4a4a] lg:hidden">{DIREITOS}</p>
           </div>
         </section>
       </main>

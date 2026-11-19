@@ -260,7 +260,8 @@ export function TrilhoCobrancas({ e }: { e: Estado }) {
   const ultima = e.cobrancas.at(-1);
   return (
     <>
-      <article className="ex-cartao flex flex-col justify-center gap-3 pr-4">
+      {/* Só no desktop: no celular o título fica parado acima do trilho (Landing) e o texto vem depois do palco. */}
+      <article className="ex-cartao hidden flex-col justify-center gap-3 pr-4 lg:flex">
         <h2 className="text-2xl font-medium tracking-[-0.03em] text-[#111111]">Cobranças de hoje</h2>
         <p className="text-sm leading-relaxed text-[#4a4a4a]">
           Abra o WhatsApp com a mensagem pronta e confirme ao voltar. O próximo retorno sai do intervalo de cada cliente: 1, 2, 3, 5 ou 7 dias.
@@ -469,7 +470,7 @@ export function VistaGestor({ e }: { e: Estado }) {
   const valores = perfil === "gestor";
   const contratos = perfil === "corretor" ? e.contratos.filter((c) => c.corretor === "C. Lima") : e.contratos;
   return (
-    <div className="flex w-full flex-col gap-5 text-white">
+    <div className="flex w-full flex-col gap-3 text-white sm:gap-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="font-mono-tabular text-xs text-[#a7a7a7]">Visão do gestor · {e.relogio}</p>
@@ -494,7 +495,7 @@ export function VistaGestor({ e }: { e: Estado }) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg bg-[#1e1e1e] p-4 sm:col-span-2">
+        <div className="rounded-lg bg-[#1e1e1e] p-3 sm:col-span-2 sm:p-4">
           <p className="font-mono-tabular text-[11px] tracking-wider text-[#a7a7a7] uppercase">VGV contratado no mês</p>
           {valores ? (
             <p className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -505,21 +506,24 @@ export function VistaGestor({ e }: { e: Estado }) {
             <p className="mt-2 text-sm text-[#a7a7a7]">Sem acesso. O banco não envia VGV para este perfil.</p>
           )}
         </div>
-        <div className="rounded-lg bg-[#1e1e1e] p-4">
+        {/* No celular, rótulo e valor na mesma linha. */}
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 rounded-lg bg-[#1e1e1e] p-3 sm:block sm:p-4">
           <p className="font-mono-tabular text-[11px] tracking-wider text-[#a7a7a7] uppercase">Remuneração prevista</p>
           {valores ? (
-            <p className="font-mono-tabular mt-1 text-xl font-medium sm:text-2xl">{formatarReais(e.remuneracaoCentavos)}</p>
+            <p className="font-mono-tabular text-xl font-medium sm:mt-1 sm:text-2xl">{formatarReais(e.remuneracaoCentavos)}</p>
           ) : (
-            <p className="mt-2 text-sm text-[#a7a7a7]">Sem acesso (RLS).</p>
+            <p className="text-sm text-[#a7a7a7] sm:mt-2">Sem acesso (RLS).</p>
           )}
         </div>
       </div>
 
       <div className="overflow-hidden rounded-lg border border-[#313131]">
-        <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto] gap-3 border-b border-[#313131] px-4 py-2 text-[11px] text-[#a7a7a7] sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)_6rem_4.25rem] gap-3 border-b border-[#313131] px-4 py-2 text-[11px] text-[#a7a7a7] sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)]">
           <span>Cliente</span>
           <span>Imóvel</span>
-          <span>Taxa congelada</span>
+          <span>
+            Taxa<span className="max-sm:hidden"> congelada</span>
+          </span>
           <span className="hidden sm:block">Remuneração</span>
         </div>
         <ul>
@@ -527,7 +531,7 @@ export function VistaGestor({ e }: { e: Estado }) {
             <li
               key={c.nome}
               className={cn(
-                "grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_auto] items-center gap-3 border-b border-[#1e1e1e] px-4 py-2.5 text-sm last:border-b-0 sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)]",
+                "grid grid-cols-[minmax(0,1fr)_6rem_4.25rem] items-center gap-3 border-b border-[#1e1e1e] px-4 py-2.5 text-sm last:border-b-0 sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)]",
                 c.hoje && "ex-entra bg-[#141414]",
               )}
             >
@@ -535,7 +539,7 @@ export function VistaGestor({ e }: { e: Estado }) {
                 {c.nome}
                 {c.hoje && <span className="font-mono-tabular ml-2 text-xs text-[#6798ff]">hoje</span>}
               </span>
-              <span className="font-mono-tabular truncate text-[#a7a7a7]">{formatarReais(c.imovelCentavos)}</span>
+              <span className="font-mono-tabular text-xs text-[#a7a7a7] sm:truncate sm:text-sm">{formatarReais(c.imovelCentavos)}</span>
               {valores ? (
                 <span className="font-mono-tabular inline-flex items-center gap-1.5 text-xs text-[#6798ff]">
                   <Cadeado fechado />
