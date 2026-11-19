@@ -2,11 +2,8 @@
    aqui só a composição da página. Prefixo ex- para não vazar para o resto da app. */
 
 .ex {
-  --ex-barra: 3.5rem; /* altura da barra do app */
+  --ex-barra: 3.5rem; /* altura da barra do app (uma linha em toda largura) */
   --ex-gutter: clamp(1rem, 4vw, 3rem);
-}
-@media (max-width: 767px) {
-  .ex { --ex-barra: 6rem; } /* barra em duas linhas: marca + relógio, depois as abas */
 }
 
 /* Palco fixado pelo motor: conteúdo centrado abaixo da barra do app. */

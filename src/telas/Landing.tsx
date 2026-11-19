@@ -203,11 +203,12 @@ export function Landing() {
             <Link to="/entrar" className="px-1 py-2 text-sm font-medium text-[#4a4a4a] hover:text-[#111111]">
               Entrar
             </Link>
+            {/* No celular a barra fica numa linha só: as abas viram só o atalho para assinar. */}
+            <a href="#assinar" className="rounded-md bg-[#1a4be0] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#143bb5] md:hidden">
+              Assinar
+            </a>
           </div>
         </div>
-        <nav aria-label="Vistas da demonstração" className="flex gap-1 overflow-x-auto border-t border-[#e5e5e5] px-3 py-2 md:hidden">
-          {abas}
-        </nav>
       </header>
 
       {/* Escuro só depois que a visão do gestor cobriu a tela (reveal entre 15:37 e 15:53). */}
