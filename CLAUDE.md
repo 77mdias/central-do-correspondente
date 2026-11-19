@@ -14,7 +14,7 @@ Toda a interface, o schema, os commits e a documentação são em **português**
 
 ```bash
 pnpm docker:up                               # Postgres, Mailpit, s3mock e o app (http://localhost:3002), segredos do CriptEnv
-pnpm test                                    # unidade (src/**/*.test.ts)
+pnpm test                                    # unidade (src/**/*.test.ts e worker/**/*.test.ts)
 pnpm test:db                                 # RLS e gatilhos, contra o Postgres do compose (porta 5435)
 pnpm test:worker                             # rotas da API (Hono app.request) contra o banco de teste
 pnpm test:e2e                                # Playwright (Postgres + Mailpit do compose)
@@ -59,7 +59,7 @@ RLS comprovada por teste: para cada perfil e para um usuário de **outra conta**
 
 ## Mapa da documentação
 
-- `docs/DECISOES.md` — decisões D-01..D-35 e pendências P-01..P-10 (ler primeiro).
+- `docs/DECISOES.md` — decisões D-01..D-38 e pendências P-01..P-10 (ler primeiro).
 - `docs/SRS.md` — requisitos RF-xx, regras RN-xx, matriz de permissões, RNF. Citar esses códigos em tarefas, commits e testes.
 - `docs/MODELO-DE-DADOS.md` — tipos, tabelas, RLS, gatilhos, views e o mapeamento do JSON do protótipo para o importador (gatilhos RN-07/RN-12 desligados durante a importação).
 - `docs/ARQUITETURA.md` — rotas do Worker, crons, integrações (Asaas idempotente via `eventos_asaas`), ambientes.

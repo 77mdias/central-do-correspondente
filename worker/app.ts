@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { criarAuth } from "./auth";
 import type { AppTipos } from "./contexto";
 import { abrirPools } from "./db";
-import { criarEnvioMailpit, type Email, type EnviarEmail } from "./email";
+import { criarEnvio, type Email, type EnviarEmail } from "./email";
 import { rotasCadastro } from "./rotas/cadastro";
 import { rotasConvites } from "./rotas/convites";
 import { rotasEquipe } from "./rotas/equipe";
@@ -16,7 +16,7 @@ export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   // Por pedido: conexões, Better Auth, envio de e-mail (depois da resposta) e a sessão.
   app.use("/api/*", async (c, next) => {
     const pools = abrirPools(c.env);
-    const enviarEmail = deps.enviarEmail ?? criarEnvioMailpit(c.env.EMAIL_API_URL, c.env.EMAIL_REMETENTE);
+    const enviarEmail = deps.enviarEmail ?? criarEnvio(c.env);
     const enviar = (e: Email) =>
       c.executionCtx.waitUntil(enviarEmail(e).catch((err) => console.error("e-mail não enviado", e.assunto, err)));
     const auth = criarAuth(c.env, pools.system, enviar);

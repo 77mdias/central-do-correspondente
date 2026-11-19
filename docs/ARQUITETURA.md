@@ -144,7 +144,7 @@ Papel na LGPD: a correspondente é a **controladora** dos dados dos clientes del
 - Inscrições em `push_inscricoes`; inscrição expirada (resposta 404/410) é apagada.
 
 ### E-mail
-- O Worker não usa SMTP: envia por API HTTP, num módulo só. Local: API de envio do Mailpit. Produção: provedor da pendência P-08 (proposta: Resend), definido antes do deploy.
+- O Worker não usa SMTP: envia por API HTTP, num módulo só. Local: API de envio do Mailpit (`EMAIL_API_URL`). Produção: Resend (D-38), escolhida pela presença de `EMAIL_API_KEY`.
 - E-mails da fase 1: confirmação de cadastro, recuperação de senha, convite e aviso de conta existente.
 
 ## 6. Ambientes e entrega
@@ -153,7 +153,7 @@ Papel na LGPD: a correspondente é a **controladora** dos dados dos clientes del
 |---|---|---|---|---|
 | Local | `pnpm docker:up`: container do app com `vite dev` (plugin da Cloudflare) | Postgres 18 em container | Mailpit | Sandbox |
 | Testes e CI | Vitest no host e Playwright | Postgres 18 (`cc_test`, `cc_e2e`) | Mailpit | — |
-| Produção (a partir da fase 3) | Cloudflare Workers | Supabase (São Paulo) via Hyperdrive | Provedor da P-08 | Produção |
+| Produção (a partir da fase 3) | Cloudflare Workers | Supabase (São Paulo) via Hyperdrive | Resend (D-38) | Produção |
 
 - Tudo em desenvolvimento roda em Docker (`compose.yaml`: Postgres, Mailpit, s3mock e o app), com os segredos do ambiente `development` do CriptEnv. Portas: app 3002, Postgres 5435, Mailpit 1028/8028, s3mock 9093. Detalhes em [SEGREDOS.md](SEGREDOS.md).
 - GitHub Actions: jobs `app` (lint, tipos, unidade), `db` (RLS, gatilhos e rotas contra Postgres) e `e2e` em todo PR. O deploy entra antes do uso real da fase 3.
