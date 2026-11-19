@@ -11,7 +11,8 @@ services:
     ports:
       - "127.0.0.1:3002:3002"
     environment:
-      CRIPTENV_PROJECT: ${CRIPTENV_PROJECT:-central-do-correspondente}
+      # ID do projeto central-do-correspondente no CriptEnv (não é segredo; sem a API key e a senha do cofre não abre nada)
+      CRIPTENV_PROJECT: ${CRIPTENV_PROJECT:-ba29641d-0d7d-4505-8413-3f4e3ac1c18f}
       CRIPTENV_ENV: ${CRIPTENV_ENV:-development}
     secrets:
       - criptenv_api_key
