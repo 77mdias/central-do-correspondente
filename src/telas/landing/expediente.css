@@ -3,20 +3,22 @@
 
 .ex {
   --ex-barra: 3.5rem; /* altura da barra do app (uma linha em toda largura) */
+  --ex-respiro: 1.25rem; /* folga mínima entre a barra e o conteúdo do palco */
   --ex-gutter: clamp(1rem, 4vw, 3rem);
 }
 
-/* Palco fixado pelo motor: conteúdo centrado abaixo da barra do app. */
+/* Palco fixado pelo motor: conteúdo centrado abaixo da barra do app. `safe center` só centra
+   quando cabe; na tela baixa (celular com a barra do navegador) começa do topo e corta embaixo. */
 .ex-palco {
   display: flex;
-  align-items: center;
-  padding-top: var(--ex-barra);
+  align-items: safe center;
+  padding-top: calc(var(--ex-barra) + var(--ex-respiro));
   background: #ffffff;
 }
 .ex-palco--coluna {
   flex-direction: column;
   align-items: stretch;
-  justify-content: center;
+  justify-content: safe center;
   gap: 1.25rem;
 }
 .ex-conteudo {
@@ -46,8 +48,8 @@
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
-  padding-top: var(--ex-barra);
+  align-items: safe center;
+  padding-top: calc(var(--ex-barra) + var(--ex-respiro));
   background-color: #0a0a0a;
   background-image:
     linear-gradient(to right, #1e1e1e 1px, transparent 1px),
