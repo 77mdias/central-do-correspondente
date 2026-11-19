@@ -39,11 +39,12 @@
       ],
       "vars": {
         "APP_URL": "https://central-do-correspondente.jean-carlos3.workers.dev",
-        // shortcut: e-mail só funciona com o provedor da P-08 e domínio verificado (P-09)
-        "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>"
+        // shortcut: remetente de teste da Resend, que só entrega para o e-mail do dono da conta; trocar pelo domínio verificado (P-09)
+        "EMAIL_REMETENTE": "Central do Correspondente <onboarding@resend.dev>"
       },
-      // sem BETTER_AUTH_SECRET o Better Auth cai numa chave padrão pública: o deploy tem que falhar
-      "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_URL"] }
+      // sem BETTER_AUTH_SECRET o Better Auth cai numa chave padrão pública: o deploy tem que falhar.
+      // EMAIL_API_KEY é a chave da Resend: sem ela não há confirmação de cadastro nem convite.
+      "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_KEY"] }
     }
   }
 }

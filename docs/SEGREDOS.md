@@ -83,7 +83,7 @@ Os valores secretos (os quatro primeiros e o último, porque as strings de conex
 | Variável | Onde | Valor de produção |
 |---|---|---|
 | `BETTER_AUTH_SECRET` | segredo do Worker | novo, gerado com `openssl rand -base64 32` (nunca o de desenvolvimento) |
-| `EMAIL_API_URL` | segredo do Worker | endpoint de envio do provedor da P-08 (proposta: Resend) |
+| `EMAIL_API_KEY` | segredo do Worker | chave de API da Resend (D-38), com permissão só de envio. Com ela, o Worker envia pela Resend e ignora `EMAIL_API_URL` |
 | `DB_APP` | Hyperdrive | string de conexão do Supabase com o papel `app_user` |
 | `DB_SYSTEM` | Hyperdrive | string de conexão do Supabase com o papel `app_system` |
 | `APP_URL` | `vars` do `wrangler.jsonc` | domínio real com `https://` (base do Better Auth) |
@@ -96,11 +96,11 @@ Para levar os valores ao Cloudflare:
 npx wrangler hyperdrive create cc-db-app --connection-string="<string do app_user>"
 npx wrangler hyperdrive create cc-db-system --connection-string="<string do app_system>"
 npx wrangler secret put BETTER_AUTH_SECRET --name central-do-correspondente
-npx wrangler secret put EMAIL_API_URL --name central-do-correspondente
+npx wrangler secret put EMAIL_API_KEY --name central-do-correspondente
 ```
 
 Antes do primeiro deploy:
 
-- **Bloco de produção.** `env.production` no `wrangler.jsonc` já tem os ids reais do Hyperdrive (`cc-db-app` e `cc-db-system`, cache desligado). Com o plugin da Cloudflare no Vite, o ambiente é escolhido no build (`CLOUDFLARE_ENV`), não com `--env`: o deploy é `pnpm deploy:producao` (ou, no Workers Builds, build `CLOUDFLARE_ENV=production pnpm build` e deploy `npx wrangler deploy`). O Worker de produção se chama `central-do-correspondente` (https://central-do-correspondente.jean-carlos3.workers.dev); o nome de topo é `central-do-correspondente-local`, para um deploy sem `CLOUDFLARE_ENV` não sobrescrever produção. O bloco exige `BETTER_AUTH_SECRET` e `EMAIL_API_URL` (`secrets.required`): sem eles o deploy falha. Os dois ficam no painel do Worker (*Settings → Variables and Secrets*, tipo *Secret*). Num Worker novo, o primeiro deploy precisa de `--secrets-file` ou de tirar a linha temporariamente.
-- **E-mail.** `worker/email.ts` só fala com a API do Mailpit. O envio pelo provedor da P-08 precisa ser escrito. A Resend autentica por chave de API, o que acrescenta um segredo (por exemplo `EMAIL_API_KEY`) à tabela acima.
+- **Bloco de produção.** `env.production` no `wrangler.jsonc` já tem os ids reais do Hyperdrive (`cc-db-app` e `cc-db-system`, cache desligado). Com o plugin da Cloudflare no Vite, o ambiente é escolhido no build (`CLOUDFLARE_ENV`), não com `--env`: o deploy é `pnpm deploy:producao` (ou, no Workers Builds, build `CLOUDFLARE_ENV=production pnpm build` e deploy `npx wrangler deploy`). O Worker de produção se chama `central-do-correspondente` (https://central-do-correspondente.jean-carlos3.workers.dev); o nome de topo é `central-do-correspondente-local`, para um deploy sem `CLOUDFLARE_ENV` não sobrescrever produção. O bloco exige `BETTER_AUTH_SECRET` e `EMAIL_API_KEY` (`secrets.required`): sem eles o deploy falha. Os dois ficam no painel do Worker (*Settings → Variables and Secrets*, tipo *Secret*). Num Worker novo, o primeiro deploy precisa de `--secrets-file` ou de tirar a linha temporariamente.
+- **E-mail.** Enviado pela Resend (D-38). Enquanto não há domínio (P-09), o remetente é o de teste da Resend (`onboarding@resend.dev`), que **só entrega para o e-mail do dono da conta da Resend**: serve para o Jean testar o próprio cadastro, não para clientes. Com o domínio verificado na Resend, trocar `EMAIL_REMETENTE` no `env.production`.
 - **Ainda não existem no código** e entram com as fases seguintes: chaves do Asaas (assinatura), chaves VAPID (Web Push) e credenciais do storage S3 (anexos). Só criar quando o código que as lê chegar.
