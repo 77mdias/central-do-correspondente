@@ -81,12 +81,12 @@ Para levar os valores ao Cloudflare:
 ```bash
 npx wrangler hyperdrive create cc-db-app --connection-string="<string do app_user>"
 npx wrangler hyperdrive create cc-db-system --connection-string="<string do app_system>"
-npx wrangler secret put BETTER_AUTH_SECRET --name central-do-correspondente-production
-npx wrangler secret put EMAIL_API_URL --name central-do-correspondente-production
+npx wrangler secret put BETTER_AUTH_SECRET --name central-do-correspondente
+npx wrangler secret put EMAIL_API_URL --name central-do-correspondente
 ```
 
 Antes do primeiro deploy:
 
-- **Bloco de produção.** `env.production` no `wrangler.jsonc` já tem os ids reais do Hyperdrive (`cc-db-app` e `cc-db-system`, cache desligado). Com o plugin da Cloudflare no Vite, o ambiente é escolhido no build (`CLOUDFLARE_ENV`), não com `--env`: o deploy é `pnpm deploy:producao` (ou, no Workers Builds, build `CLOUDFLARE_ENV=production pnpm build` e deploy `npx wrangler deploy`). O Worker se chama `central-do-correspondente-production`. O bloco não tem `secrets.required` porque o wrangler recusa o primeiro deploy de um Worker que ainda não existe; os segredos entram depois, no painel (*Settings → Variables and Secrets*), e aí a linha volta.
+- **Bloco de produção.** `env.production` no `wrangler.jsonc` já tem os ids reais do Hyperdrive (`cc-db-app` e `cc-db-system`, cache desligado). Com o plugin da Cloudflare no Vite, o ambiente é escolhido no build (`CLOUDFLARE_ENV`), não com `--env`: o deploy é `pnpm deploy:producao` (ou, no Workers Builds, build `CLOUDFLARE_ENV=production pnpm build` e deploy `npx wrangler deploy`). O Worker de produção se chama `central-do-correspondente` (https://central-do-correspondente.jean-carlos3.workers.dev); o nome de topo é `central-do-correspondente-local`, para um deploy sem `CLOUDFLARE_ENV` não sobrescrever produção. O bloco não tem `secrets.required` porque o wrangler recusa o primeiro deploy de um Worker que ainda não existe; os segredos entram depois, no painel (*Settings → Variables and Secrets*), e aí a linha volta.
 - **E-mail.** `worker/email.ts` só fala com a API do Mailpit. O envio pelo provedor da P-08 precisa ser escrito. A Resend autentica por chave de API, o que acrescenta um segredo (por exemplo `EMAIL_API_KEY`) à tabela acima.
 - **Ainda não existem no código** e entram com as fases seguintes: chaves do Asaas (assinatura), chaves VAPID (Web Push) e credenciais do storage S3 (anexos). Só criar quando o código que as lê chegar.
