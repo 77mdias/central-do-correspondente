@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { Navigate, NavLink, Outlet, useNavigate, useParams } from "react-router";
 import { authCliente } from "@/auth-cliente";
-import { ultimoEscritorio } from "@/consultas";
+import { sessaoProvavel, ultimoEscritorio } from "@/consultas";
 import { cn } from "@/lib/cn";
 import { ROTULO_PERFIL } from "@/regras/rotulos";
 import type { Eu } from "@/tipos-api";
@@ -18,13 +18,16 @@ export function Casca({ eu }: { eu: Eu }) {
   const consultas = useQueryClient();
 
   useEffect(() => {
-    if (escritorio) ultimoEscritorio.guardar(escritorio.contaId);
+    if (!escritorio) return;
+    ultimoEscritorio.guardar(escritorio.contaId);
+    sessaoProvavel.marcar(true);
   }, [escritorio]);
 
   if (!escritorio) return <Navigate to="/" replace />;
 
   const sair = async () => {
     await authCliente.signOut();
+    sessaoProvavel.marcar(false);
     consultas.clear();
     navegar("/entrar");
   };

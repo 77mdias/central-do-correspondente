@@ -10,9 +10,97 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400..500&display=swap" rel="stylesheet" />
+    <!-- Casca de carregamento: a regra fica aqui, e não no CSS do app, para valer desde o primeiro quadro. -->
+    <style>
+      #pre { display: none; }
+      #raiz:empty + #pre { display: block; }
+      html:not([data-casca="app"]) [data-pre="app"],
+      html:not([data-casca="landing"]) [data-pre="landing"],
+      html:not([data-casca="simples"]) [data-pre="simples"] { display: none; }
+    </style>
+    <script>
+      // Qual casca mostrar antes do JS. Mesma regra das rotas (src/rotas.tsx) e mesma chave de consultas.ts (sessaoProvavel).
+      (function () {
+        var p = location.pathname, sessao = false;
+        try { sessao = !!localStorage.getItem("sessaoProvavel"); } catch (e) {}
+        document.documentElement.dataset.casca =
+          p === "/landing" || (p === "/" && !sessao) ? "landing" : p === "/" || p === "/escritorios" || p.indexOf("/e/") === 0 ? "app" : "simples";
+      })();
+    </script>
   </head>
   <body>
+    <!-- Sem espaço dentro de #raiz: enquanto ela está vazia (antes do JS e enquanto a sessão carrega),
+         o CSS acima mostra a casca #pre da tela que vai abrir. O React escolhe a casca em Carregando (Esqueleto.tsx). -->
     <div id="raiz"></div>
+    <div id="pre">
+      <p class="sr-only" role="status">Carregando…</p>
+
+      <!-- Escritório: mesmo desenho da Casca com a tela Início -->
+      <div data-pre="app" aria-hidden="true" class="min-h-dvh min-[900px]:grid min-[900px]:grid-cols-[15rem_1fr]">
+        <div class="hidden border-r border-borda bg-superficie p-4 min-[900px]:flex min-[900px]:flex-col min-[900px]:gap-6">
+          <div class="flex flex-col gap-2 px-2">
+            <div class="flex items-center gap-2.5"><i class="osso size-6 rounded-md"></i><i class="osso h-3.5 w-40"></i></div>
+            <i class="block h-8 rounded-lg border border-borda bg-fundo"></i>
+          </div>
+          <div class="flex flex-col gap-1">
+            <i class="block h-10 rounded-lg bg-acento-suave"></i>
+            <i class="osso mx-3 my-3 h-3.5 w-28"></i>
+          </div>
+        </div>
+        <div class="flex min-w-0 flex-col">
+          <div class="flex h-14 items-center justify-between gap-3 border-b border-borda bg-superficie px-4 min-[900px]:px-8">
+            <i class="osso h-3.5 w-40"></i>
+            <i class="block h-9 w-14 rounded-lg border border-borda"></i>
+          </div>
+          <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 min-[900px]:p-8">
+            <div class="flex flex-col gap-2.5 border-b border-borda pb-5"><i class="osso h-3 w-32"></i><i class="osso h-7 w-64 max-w-full"></i><i class="osso h-3.5 w-48"></i></div>
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div class="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-5"><i class="osso h-3 w-20"></i><i class="osso h-7 w-14"></i><i class="osso h-3 w-28"></i></div><div class="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-5"><i class="osso h-3 w-20"></i><i class="osso h-7 w-14"></i><i class="osso h-3 w-28"></i></div><div class="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-5"><i class="osso h-3 w-20"></i><i class="osso h-7 w-14"></i><i class="osso h-3 w-28"></i></div><div class="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-5"><i class="osso h-3 w-20"></i><i class="osso h-7 w-14"></i><i class="osso h-3 w-28"></i></div></div>
+            <div class="grid gap-4 lg:grid-cols-12">
+              <div class="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-5 lg:col-span-7"><i class="osso h-4 w-28"></i><i class="osso h-3 w-full"></i><i class="osso h-3 w-4/5"></i><i class="osso h-3 w-3/5"></i></div>
+              <div class="flex flex-col gap-3 rounded-xl border border-borda bg-superficie p-5 lg:col-span-5"><i class="osso h-4 w-40"></i><i class="osso h-3 w-full"></i><i class="osso h-3 w-full"></i><i class="osso h-3 w-2/3"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Landing: barra e a primeira dobra (texto à esquerda, painel à direita), sempre clara -->
+      <div data-pre="landing" aria-hidden="true" class="tema-claro min-h-dvh bg-white">
+        <div class="border-b border-borda">
+          <div class="mx-auto flex h-14 max-w-[90rem] items-center gap-4 px-4 sm:px-6">
+            <img src="/logo.svg" alt="" width="24" height="24" class="size-6" />
+            <i class="osso hidden h-3.5 w-44 lg:block"></i>
+            <span class="hidden items-center gap-5 pl-2 md:flex"><i class="osso h-3.5 w-12"></i><i class="osso h-3.5 w-20"></i><i class="osso h-3.5 w-10"></i><i class="osso h-3.5 w-14"></i></span>
+            <span class="ml-auto flex items-center gap-4"><i class="osso h-3.5 w-11"></i><i class="osso h-3.5 w-11"></i><i class="osso h-8 w-[4.5rem] rounded-md md:hidden"></i></span>
+          </div>
+        </div>
+        <div class="mx-auto grid w-full max-w-[76rem] gap-8 px-[clamp(1rem,4vw,3rem)] pt-5 lg:min-h-[calc(100dvh-3.5rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center lg:gap-12 lg:pt-0">
+          <div class="flex flex-col gap-4">
+            <i class="osso h-3 w-56"></i>
+            <div class="flex flex-col gap-2.5"><i class="osso h-7 w-[92%]"></i><i class="osso h-7 w-[64%]"></i><i class="osso h-7 w-[78%]"></i></div>
+            <div class="flex flex-col gap-2.5 pt-1"><i class="osso h-3.5 w-[88%]"></i><i class="osso h-3.5 w-[94%]"></i><i class="osso h-3.5 w-[70%]"></i></div>
+            <i class="osso mt-2 hidden h-11 w-36 rounded-lg sm:block"></i>
+          </div>
+          <div class="overflow-hidden rounded-xl border border-borda">
+            <div class="flex h-10 items-center justify-between border-b border-borda bg-[#f8f8f7] px-4"><i class="osso h-3 w-44"></i><i class="osso h-3 w-10"></i></div>
+            <div class="grid grid-cols-2"><div class="flex flex-col gap-2 border-r border-b border-borda px-4 py-3"><i class="osso h-2.5 w-20"></i><i class="osso h-6 w-8"></i></div><div class="flex flex-col gap-2 border-r border-b border-borda px-4 py-3"><i class="osso h-2.5 w-20"></i><i class="osso h-6 w-8"></i></div><div class="flex flex-col gap-2 border-r border-b border-borda px-4 py-3"><i class="osso h-2.5 w-20"></i><i class="osso h-6 w-8"></i></div><div class="flex flex-col gap-2 border-r border-b border-borda px-4 py-3"><i class="osso h-2.5 w-20"></i><i class="osso h-6 w-8"></i></div></div>
+            <div class="flex flex-col gap-2 p-4"><i class="osso h-3 w-32"></i><i class="mt-1 block h-14 rounded-lg border border-borda"></i><i class="block h-14 rounded-lg border border-borda"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telas de formulário (entrar, criar escritório, convite): mesmo desenho da TelaSimples -->
+      <div data-pre="simples" aria-hidden="true" class="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center gap-6 px-4 py-10">
+        <div class="flex items-center justify-between gap-3">
+          <span class="flex items-center gap-2.5"><i class="osso size-6 rounded-md"></i><i class="osso h-3.5 w-44"></i></span>
+          <i class="osso h-3 w-20"></i>
+        </div>
+        <div class="flex flex-col gap-5 rounded-xl border border-borda bg-superficie p-6 sm:p-7">
+          <i class="osso h-7 w-40"></i>
+          <div class="flex flex-col gap-2"><i class="osso h-3 w-24"></i><i class="block h-11 rounded-lg border border-borda"></i></div><div class="flex flex-col gap-2"><i class="osso h-3 w-24"></i><i class="block h-11 rounded-lg border border-borda"></i></div>
+          <i class="osso h-11 rounded-lg"></i>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

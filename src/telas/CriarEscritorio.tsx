@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 import { api, ErroApi } from "@/api";
 import { errosPorCampo, mensagemDeErro } from "@/componentes/formulario";
 import { Aviso, Botao, Campo, TelaSimples } from "@/componentes/ui";
+import { OssosFormulario } from "@/componentes/Esqueleto";
 import { chaves, useEu } from "@/consultas";
 import { formatarReais } from "@/regras/dinheiro";
 import { esquemaCadastro, esquemaEscritorio } from "@/regras/esquemas";
@@ -48,7 +49,7 @@ export function CriarEscritorio() {
     }
   }
 
-  if (eu.isPending) return <TelaSimples titulo="Criar escritório"><p role="status" className="text-texto-2">Carregando…</p></TelaSimples>;
+  if (eu.isPending) return <TelaSimples titulo="Criar escritório"><OssosFormulario campos={4} /></TelaSimples>;
 
   return (
     <TelaSimples titulo="Criar escritório">

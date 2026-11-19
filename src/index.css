@@ -100,6 +100,23 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Osso de esqueleto: o lugar de um texto ou número que ainda vai chegar (index.html e Esqueleto.tsx).
+   Em @layer components para as utilidades (hidden, md:hidden, rounded-lg) vencerem. */
+@layer components {
+  .osso {
+    display: block;
+    border-radius: 0.25rem;
+    background: var(--borda);
+    animation: osso 1.4s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .osso { animation: none; }
+  }
+}
+@keyframes osso {
+  50% { opacity: 0.45; }
+}
+
 .font-mono-tabular {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;

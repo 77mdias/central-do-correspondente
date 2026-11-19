@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { createBrowserRouter, Navigate } from "react-router";
 import { ErroApi } from "./api";
 import { Casca } from "./componentes/Casca";
+import { Carregando } from "./componentes/Esqueleto";
 import { ExigeSessao } from "./componentes/Sessao";
-import { ultimoEscritorio, useEu } from "./consultas";
+import { sessaoProvavel, ultimoEscritorio, useEu } from "./consultas";
 import { destinoAposEntrar } from "./regras/destino";
 import { AceitarConvite } from "./telas/AceitarConvite";
 import { ConfirmeEmail } from "./telas/ConfirmeEmail";
@@ -16,12 +18,19 @@ import { Landing } from "./telas/Landing";
 import { NovaSenha } from "./telas/NovaSenha";
 import { Privacidade, Termos } from "./telas/TermosPrivacidade";
 
-/** Raiz: mostra a Landing quando sem sessão e envia direto ao escritório quando autenticado. */
+/**
+ * Raiz: Landing para quem não tem sessão, escritório para quem tem. A landing é pública e não espera
+ * a sessão: só quem já entrou neste aparelho vê a casca do app enquanto /api/eu responde.
+ */
 export function Entrada() {
   const eu = useEu();
-  if (eu.isPending) return <p className="p-6 text-texto-2" role="status">Carregando…</p>;
+  const semSessao = eu.error instanceof ErroApi && eu.error.status === 401;
+  useEffect(() => {
+    if (semSessao) sessaoProvavel.marcar(false);
+  }, [semSessao]);
   if (eu.data) return <Navigate to={destinoAposEntrar(eu.data.escritorios, ultimoEscritorio.ler())} replace />;
-  if (eu.error && !(eu.error instanceof ErroApi && eu.error.status === 401)) return <Landing />;
+  // isFetching e não isPending: logo depois de entrar, a consulta antiga (401) ainda existe enquanto a nova não chega.
+  if (eu.isFetching && sessaoProvavel.ler()) return <Carregando casca="app" />;
   return <Landing />;
 }
 

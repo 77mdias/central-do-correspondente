@@ -3,6 +3,7 @@ import { type FormEvent, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { authCliente } from "@/auth-cliente";
 import { Aviso, Botao, Campo, TelaSimples } from "@/componentes/ui";
+import { sessaoProvavel } from "@/consultas";
 
 export function Entrar() {
   const [params] = useSearchParams();
@@ -21,6 +22,7 @@ export function Entrar() {
     const { error } = await authCliente.signIn.email({ email, password: String(f.get("senha") ?? "") });
     setEnviando(false);
     if (!error) {
+      sessaoProvavel.marcar(true);
       await consultas.invalidateQueries();
       return navegar(volta);
     }
