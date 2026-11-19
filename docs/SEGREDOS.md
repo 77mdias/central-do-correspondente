@@ -60,7 +60,21 @@ Os testes rodam no host e não precisam do CriptEnv: usam os valores fixos de `t
 
 ## Produção (a partir da fase 3)
 
-Os papéis `app_user` e `app_system` são criados à mão no Supabase, com senhas fortes, antes da primeira migration (as migrations dão grants a eles). Os segredos de produção ficam no ambiente `production` do CriptEnv e vão para o Worker como segredos da Cloudflare. As conexões do Worker usam dois Hyperdrive (`DB_APP` e `DB_SYSTEM`), cada um com o papel dele.
+Os papéis `app_user` e `app_system` são criados à mão no Supabase, com senhas fortes, antes da primeira migration (as migrations dão grants a eles). No SQL Editor do Supabase (projeto `tlpumcurfxwmalkarpjt`, feito em 19/11/2026), com senhas de `openssl rand -hex 32` e o snippet apagado depois:
+
+```sql
+create role app_user   login password '...' nobypassrls;
+create role app_system login password '...' bypassrls;
+-- D-37: fechar o schema public para a API do Supabase (desligar também a Data API no painel)
+revoke usage on schema public from anon, authenticated;
+alter default privileges for role postgres in schema public revoke all on tables    from anon, authenticated;
+alter default privileges for role postgres in schema public revoke all on sequences from anon, authenticated;
+alter default privileges for role postgres in schema public revoke all on functions from anon, authenticated;
+```
+
+As migrations até `20261115120600` entraram pelo SQL Editor, num script gerado das partes `migrate:up` com a tabela `schema_migrations` do dbmate preenchida. As próximas vão por `pnpm db:migrate` com o `DATABASE_URL_OWNER` de produção.
+
+As strings de conexão usam a *Direct connection* (`db.tlpumcurfxwmalkarpjt.supabase.co:5432`, banco `postgres`), trocando só usuário e senha. Pelo *Session pooler*, o usuário vira `app_user.tlpumcurfxwmalkarpjt`; o pooler de transação (6543) não serve. Os segredos de produção ficam no ambiente `production` do CriptEnv e vão para o Worker como segredos da Cloudflare. As conexões do Worker usam dois Hyperdrive (`DB_APP` e `DB_SYSTEM`), cada um com o papel dele.
 
 ### Ambiente `production`
 
@@ -87,6 +101,6 @@ npx wrangler secret put EMAIL_API_URL --name central-do-correspondente
 
 Antes do primeiro deploy:
 
-- **Bloco de produção.** `env.production` no `wrangler.jsonc` já tem os ids reais do Hyperdrive (`cc-db-app` e `cc-db-system`, cache desligado). Com o plugin da Cloudflare no Vite, o ambiente é escolhido no build (`CLOUDFLARE_ENV`), não com `--env`: o deploy é `pnpm deploy:producao` (ou, no Workers Builds, build `CLOUDFLARE_ENV=production pnpm build` e deploy `npx wrangler deploy`). O Worker de produção se chama `central-do-correspondente` (https://central-do-correspondente.jean-carlos3.workers.dev); o nome de topo é `central-do-correspondente-local`, para um deploy sem `CLOUDFLARE_ENV` não sobrescrever produção. O bloco não tem `secrets.required` porque o wrangler recusa o primeiro deploy de um Worker que ainda não existe; os segredos entram depois, no painel (*Settings → Variables and Secrets*), e aí a linha volta.
+- **Bloco de produção.** `env.production` no `wrangler.jsonc` já tem os ids reais do Hyperdrive (`cc-db-app` e `cc-db-system`, cache desligado). Com o plugin da Cloudflare no Vite, o ambiente é escolhido no build (`CLOUDFLARE_ENV`), não com `--env`: o deploy é `pnpm deploy:producao` (ou, no Workers Builds, build `CLOUDFLARE_ENV=production pnpm build` e deploy `npx wrangler deploy`). O Worker de produção se chama `central-do-correspondente` (https://central-do-correspondente.jean-carlos3.workers.dev); o nome de topo é `central-do-correspondente-local`, para um deploy sem `CLOUDFLARE_ENV` não sobrescrever produção. O bloco exige `BETTER_AUTH_SECRET` e `EMAIL_API_URL` (`secrets.required`): sem eles o deploy falha. Os dois ficam no painel do Worker (*Settings → Variables and Secrets*, tipo *Secret*). Num Worker novo, o primeiro deploy precisa de `--secrets-file` ou de tirar a linha temporariamente.
 - **E-mail.** `worker/email.ts` só fala com a API do Mailpit. O envio pelo provedor da P-08 precisa ser escrito. A Resend autentica por chave de API, o que acrescenta um segredo (por exemplo `EMAIL_API_KEY`) à tabela acima.
 - **Ainda não existem no código** e entram com as fases seguintes: chaves do Asaas (assinatura), chaves VAPID (Web Push) e credenciais do storage S3 (anexos). Só criar quando o código que as lê chegar.
