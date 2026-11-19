@@ -19,7 +19,8 @@
     "docker:exec": "sh docker/compose.sh exec app entrypoint.sh",
     "docker:logs": "sh docker/compose.sh logs -f app",
     "conta:liberar": "tsx scripts/conta-liberar.ts",
-    "test:e2e": "playwright test --trace off"
+    "test:e2e": "playwright test --trace off",
+    "deploy:producao": "CLOUDFLARE_ENV=production vite build && wrangler deploy"
   },
   "dependencies": {
     "@tanstack/react-query": "5.107.1",
