@@ -28,6 +28,20 @@
         "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>"
       },
       "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_URL"] }
+    },
+    // produção: Worker central-do-correspondente-production, escolhido no build (pnpm deploy:producao)
+    "production": {
+      "hyperdrive": [
+        { "binding": "DB_APP", "id": "0253d0f009b143da92d759659f2f8bfb" },
+        { "binding": "DB_SYSTEM", "id": "6c6763de2925460596be133ac22b09a6" }
+      ],
+      "vars": {
+        "APP_URL": "https://central-do-correspondente-production.SUBDOMINIO.workers.dev",
+        // shortcut: e-mail só funciona com o provedor da P-08 e domínio verificado (P-09)
+        "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>"
+      }
+      // sem secrets.required: no primeiro deploy o Worker ainda não existe e o wrangler recusa.
+      // Depois que BETTER_AUTH_SECRET e EMAIL_API_URL estiverem no painel, voltar com a linha.
     }
   }
 }
