@@ -4,6 +4,7 @@ import { Navigate, useOutletContext } from "react-router";
 import { api, ErroApi } from "@/api";
 import { mensagemDeErro } from "@/componentes/formulario";
 import { Aviso, Botao, Campo, Cartao } from "@/componentes/ui";
+import { OssosLista } from "@/componentes/Esqueleto";
 import { chaves, useEquipe } from "@/consultas";
 import { esquemaConvite } from "@/regras/esquemas";
 import { dataBr, ROTULO_PERFIL } from "@/regras/rotulos";
@@ -57,7 +58,7 @@ export function Equipe() {
       </div>
 
       {erroAcao && <Aviso tom="erro">{erroAcao}</Aviso>}
-      {equipe.isPending && <p role="status" className="text-texto-2">Carregando…</p>}
+      {equipe.isPending && <OssosLista />}
       {equipe.error && <Aviso tom="erro">Não foi possível carregar a equipe.</Aviso>}
       {equipe.data && (
         <>

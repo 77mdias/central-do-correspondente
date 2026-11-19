@@ -35,3 +35,26 @@ export const ultimoEscritorio = {
     }
   },
 };
+
+/**
+ * Pista por aparelho de que há sessão aberta (não é a sessão: essa fica no cookie). Só decide o que
+ * mostrar enquanto /api/eu responde: quem nunca entrou vê a landing na hora, sem esperar.
+ * A mesma chave é lida no index.html, antes do JS.
+ */
+export const sessaoProvavel = {
+  ler: (): boolean => {
+    try {
+      return localStorage.getItem("sessaoProvavel") !== null;
+    } catch {
+      return false;
+    }
+  },
+  marcar: (sim: boolean) => {
+    try {
+      if (sim) localStorage.setItem("sessaoProvavel", "1");
+      else localStorage.removeItem("sessaoProvavel");
+    } catch {
+      /* sem armazenamento: só não lembra */
+    }
+  },
+};

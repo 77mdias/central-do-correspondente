@@ -5,6 +5,7 @@ import { api, ErroApi } from "@/api";
 import { authCliente } from "@/auth-cliente";
 import { mensagemDeErro } from "@/componentes/formulario";
 import { Aviso, Botao, Campo, TelaSimples } from "@/componentes/ui";
+import { OssosFormulario } from "@/componentes/Esqueleto";
 import { chaves, useEu } from "@/consultas";
 import { ROTULO_PERFIL } from "@/regras/rotulos";
 import type { ConvitePublico } from "@/tipos-api";
@@ -47,7 +48,7 @@ export function AceitarConvite() {
     }
   }
 
-  if (convite.isPending || eu.isPending) return <TelaSimples titulo="Convite"><p role="status">Carregando…</p></TelaSimples>;
+  if (convite.isPending || eu.isPending) return <TelaSimples titulo="Convite"><OssosFormulario campos={2} /></TelaSimples>;
   const v = convite.data;
   if (!v || v.estado === "invalido")
     return <TelaSimples titulo="Convite"><Aviso tom="erro">{INVALIDO}</Aviso></TelaSimples>;
