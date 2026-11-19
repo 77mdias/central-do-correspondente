@@ -38,7 +38,8 @@
         { "binding": "DB_SYSTEM", "id": "6c6763de2925460596be133ac22b09a6" }
       ],
       "vars": {
-        "APP_URL": "https://central-do-correspondente.jean-carlos3.workers.dev",
+        // domínio ligado ao Worker pelo painel (aba Domains); o deploy não mexe em domínio que não está declarado aqui
+        "APP_URL": "https://central-correspondente.wdias.tech",
         // shortcut: remetente de teste da Resend, que só entrega para o e-mail do dono da conta; trocar pelo domínio verificado (P-09)
         "EMAIL_REMETENTE": "Central do Correspondente <onboarding@resend.dev>"
       },

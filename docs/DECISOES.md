@@ -91,7 +91,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-35 · Segredos no CriptEnv:** nenhum `.env` com valores no disco. No container de desenvolvimento os segredos chegam por `criptenv run`; testes e CI usam valores fixos de desenvolvimento. Ver [SEGREDOS.md](SEGREDOS.md).
 
-**D-36 · Deploy pela integração da Cloudflare com o GitHub** (19/11/2026): o Worker `central-do-correspondente` é publicado pelo Workers Builds a cada push na `main`, com a variável de build `CLOUDFLARE_ENV=production` (com o plugin do Vite o ambiente é escolhido no build, não com `--env`). Endereço provisório: https://central-do-correspondente.jean-carlos3.workers.dev, até o domínio da P-09. **Prévias de PR desligadas**: usariam os mesmos Hyperdrive, ou seja, código não revisado no banco de produção; os PRs são testados pelo CI do GitHub. O deploy exige `BETTER_AUTH_SECRET` e a chave de e-mail (`secrets.required`; hoje `EMAIL_API_KEY`, D-38), porque sem o primeiro o Better Auth assina as sessões com uma chave padrão conhecida.
+**D-36 · Deploy pela integração da Cloudflare com o GitHub** (19/11/2026): o Worker `central-do-correspondente` é publicado pelo Workers Builds a cada push na `main`, com a variável de build `CLOUDFLARE_ENV=production` (com o plugin do Vite o ambiente é escolhido no build, não com `--env`). Endereço: https://central-correspondente.wdias.tech (domínio ligado ao Worker pelo painel, 19/11/2026; fecha a P-09). O endereço `workers.dev` continua no ar, mas o login só vale no domínio (`APP_URL`). **Prévias de PR desligadas**: usariam os mesmos Hyperdrive, ou seja, código não revisado no banco de produção; os PRs são testados pelo CI do GitHub. O deploy exige `BETTER_AUTH_SECRET` e a chave de e-mail (`secrets.required`; hoje `EMAIL_API_KEY`, D-38), porque sem o primeiro o Better Auth assina as sessões com uma chave padrão conhecida.
 
 **D-37 · Supabase fechado para a API dele** (19/11/2026): o Supabase dá por padrão ao papel `anon` (chave pública) acesso ao schema `public`, o que deixaria as tabelas do Better Auth legíveis. Em produção: `revoke usage on schema public from anon, authenticated`, privilégios padrão revogados e a Data API desligada. Os Hyperdrive (`cc-db-app` e `cc-db-system`) ficam **sem cache**: o acesso depende da sessão de cada pedido, e uma resposta guardada poderia ir para quem não deveria. SQL em [SEGREDOS.md](SEGREDOS.md).
 
@@ -111,5 +111,5 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 | P-06 | Horário do lembrete diário | 8h (horário de Brasília) | William |
 | P-07 | Quantos dias antes de apagar anexos avisar | 5 dias | William |
 | ~~P-08~~ | ~~Provedor de e-mail~~ | Resolvida: Resend (D-38) | — |
-| P-09 | Domínio do app | — | William |
+| ~~P-09~~ | ~~Domínio do app~~ | Resolvida: `central-correspondente.wdias.tech` (D-36) | — |
 | P-10 | Acordo por escrito entre os sócios (código, receita, saída) | — | Sócios |
