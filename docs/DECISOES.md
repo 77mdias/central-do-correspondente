@@ -91,6 +91,10 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-35 · Segredos no CriptEnv:** nenhum `.env` com valores no disco. No container de desenvolvimento os segredos chegam por `criptenv run`; testes e CI usam valores fixos de desenvolvimento. Ver [SEGREDOS.md](SEGREDOS.md).
 
+**D-36 · Deploy pela integração da Cloudflare com o GitHub** (19/11/2026): o Worker `central-do-correspondente` é publicado pelo Workers Builds a cada push na `main`, com a variável de build `CLOUDFLARE_ENV=production` (com o plugin do Vite o ambiente é escolhido no build, não com `--env`). Endereço provisório: https://central-do-correspondente.jean-carlos3.workers.dev, até o domínio da P-09. **Prévias de PR desligadas**: usariam os mesmos Hyperdrive, ou seja, código não revisado no banco de produção; os PRs são testados pelo CI do GitHub. O deploy exige `BETTER_AUTH_SECRET` e `EMAIL_API_URL` (`secrets.required`), porque sem o primeiro o Better Auth assina as sessões com uma chave padrão conhecida.
+
+**D-37 · Supabase fechado para a API dele** (19/11/2026): o Supabase dá por padrão ao papel `anon` (chave pública) acesso ao schema `public`, o que deixaria as tabelas do Better Auth legíveis. Em produção: `revoke usage on schema public from anon, authenticated`, privilégios padrão revogados e a Data API desligada. Os Hyperdrive (`cc-db-app` e `cc-db-system`) ficam **sem cache**: o acesso depende da sessão de cada pedido, e uma resposta guardada poderia ir para quem não deveria. SQL em [SEGREDOS.md](SEGREDOS.md).
+
 ---
 
 ## Pendências
