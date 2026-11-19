@@ -27,7 +27,7 @@ As URLs apontam para a rede do compose (`postgres`, `mailpit`).
 | `BETTER_AUTH_SECRET` | gerar com `openssl rand -base64 32` |
 | `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_DB_APP` | `postgres://app_user:app_user@postgres:5432/central` |
 | `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_DB_SYSTEM` | `postgres://app_system:app_system@postgres:5432/central` |
-| `DATABASE_URL_OWNER` | `postgres://postgres:postgres@postgres:5432/central` |
+| `DATABASE_URL_OWNER` | `postgres://postgres:postgres@postgres:5432/central?sslmode=disable` |
 | `EMAIL_API_URL` | `http://mailpit:8025/api/v1/send` |
 
 ## Como o Worker local recebe os valores

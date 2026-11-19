@@ -15,5 +15,19 @@
     "APP_URL": "http://localhost:3002",
     "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>"
   },
-  "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_URL"] }
+  "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_URL"] },
+  "env": {
+    // e2e: mesmo app na porta 3102 (CLOUDFLARE_ENV=e2e, playwright.config.ts); vars e bindings não são herdados
+    "e2e": {
+      "hyperdrive": [
+        { "binding": "DB_APP", "id": "00000000000000000000000000000000" },
+        { "binding": "DB_SYSTEM", "id": "00000000000000000000000000000001" }
+      ],
+      "vars": {
+        "APP_URL": "http://localhost:3102",
+        "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>"
+      },
+      "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_URL"] }
+    }
+  }
 }
