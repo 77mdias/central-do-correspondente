@@ -1,0 +1,87 @@
+/* Landing "o expediente" (superfície viva). O motor do scroll-craft cuida de pin, pan e reveal;
+   aqui só a composição da página. Prefixo ex- para não vazar para o resto da app. */
+
+.ex {
+  --ex-barra: 3.5rem; /* altura da barra do app */
+  --ex-gutter: clamp(1rem, 4vw, 3rem);
+}
+@media (max-width: 767px) {
+  .ex { --ex-barra: 6rem; } /* barra em duas linhas: marca + relógio, depois as abas */
+}
+
+/* Palco fixado pelo motor: conteúdo centrado abaixo da barra do app. */
+.ex-palco {
+  display: flex;
+  align-items: center;
+  padding-top: var(--ex-barra);
+  background: #ffffff;
+}
+.ex-palco--coluna {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 1.25rem;
+}
+.ex-conteudo {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: var(--ex-gutter);
+}
+.ex-secao {
+  padding-block: clamp(4rem, 10vh, 7rem);
+  scroll-margin-top: var(--ex-barra);
+}
+
+/* Trilho das cobranças: o motor desloca para o lado exatamente o que passa da largura da janela. */
+.ex-trilho {
+  gap: 1rem;
+  align-items: stretch;
+  padding-inline: var(--ex-gutter);
+}
+.ex-cartao {
+  flex: none;
+  width: clamp(17rem, 25vw, 22rem);
+}
+
+/* Visão do gestor: chão escuro (Dovetail) com a malha de 40 px, revelado de baixo para cima. */
+.ex-escuro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding-top: var(--ex-barra);
+  background-color: #0a0a0a;
+  background-image:
+    linear-gradient(to right, #1e1e1e 1px, transparent 1px),
+    linear-gradient(to bottom, #1e1e1e 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: #ffffff;
+}
+
+/* Linha que acabou de mudar de estado: entra seca, sem quicar. */
+.ex-entra {
+  animation: ex-entra 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes ex-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.ex-progresso {
+  transform-origin: left center;
+  transition: transform 150ms linear;
+}
+/* O arco do cadeado fecha quando o contrato do dia aparece. */
+.ex-entra .ex-arco {
+  animation: ex-trava 360ms 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes ex-trava {
+  from { transform: translateY(-2px); }
+  to { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ex-entra,
+  .ex-entra .ex-arco { animation: none; }
+  .ex-progresso { transition: none; }
+}

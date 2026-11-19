@@ -1,54 +1,69 @@
 @import "tailwindcss";
 
-/* Tokens claro e escuro (RNF-02). Componentes usam só estes tokens, nada de cor solta. */
+/* Tokens claro (Dub) e escuro (Dovetail). Componentes usam só estes tokens (RNF-02). */
 :root {
   color-scheme: light;
-  --fundo: oklch(0.985 0.004 240);
-  --superficie: oklch(1 0 0);
-  --texto: oklch(0.23 0.02 250);
-  --texto-2: oklch(0.45 0.02 250);
-  --borda: oklch(0.9 0.01 250);
-  --marca: oklch(0.47 0.12 200);
-  --marca-forte: oklch(0.4 0.12 200);
-  --marca-texto: oklch(0.99 0 0);
-  --foco: oklch(0.6 0.15 200);
-  --perigo: oklch(0.52 0.2 27);
-  --aviso-fundo: oklch(0.95 0.06 85);
-  --aviso-texto: oklch(0.38 0.09 65);
-  --ok-fundo: oklch(0.95 0.05 155);
-  --ok-texto: oklch(0.36 0.09 155);
-  --raio: 0.6rem;
+  --fundo: #f8f8f7;
+  --superficie: #ffffff;
+  --superficie-sutil: #f4f4f4;
+  --texto: #111111;
+  --texto-2: #4a4a4a;
+  --borda: #e5e5e5;
+  --borda-campo: #171717;
+  --marca: #1a4be0;
+  --marca-forte: #143bb5;
+  --marca-texto: #ffffff;
+  --acento: #1a4be0;
+  --acento-suave: #eff6ff;
+  --foco: #1a4be0;
+  --perigo: #b91c1c;
+  --aviso-fundo: #ffedd5;
+  --aviso-texto: #9a3412;
+  --ok-fundo: #dcfce7;
+  --ok-texto: #15803d;
+  --raio: 0.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --fundo: oklch(0.18 0.01 250);
-    --superficie: oklch(0.23 0.012 250);
-    --texto: oklch(0.94 0.005 250);
-    --texto-2: oklch(0.75 0.01 250);
-    --borda: oklch(0.34 0.012 250);
-    --marca: oklch(0.72 0.11 200);
-    --marca-forte: oklch(0.8 0.1 200);
-    --marca-texto: oklch(0.18 0.02 250);
-    --foco: oklch(0.78 0.12 200);
-    --perigo: oklch(0.7 0.17 27);
-    --aviso-fundo: oklch(0.33 0.06 75);
-    --aviso-texto: oklch(0.92 0.06 85);
-    --ok-fundo: oklch(0.3 0.05 155);
-    --ok-texto: oklch(0.9 0.06 155);
+    --fundo: #0a0a0a;
+    --superficie: #141414;
+    --superficie-sutil: #1e1e1e;
+    --texto: #ffffff;
+    --texto-2: #a7a7a7;
+    --borda: #313131;
+    --borda-campo: #454545;
+    --marca: #ffffff;
+    --marca-forte: #e5e5e5;
+    --marca-texto: #0a0a0a;
+    --acento: #6798ff;
+    --acento-suave: #1e1e1e;
+    --foco: #6798ff;
+    --perigo: #fca5a5;
+    --aviso-fundo: #2b180c;
+    --aviso-texto: #fdba74;
+    --ok-fundo: #0f291a;
+    --ok-texto: #6ee7a8;
+    --logo-azul: #6798ff;
   }
 }
 
 @theme inline {
+  --font-sans: "Host Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --color-fundo: var(--fundo);
   --color-superficie: var(--superficie);
+  --color-superficie-sutil: var(--superficie-sutil);
   --color-texto: var(--texto);
   --color-texto-2: var(--texto-2);
   --color-borda: var(--borda);
+  --color-borda-campo: var(--borda-campo);
   --color-marca: var(--marca);
   --color-marca-forte: var(--marca-forte);
   --color-marca-texto: var(--marca-texto);
+  --color-acento: var(--acento);
+  --color-acento-suave: var(--acento-suave);
   --color-foco: var(--foco);
   --color-perigo: var(--perigo);
   --color-aviso-fundo: var(--aviso-fundo);
@@ -58,10 +73,44 @@
   --radius-md: var(--raio);
 }
 
+/* Força polaridade clara (Dub) dentro da Landing mesmo quando o navegador prefere escuro. */
+.tema-claro {
+  color-scheme: light;
+  --fundo: #ffffff;
+  --superficie: #ffffff;
+  --superficie-sutil: #f4f4f4;
+  --texto: #111111;
+  --texto-2: #4a4a4a;
+  --borda: #e5e5e5;
+  --borda-campo: #171717;
+  --marca: #1a4be0;
+  --marca-forte: #143bb5;
+  --marca-texto: #ffffff;
+  --acento: #1a4be0;
+  --acento-suave: #eff6ff;
+  --foco: #1a4be0;
+  --perigo: #b91c1c;
+  --logo-azul: #213fa0;
+}
+
 body {
   background: var(--fundo);
   color: var(--texto);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.blueprint-grid {
+  background-color: #0a0a0a;
+  background-image:
+    linear-gradient(to right, #1e1e1e 1px, transparent 1px),
+    linear-gradient(to bottom, #1e1e1e 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 :focus-visible {

@@ -8,3 +8,9 @@ test-results/
 # nunca segredos no disco (docs/SEGREDOS.md)
 .env*
 .dev.vars*
+# estado local das ferramentas de agente e do navegador de conferência
+.claude-flow/
+.swarm/
+agentdb.rvf*
+ruvector.db
+landing/.taste-skill/

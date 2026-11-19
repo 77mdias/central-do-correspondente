@@ -4,17 +4,15 @@ Nenhum `.env` ou `.dev.vars` com valores no disco (D-35). Os segredos ficam cifr
 
 ## Primeira configuração (uma vez por máquina)
 
-1. Criar o projeto `central-do-correspondente` no CriptEnv, com o ambiente `development`.
+1. Criar o projeto `central-do-correspondente` no CriptEnv, com o ambiente `development`. Já existe: ID `ba29641d-0d7d-4505-8413-3f4e3ac1c18f`, que é o padrão de `CRIPTENV_PROJECT` em `compose.app.yaml` (o ID não é segredo).
 2. Gravar as variáveis do ambiente `development` (tabela abaixo).
-3. Criar a API key só de leitura presa ao ambiente e guardar as credenciais no chaveiro do sistema (o `secret-tool` pede o valor sem mostrar):
+3. Criar a API key só de leitura presa ao ambiente e guardar as credenciais no chaveiro do sistema (o `secret-tool` pede o valor sem mostrar). O `api-keys create` só aceita o ID do projeto, não o nome:
 
 ```bash
-criptenv api-keys create -p central-do-correspondente -n docker-dev -s read:secrets --env development
+criptenv api-keys create -p ba29641d-0d7d-4505-8413-3f4e3ac1c18f -n docker-dev -s read:secrets --env development
 secret-tool store --label='CriptEnv central-do-correspondente api-key' service criptenv project central-do-correspondente item api-key
 secret-tool store --label='CriptEnv central-do-correspondente vault-password' service criptenv project central-do-correspondente item vault-password
 ```
-
-4. Se o `criptenv run` pedir o ID do projeto (e não o nome), trocar o padrão de `CRIPTENV_PROJECT` em `compose.app.yaml` pelo ID, que não é segredo.
 
 **Guarde também a senha do cofre no seu gerenciador de senhas**: sem ela ninguém lê os segredos.
 
@@ -63,3 +61,32 @@ Os testes rodam no host e não precisam do CriptEnv: usam os valores fixos de `t
 ## Produção (a partir da fase 3)
 
 Os papéis `app_user` e `app_system` são criados à mão no Supabase, com senhas fortes, antes da primeira migration (as migrations dão grants a eles). Os segredos de produção ficam no ambiente `production` do CriptEnv e vão para o Worker como segredos da Cloudflare. As conexões do Worker usam dois Hyperdrive (`DB_APP` e `DB_SYSTEM`), cada um com o papel dele.
+
+### Ambiente `production`
+
+Os valores secretos (os quatro primeiros e o último, porque as strings de conexão levam senha) ficam no CriptEnv; a coluna "Onde" diz para onde cada um vai.
+
+| Variável | Onde | Valor de produção |
+|---|---|---|
+| `BETTER_AUTH_SECRET` | segredo do Worker | novo, gerado com `openssl rand -base64 32` (nunca o de desenvolvimento) |
+| `EMAIL_API_URL` | segredo do Worker | endpoint de envio do provedor da P-08 (proposta: Resend) |
+| `DB_APP` | Hyperdrive | string de conexão do Supabase com o papel `app_user` |
+| `DB_SYSTEM` | Hyperdrive | string de conexão do Supabase com o papel `app_system` |
+| `APP_URL` | `vars` do `wrangler.jsonc` | domínio real com `https://` (base do Better Auth) |
+| `EMAIL_REMETENTE` | `vars` do `wrangler.jsonc` | `Central do Correspondente <nao-responda@…>`, com o domínio verificado no provedor |
+| `DATABASE_URL_OWNER` | só CriptEnv, nunca no Worker | conexão do papel `postgres` do Supabase, para `pnpm db:migrate` e `pnpm conta:liberar` |
+
+Para levar os valores ao Cloudflare:
+
+```bash
+npx wrangler hyperdrive create cc-db-app --connection-string="<string do app_user>"
+npx wrangler hyperdrive create cc-db-system --connection-string="<string do app_system>"
+npx wrangler secret put BETTER_AUTH_SECRET --env production
+npx wrangler secret put EMAIL_API_URL --env production
+```
+
+Antes do primeiro deploy:
+
+- **`wrangler.jsonc` sem bloco de produção.** Hoje os valores de topo são os de localhost, e os ids do Hyperdrive são falsos (`0000…`). Criar um `env.production` com os dois ids que o `hyperdrive create` devolver, o `APP_URL`, o `EMAIL_REMETENTE` e `secrets.required`: blocos `env` não herdam `vars`, `hyperdrive` nem `secrets`.
+- **E-mail.** `worker/email.ts` só fala com a API do Mailpit. O envio pelo provedor da P-08 precisa ser escrito. A Resend autentica por chave de API, o que acrescenta um segredo (por exemplo `EMAIL_API_KEY`) à tabela acima.
+- **Ainda não existem no código** e entram com as fases seguintes: chaves do Asaas (assinatura), chaves VAPID (Web Push) e credenciais do storage S3 (anexos). Só criar quando o código que as lê chegar.
