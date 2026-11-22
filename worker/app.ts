@@ -10,6 +10,7 @@ import { rotasConvites } from "./rotas/convites";
 import { rotasCorretores } from "./rotas/corretores";
 import { rotasEquipe } from "./rotas/equipe";
 import { rotasEu } from "./rotas/eu";
+import { rotasImportacao } from "./rotas/importacao";
 import { rotasVgv } from "./rotas/vgv";
 
 export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
@@ -49,6 +50,7 @@ export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   app.route("/api", rotasArquivos);
   app.route("/api", rotasCorretores);
   app.route("/api", rotasVgv);
+  app.route("/api", rotasImportacao);
 
   app.onError((err, c) => {
     console.error(err);
