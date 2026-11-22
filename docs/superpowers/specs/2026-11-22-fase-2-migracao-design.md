@@ -142,7 +142,7 @@ O convite do corretor usa a rota que já existe (`POST …/convites` com `perfil
 O botão entra no menu do protótipo e baixa `central-AAAA-MM-DD.json` com o que a página já tem carregado:
 
 ```json
-{ "formato": "central-prototipo", "versao": 1, "exportadoEm": "2026-11-22T12:00:00.000Z",
+{ "formato": "central-prototipo", "versao": 1, "origem": "<uuid da cópia>", "exportadoEm": "2026-11-22T12:00:00.000Z",
   "config": { "percentual": 1.2, "historicoPct": [{ "t": "…", "pct": 1.2 }] },
   "corretores": [{ "id": "…", "nome": "…", "imobiliaria": "…", "telefone": "…", "creci": "…", "email": "…", "criadoEm": "…" }],
   "clientes": [{ "id": "…", "nome": "…", "…": "todos os campos como estão no banco do protótipo" }] }
@@ -150,7 +150,9 @@ O botão entra no menu do protótipo e baixa `central-AAAA-MM-DD.json` com o que
 
 - O arquivo inclui os metadados de `arquivos`, só para a prévia dizer quantos anexos vão precisar ser reenviados.
 - A mudança é feita na cópia `docs/prototipo/prototipo.html` e republicada **no mesmo Artifact**: mesmo link e mesmo banco, então os dados continuam lá.
-- Quem republica precisa ter edição no Artifact. Ver a pergunta 1 da seção 16.
+- **Uma cópia do protótipo é um escritório** (decisão do Jean, seção 16). Cada correspondente usa a própria cópia, e o botão entra em cada uma. Eu preparo o HTML, e quem é dono da cópia republica.
+- **`origem`:** na primeira exportação, o botão sorteia um uuid e grava em `config/geral.origem`, no banco da própria cópia. Daí em diante toda exportação daquela cópia leva o mesmo valor. É assim que o app reconhece a cópia (seção 10.2).
+- Se uma cópia tiver clientes de dois escritórios, ela **não é importada** até alguém separar os dados fora do app. O importador não tem como separar.
 
 ### 10.2 Importar no app
 
@@ -164,7 +166,7 @@ O botão entra no menu do protótipo e baixa `central-AAAA-MM-DD.json` com o que
    - quantos anexos terão de ser reenviados.
 3. "Importar" envia o JSON para `POST …/importacao`. O Worker valida de novo e grava tudo numa transação, como `app_user` (a RLS vale). Ou entra tudo, ou nada.
 
-**Condições:** a conta está ativa (`conta_ativa`), ainda não importou (`contas.importado_prototipo_em` nulo) e não tem clientes nem corretores. Assim não há o que mesclar. A importação grava `importado_prototipo_em`, uma nota do tipo `sistema` em cada cliente ("Importado do protótipo em dd/mm/aaaa") e uma linha de auditoria.
+**Condições:** a conta está ativa (`conta_ativa`), ainda não importou (`contas.importado_prototipo_em` nulo) e não tem clientes nem corretores. Assim não há o que mesclar. Além disso, **a mesma cópia do protótipo (`origem`) não entra em duas contas**: `contas.prototipo_origem` é único no banco. Uma segunda importação da mesma cópia, mesmo em outra conta, é recusada com a mensagem "Estes dados já foram importados em outro escritório". A importação grava `importado_prototipo_em`, uma nota do tipo `sistema` em cada cliente ("Importado do protótipo em dd/mm/aaaa") e uma linha de auditoria.
 
 **Gatilhos durante a importação:** a transação faz `set_config('app.importando', 'on', true)`. Com essa marca, os gatilhos de RN-07 (congelar percentual), RN-12 (`atualizado_em`), histórico automático e auditoria por linha não agem, e as datas e percentuais originais ficam preservados. Só a rota de importação liga a marca; o teste de banco prova que, sem ela, os gatilhos seguem valendo.
 
@@ -196,7 +198,7 @@ O botão entra no menu do protótipo e baixa `central-AAAA-MM-DD.json` com o que
 ## 11. Exclusão programada de anexos (RF-27, RN-14)
 
 A rotina roda pelo Cron Trigger diário às 3h de Brasília (6h UTC), como `app_system`, sempre filtrando por `conta_id`:
-1. **Aviso:** clientes com `anexos_apagar_em = hoje_br() + 5` (P-07) e anexos não apagados geram **um e-mail por conta** para G e F, listando os clientes e a data.
+1. **Aviso:** clientes com `anexos_apagar_em = hoje_br() + 5` (P-07, confirmada pelo Jean) e anexos não apagados geram **um e-mail por conta** para G e F, listando os clientes e a data.
 2. **Exclusão:** clientes com `anexos_apagar_em <= hoje_br()`:
    - apaga os objetos no S3;
    - grava `arquivos.apagado_em`;
@@ -212,6 +214,7 @@ A rotina é idempotente: rodar duas vezes no mesmo dia não manda dois avisos (m
 - Migration que **popula `tipos_documento`** com os 12 tipos da lista do MODELO-DE-DADOS (P-01).
 - Os gatilhos passam a respeitar `app.importando` (seção 10.2).
 - `arquivos.tamanho` com `check (tamanho <= 20971520)`; `arquivos.tipo_documento` aponta para `tipos_documento` ou vale `outros`.
+- `contas.prototipo_origem text unique`, gravado junto com `importado_prototipo_em` pela função `marcar_importacao(conta, origem)` (`security definer`; confere `meu_perfil(conta) = 'gestor'`), porque `app_user` não altera `contas` além do nome.
 - `anexos_aviso_em date` em `clientes`, para o aviso não ir duas vezes (seção 11).
 - Política de **insert em `auditoria`** para `app_user`, restrita a `acao in ('ver', 'baixar')`, à própria conta e a `usuario_id = meu_usuario_id()`. Leitura continua só do gestor.
 - Nenhuma mudança na RLS de `clientes`, `documentos`, `arquivos` e `historico`: elas já existem e têm teste. A fase acrescenta casos de teste (seção 13).
@@ -230,6 +233,7 @@ A rotina é idempotente: rodar duas vezes no mesmo dia não manda dois avisos (m
   - upload grava a linha e o objeto (s3mock);
   - link temporário grava a auditoria;
   - importação de um JSON de exemplo (com dados inventados em `tests/fixtures/`) bate com o esperado e não roda duas vezes;
+  - a mesma `origem` não entra em uma segunda conta;
   - a rotina da seção 11 avisa e apaga.
 - **unit:**
   - regras de `src/regras/`: ativo, parado, cobrança, faltando, ordenação, mensagens, link do WhatsApp, cota, dinheiro, hoje em Brasília;
@@ -245,7 +249,7 @@ A rotina é idempotente: rodar duas vezes no mesmo dia não manda dois avisos (m
 
 ## 14. Documentos a atualizar nesta fase
 
-- **DECISOES:** D-39 (P-02) e D-40 (P-11) já entraram junto com esta spec. Atualizar a P-07 se o William mudar os 5 dias.
+- **DECISOES:** D-39 (P-02) e D-40 (P-11) já entraram junto com esta spec. A P-07 (5 dias) foi confirmada pelo Jean.
 - **SRS:** RF-36 sem "pendência P-02"; RF-90 citando o botão de exportar; a origem "Protótipo" continua valendo.
 - **MODELO-DE-DADOS:** substituir a seção 8 pelo mapeamento da seção 10.3; acrescentar `anexos_aviso_em`, a marca `app.importando` e a política de insert da auditoria.
 - **ARQUITETURA:** rotas da seção 7 (`/api/importar` vira `/api/contas/:contaId/importacao`, e o link de arquivo passa para dentro da conta); segredos S3; rotina de anexos.
@@ -262,9 +266,9 @@ A rotina é idempotente: rodar duas vezes no mesmo dia não manda dois avisos (m
 
 ## 16. Escolhas minhas e perguntas para o Jean
 
-**Perguntas (preciso da resposta antes do plano):**
-1. **Quem tem edição no Artifact do protótipo, e cada correspondente usa uma cópia própria?** O protótipo não separa escritórios: se as duas usam o mesmo Artifact, os clientes delas estão misturados no mesmo banco. A importação teria então de separar por corretor ou por alguma outra marca. Se cada uma tem a sua cópia, cada cópia precisa do botão.
-2. **P-07 (aviso 5 dias antes de apagar os anexos):** continua a proposta, ou o William prefere outro prazo? É uma constante; muda sem custo.
+**Respostas do Jean (22/11/2026):**
+1. **Os clientes de escritórios diferentes não se misturam.** Cada correspondente exporta da própria cópia do protótipo, e o banco garante que uma cópia entra em uma conta só (seção 10).
+2. **P-07:** o aviso continua 5 dias antes de apagar os anexos.
 
 **Escolhas para conferir:**
 1. Visual do app atual (tokens de `src/index.css`) com o conteúdo e a organização do protótipo. Não copio as cores nem as fontes do protótipo (seção 6).

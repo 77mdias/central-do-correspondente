@@ -99,7 +99,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-39 · Cobrança só com "Enviou?"** (22/11/2026, fecha a P-02): ao voltar do WhatsApp (ou depois de copiar a mensagem), o app pergunta "Enviou a cobrança para Fulano?" e só registra a cobrança (RN-13) se a resposta for sim. Sem resposta, o cliente fica com "Cobrança aberta" em Cobrar hoje. Detalhe na spec da fase 2, seção 9.
 
-**D-40 · Dados do protótipo por "Exportar JSON"** (22/11/2026, fecha a P-11): o protótipo ganha um botão que baixa os dados dele num JSON (`formato: "central-prototipo"`, `versao: 1`), republicado no mesmo Artifact para manter o banco. O importador do app (RF-90) lê esse arquivo, numa conta vazia, uma vez só. Os anexos não migram: são reenviados à mão. Detalhe na spec da fase 2, seção 10.
+**D-40 · Dados do protótipo por "Exportar JSON"** (22/11/2026, fecha a P-11): o protótipo ganha um botão que baixa os dados dele num JSON (`formato: "central-prototipo"`, `versao: 1`), republicado no mesmo Artifact para manter o banco. O importador do app (RF-90) lê esse arquivo, numa conta vazia, uma vez só. Uma cópia do protótipo é um escritório: os clientes de escritórios diferentes nunca se misturam, e o banco recusa importar a mesma cópia (`origem`) em duas contas. Os anexos não migram: são reenviados à mão. Detalhe na spec da fase 2, seção 10.
 
 ---
 
@@ -113,7 +113,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 | P-04 | Como a correspondente nova se cadastra | Cadastro feito na fase 1 (D-33). Falta: página de venda → escolha do plano → cadastro → pagamento no Asaas → conta ativa | William |
 | P-05 | Formas de pagamento aceitas no Asaas | Cartão, Pix e boleto | William |
 | P-06 | Horário do lembrete diário | 8h (horário de Brasília) | William |
-| P-07 | Quantos dias antes de apagar anexos avisar | 5 dias | William |
+| ~~P-07~~ | ~~Quantos dias antes de apagar anexos avisar~~ | Resolvida: 5 dias (confirmado pelo Jean em 22/11/2026) | — |
 | ~~P-08~~ | ~~Provedor de e-mail~~ | Resolvida: Resend (D-38) | — |
 | ~~P-09~~ | ~~Domínio do app~~ | Resolvida: `central-correspondente.wdias.tech` (D-36) | — |
 | P-10 | Acordo por escrito entre os sócios (código, receita, saída) | — | Sócios |
