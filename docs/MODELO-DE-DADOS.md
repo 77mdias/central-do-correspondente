@@ -56,7 +56,6 @@ create type acao_auditoria as enum ('ver', 'criar', 'alterar', 'excluir', 'baixa
 | vencimento_em_aberto | date | preenchido pelo webhook quando atrasa |
 | asaas_customer_id | text | |
 | asaas_subscription_id | text | |
-| importado_prototipo_em | timestamptz | impede importar duas vezes |
 | criado_em | timestamptz default now() | |
 
 `plano`, `status_assinatura` e `ativa_ate` não têm permissão de update para `app_user`: só o comando `conta:liberar`, o webhook e as rotinas do sistema mudam esses campos.
@@ -178,6 +177,23 @@ Gatilho `tg_limite_convite` (RN-18): em conta `simples` recusa qualquer convite;
 | marcado_por | uuid → "user" | |
 
 `unique (cliente_id, tipo)`. Os 12 tipos ficam numa tabela fixa `tipos_documento (codigo, nome, grupo, ordem)` para a lista ser igual em todo lugar.
+
+**Lista proposta (P-01, aguardando revisão do William com as correspondentes).** Documentos usuais do financiamento habitacional da Caixa; a tabela só recebe as linhas depois da revisão.
+
+| Grupo | Ordem | `codigo` | Nome |
+|---|---|---|---|
+| comprador | 1 | `identidade` | RG ou CNH, com CPF |
+| comprador | 2 | `estado_civil` | Certidão de nascimento ou casamento |
+| comprador | 3 | `residencia` | Comprovante de residência |
+| comprador | 4 | `renda` | Comprovante de renda |
+| comprador | 5 | `ctps` | Carteira de trabalho |
+| comprador | 6 | `irpf` | Declaração do Imposto de Renda |
+| comprador | 7 | `fgts` | Extrato do FGTS |
+| comprador | 8 | `conjuge` | Documentos do cônjuge ou de quem compõe a renda |
+| imovel_vendedor | 1 | `matricula` | Matrícula atualizada do imóvel |
+| imovel_vendedor | 2 | `iptu` | IPTU |
+| imovel_vendedor | 3 | `vendedor` | Documentos do vendedor (RG, CPF e estado civil) |
+| imovel_vendedor | 4 | `contrato_compra` | Contrato ou proposta de compra e venda |
 
 ### arquivos
 | Campo | Tipo | Nota |
@@ -301,20 +317,3 @@ Storage (`documentos`): inserir quando o primeiro segmento do caminho é uma con
 - `vw_vgv_origem`: contratos, VGV, financiado, remuneração e em andamento por corretor/cliente direto.
 
 As views filtram por `meu_perfil(conta_id) = 'gestor'` (um único papel, `app_user`, atende todos os perfis) e são `security_invoker` + `security_barrier`: valem a RLS das tabelas de quem consulta e o filtro de perfil roda antes de qualquer filtro de quem consulta.
-
-## 8. Mapeamento do protótipo (importador)
-
-| Protótipo | Novo |
-|---|---|
-| `clientes.telefone` | `clientes.whatsapp` |
-| `corretorId` | `corretor_id` (via mapa de ids importados) |
-| `valorImovel`, `valorFinanciado`, `valorAvaliacao` | `valor_imovel_centavos`, `valor_financiado_centavos`, `valor_avaliacao_centavos` (× 100) |
-| `fgtsUsado` | `fgts_centavos` (× 100) |
-| `contrato`, `dataContrato` | `numero_contrato`, `data_assinatura` |
-| `pctContrato`, `pctOverride`, `remRecebida` | `clientes_remuneracao.*` |
-| `docs` (data por documento) | linhas em `documentos` |
-| `arquivos` | **não importados** (arquivos do protótipo precisam ser reenviados, ou importados à parte se o storage do protótipo permitir exportar) |
-| `historico` | linhas em `historico` (tipo `nota`) |
-| `config/geral.percentual`, `historicoPct` | `contas_config.percentual_atual`, `historico_percentual` |
-
-Gatilhos de RN-07 e RN-12 ficam desligados durante a importação, para preservar percentuais e datas originais.

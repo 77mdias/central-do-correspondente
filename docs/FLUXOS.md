@@ -181,7 +181,7 @@ Troca de plano (RF-74): o gestor muda na tela Assinatura e o Worker atualiza o v
 2. Formulário: nome, e-mail, senha, nome do escritório, CPF ou CNPJ (o Asaas exige).
 3. Aceite dos termos.
 4. Link de pagamento do Asaas.
-5. Webhook confirma → conta ativa → gestor entra no Início vazio, com atalho para "Importar do protótipo" e "Cadastrar primeiro cliente".
+5. Webhook confirma → conta ativa → gestor entra no Início vazio, com atalho para "Cadastrar primeiro cliente".
 
 ---
 

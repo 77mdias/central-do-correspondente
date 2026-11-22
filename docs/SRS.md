@@ -3,7 +3,7 @@
 Central do Correspondente · versão 0.1 · 13/11/2026
 
 Cada requisito tem código para ser citado em tarefas, commits e testes.
-**Origem:** `Protótipo` = já existe no protótipo, precisa ser refeito no banco novo · `Novo` = não existe ainda · `Alterado` = existe, mas muda · `Removido` = saiu do escopo.
+**Origem:** `Briefing` = veio do Briefing (03/11/2026) · `Novo` = acrescentado no planejamento · `Alterado` = veio do Briefing e mudou no planejamento · `Removido` = saiu do escopo. Nada disso existe em outro sistema: não há protótipo (D-24).
 
 Perfis: **G** gestor · **F** funcionária · **C** corretor.
 
@@ -29,36 +29,36 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RF-01 | Contadores de processos ativos, cobrar hoje, com documento faltando e parados há 7+ dias; cada contador abre a lista filtrada | Protótipo |
-| RF-02 | Até 6 cobranças do dia com botão de WhatsApp | Protótipo |
-| RF-03 | Até 6 processos parados e até 6 com documentos faltando, mostrando os 3 primeiros documentos pendentes | Protótipo |
-| RF-04 | Tabela por origem (corretor ou cliente direto) com ativos, cobrar, pendência e parados; até 8 linhas | Protótipo |
-| RF-05 | As 7 últimas entradas de histórico de todos os clientes | Protótipo |
+| RF-01 | Contadores de processos ativos, cobrar hoje, com documento faltando e parados há 7+ dias; cada contador abre a lista filtrada | Briefing |
+| RF-02 | Até 6 cobranças do dia com botão de WhatsApp | Briefing |
+| RF-03 | Até 6 processos parados e até 6 com documentos faltando, mostrando os 3 primeiros documentos pendentes | Briefing |
+| RF-04 | Tabela por origem (corretor ou cliente direto) com ativos, cobrar, pendência e parados; até 8 linhas | Briefing |
+| RF-05 | As 7 últimas entradas de histórico de todos os clientes | Briefing |
 
 ### 1.3 Clientes
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RF-10 | Cadastrar cliente com nome (obrigatório), CPF, WhatsApp, e-mail, modalidade, origem, valor do imóvel e valor a financiar | Protótipo |
-| RF-11 | Cliente novo entra em "Documentação pendente", com cobrança para hoje e intervalo de 3 dias | Protótipo |
-| RF-12 | Buscar por nome, nº do contrato, corretor, imobiliária, CPF ou telefone (dígitos a partir de 3) | Protótipo |
-| RF-13 | Filtrar por origem, etapa e pelos cards: ativos, cobrar hoje, com pendência, parados, finalizados | Protótipo |
-| RF-14 | Ordenar: ativos primeiro, depois cobrança vencida, depois mais dias sem atualização | Protótipo |
-| RF-15 | Editar campos na ficha com salvamento automático (700 ms após parar de digitar) | Protótipo |
-| RF-16 | Mudar a etapa entre as 10 etapas, com registro no histórico | Protótipo |
+| RF-10 | Cadastrar cliente com nome (obrigatório), CPF, WhatsApp, e-mail, modalidade, origem, valor do imóvel e valor a financiar | Briefing |
+| RF-11 | Cliente novo entra em "Documentação pendente", com cobrança para hoje e intervalo de 3 dias | Briefing |
+| RF-12 | Buscar por nome, nº do contrato, corretor, imobiliária, CPF ou telefone (dígitos a partir de 3) | Briefing |
+| RF-13 | Filtrar por origem, etapa e pelos cards: ativos, cobrar hoje, com pendência, parados, finalizados | Briefing |
+| RF-14 | Ordenar: ativos primeiro, depois cobrança vencida, depois mais dias sem atualização | Briefing |
+| RF-15 | Editar campos na ficha com salvamento automático (700 ms após parar de digitar) | Briefing |
+| RF-16 | Mudar a etapa entre as 10 etapas, com registro no histórico | Briefing |
 | RF-17 | Anotar atualizações livres no histórico, **sem limite de entradas** | Alterado |
-| RF-18 | Excluir cliente com confirmação em dois cliques | Protótipo |
+| RF-18 | Excluir cliente com confirmação em dois cliques | Briefing |
 | RF-19 | Validar CPF e CNPJ (dígitos verificadores; CNPJ alfanumérico da IN RFB 2.229/2024 aceito), telefone brasileiro (10 ou 11 dígitos, com DDD) e e-mail | Novo |
 
 ### 1.4 Documentos
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RF-20 | Checklist de 12 documentos em 2 grupos: Comprador (8) e Imóvel e vendedor (4), mais "Outros arquivos". Lista única para todas as modalidades | Protótipo |
-| RF-21 | Marcar documento como recebido com data; desmarcar volta a pendente | Protótipo |
-| RF-22 | Anexar PDF (até 20 MB) ou foto (JPG, PNG, WebP, HEIC); fotos acima de 2,5 MB reduzidas para 2.200 px em JPG no navegador | Protótipo |
-| RF-23 | Anexar um arquivo marca o documento como recebido | Protótipo |
-| RF-24 | Remover anexo com confirmação (G e F) | Protótipo |
+| RF-20 | Checklist de 12 documentos em 2 grupos: Comprador (8) e Imóvel e vendedor (4), mais "Outros arquivos". Lista única para todas as modalidades | Briefing |
+| RF-21 | Marcar documento como recebido com data; desmarcar volta a pendente | Briefing |
+| RF-22 | Anexar PDF (até 20 MB) ou foto (JPG, PNG, WebP, HEIC); fotos acima de 2,5 MB reduzidas para 2.200 px em JPG no navegador | Briefing |
+| RF-23 | Anexar um arquivo marca o documento como recebido | Briefing |
+| RF-24 | Remover anexo com confirmação (G e F) | Briefing |
 | RF-25 | Checklist diferente por modalidade | **Removido** |
 | RF-26 | Abrir ou baixar anexo só por link temporário, com registro na auditoria | Novo |
 | RF-27 | Apagar anexos automaticamente conforme RN-14, com aviso prévio a G e F | Novo |
@@ -67,11 +67,11 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RF-30 | Gerar mensagem para o cliente listando os documentos que faltam | Protótipo |
-| RF-31 | Abrir o WhatsApp do cliente com a mensagem pronta (`wa.me`, DDI 55 automático) | Protótipo |
-| RF-32 | Registrar a cobrança: data, contador e próxima data pelo intervalo (1, 2, 3, 5 ou 7 dias) | Protótipo |
-| RF-33 | Mudar a data da próxima cobrança manualmente | Protótipo |
-| RF-34 | Copiar a mensagem quando não houver WhatsApp cadastrado | Protótipo |
+| RF-30 | Gerar mensagem para o cliente listando os documentos que faltam | Briefing |
+| RF-31 | Abrir o WhatsApp do cliente com a mensagem pronta (`wa.me`, DDI 55 automático) | Briefing |
+| RF-32 | Registrar a cobrança: data, contador e próxima data pelo intervalo (1, 2, 3, 5 ou 7 dias) | Briefing |
+| RF-33 | Mudar a data da próxima cobrança manualmente | Briefing |
+| RF-34 | Copiar a mensagem quando não houver WhatsApp cadastrado | Briefing |
 | RF-35 | Avisar G e F das cobranças do dia sem abrir o app: push (PWA) e e-mail diário | Novo |
 | RF-36 | Ao voltar do WhatsApp, perguntar "Enviou?"; registrar a cobrança só se sim (pendência P-02) | Novo |
 
@@ -79,11 +79,11 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RF-40 | Cadastrar corretor com nome (obrigatório), imobiliária, WhatsApp, CRECI e e-mail | Protótipo |
+| RF-40 | Cadastrar corretor com nome (obrigatório), imobiliária, WhatsApp, CRECI e e-mail | Briefing |
 | RF-41 | Card por corretor com ativos, contratados, VGV ativo e alertas (cobrar, pendência, parados). VGV só para G | Alterado |
-| RF-42 | Card fixo "Clientes diretos" para clientes sem corretor | Protótipo |
-| RF-43 | Mensagem para o corretor com a situação e documentos faltando de cada cliente dele | Protótipo |
-| RF-44 | Impedir remover corretor que ainda tem clientes | Protótipo |
+| RF-42 | Card fixo "Clientes diretos" para clientes sem corretor | Briefing |
+| RF-43 | Mensagem para o corretor com a situação e documentos faltando de cada cliente dele | Briefing |
+| RF-44 | Impedir remover corretor que ainda tem clientes | Briefing |
 | RF-45 | Botão "Convidar para o portal" no cadastro do corretor (exige e-mail) e indicação de status: sem acesso, convidado, ativo. Só no plano Com corretores; no Simples, o botão indica que o portal faz parte desse plano | Novo |
 
 ### 1.7 VGV e comissões (só gestor)
@@ -91,12 +91,12 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | Código | Requisito | Origem |
 |---|---|---|
 | RF-50 | Definir o percentual atual de remuneração (0 a 100%) e guardar **todas** as alterações | Alterado |
-| RF-51 | Pipeline (não contratado): VGV, financiamento previsto e remuneração prevista | Protótipo |
-| RF-52 | VGV contratado por período: este mês, mês anterior, este ano, tudo | Protótipo |
-| RF-53 | Valor financiado, cota média, remuneração, remuneração recebida e ticket médio | Protótipo |
-| RF-54 | Tabela por origem com contratos, VGV, financiado, remuneração e em andamento; tocar na linha abre Clientes filtrado | Protótipo |
-| RF-55 | Barra de VGV por etapa | Protótipo |
-| RF-56 | Marcar remuneração como recebida por cliente | Protótipo |
+| RF-51 | Pipeline (não contratado): VGV, financiamento previsto e remuneração prevista | Briefing |
+| RF-52 | VGV contratado por período: este mês, mês anterior, este ano, tudo | Briefing |
+| RF-53 | Valor financiado, cota média, remuneração, remuneração recebida e ticket médio | Briefing |
+| RF-54 | Tabela por origem com contratos, VGV, financiado, remuneração e em andamento; tocar na linha abre Clientes filtrado | Briefing |
+| RF-55 | Barra de VGV por etapa | Briefing |
+| RF-56 | Marcar remuneração como recebida por cliente | Briefing |
 | RF-57 | Exportar relatório do período em PDF e planilha | Novo |
 
 ### 1.8 Portal do corretor (plano Com corretores)
@@ -119,11 +119,11 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RF-73 | Conta suspensa fica somente leitura para todos os perfis, com aviso fixo | Novo |
 | RF-74 | Gestor troca de plano na tela de assinatura, e o valor da assinatura no Asaas muda junto. Ao voltar para o Simples, funcionária e corretores perdem o acesso (ficam desativados, histórico mantido). A troca vale na hora; o valor novo só a partir da próxima fatura, sem cobrar nem devolver diferença (D-30) | Novo |
 
-### 1.10 Migração
+### 1.10 Importação
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RF-90 | Importar o JSON do protótipo (clientes, corretores, percentual) para uma conta nova, só uma vez por conta, com prévia antes de gravar | Novo |
+| RF-90 | ~~Importar o JSON do protótipo~~: não existe protótipo nem dados a importar (D-24) | Removido |
 
 ---
 
@@ -187,16 +187,16 @@ No plano Simples só existe o perfil G; as colunas F e C valem para o plano Com 
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RNF-01 | Funcionar em celular e computador; menu lateral vira menu deslizante abaixo de 900 px | Protótipo |
-| RNF-02 | Tema claro e escuro conforme o aparelho | Protótipo |
+| RNF-01 | Funcionar em celular e computador; menu lateral vira menu deslizante abaixo de 900 px | Briefing |
+| RNF-02 | Tema claro e escuro conforme o aparelho | Briefing |
 | RNF-03 | Dados atualizados entre usuários com o app aberto: ao voltar para a aba, depois de gravar e a cada 30 s nas listas (D-32; sem tempo real na v1) | Alterado |
-| RNF-04 | Aviso quando os dados não carregam em 10 segundos | Protótipo |
-| RNF-05 | Valores em reais e datas no padrão brasileiro; fuso America/Sao_Paulo para "hoje" | Protótipo |
+| RNF-04 | Aviso quando os dados não carregam em 10 segundos | Briefing |
+| RNF-05 | Valores em reais e datas no padrão brasileiro; fuso America/Sao_Paulo para "hoje" | Briefing |
 | RNF-06 | Controle de acesso por conta e perfil aplicado no banco (RLS) | Novo |
 | RNF-07 | LGPD: termos com aceite registrado, auditoria de visualização/alteração/download, prazo dos anexos | Novo |
 | RNF-08 | Backup diário do banco e exportação dos dados da conta pelo gestor | Novo |
 | RNF-09 | Instalável como PWA (manifest, ícones, service worker) | Novo |
 | RNF-10 | Dados hospedados no Brasil (Supabase região São Paulo) | Novo |
 | RNF-11 | Arquivos em bucket privado; links temporários com validade curta (até 5 minutos) | Novo |
-| RNF-12 | Todo texto da interface em português | Protótipo |
+| RNF-12 | Todo texto da interface em português | Briefing |
 | RNF-13 | Testes automatizados das regras de negócio (RN) e das políticas de acesso por perfil | Novo |
