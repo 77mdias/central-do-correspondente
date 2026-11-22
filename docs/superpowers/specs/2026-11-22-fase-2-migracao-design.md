@@ -1,6 +1,6 @@
 # Fase 2 — Migração: design
 
-Central do Correspondente · 22/11/2026 · status: **rascunho, aguardando revisão do Jean**
+Central do Correspondente · 22/11/2026 · status: **aprovado pelo Jean em 22/11/2026** (a importação virou função SQL no plano; ver o "Ajuste à spec" em `docs/superpowers/plans/2026-11-22-fase-2-migracao.md`)
 
 Este documento manda sobre os outros de `docs/` onde eles divergem; a atualização deles faz parte da fase (seção 14). A referência de telas e regras é o protótipo (`docs/prototipo/prototipo.html`).
 
