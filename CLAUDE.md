@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado atual
 
-Fase 1 (Base) em implementação: design em `docs/superpowers/specs/2026-11-15-fase-1-base-design.md`, plano em `docs/superpowers/plans/2026-11-15-fase-1-base.md`. O protótipo é a referência de telas e regras: um Artifact do Claude (https://claude.ai/artifact/VyQhFpjAr6aetT4nVkf6c6), com os dados no banco compartilhado do próprio Artifact (coleções `clientes`, `corretores` e o documento `config/geral`) e os anexos no armazenamento de arquivos dele. O código dele **não está aqui**. Os outros protótipos citados no Briefing não funcionam e não servem de referência. Briefing e Documentação do Produto originais (PDF, 03/11/2026) ficam fora do repo, em `../central-correspondente/`.
+Fase 1 (Base) em implementação: design em `docs/superpowers/specs/2026-11-15-fase-1-base-design.md`, plano em `docs/superpowers/plans/2026-11-15-fase-1-base.md`. O protótipo é a referência de telas e regras: um Artifact do Claude (https://claude.ai/artifact/VyQhFpjAr6aetT4nVkf6c6), com os dados no banco compartilhado do próprio Artifact (coleções `clientes`, `corretores` e o documento `config/geral`) e os anexos no armazenamento de arquivos dele. Cópia de referência em `docs/prototipo/prototipo.html` (ver o README da pasta). Os outros protótipos citados no Briefing não funcionam e não servem de referência. Briefing e Documentação do Produto originais (PDF, 03/11/2026) ficam fora do repo, em `../central-correspondente/`.
 
 Precedência: spec da fase atual > `docs/DECISOES.md` > demais docs > Briefing/Documentação. Antes de implementar algo com pendência aberta (P-02 a P-11), perguntar em vez de inventar.
 
