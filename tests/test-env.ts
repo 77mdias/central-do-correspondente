@@ -14,6 +14,12 @@ export const TEST_ENV = {
   BETTER_AUTH_SECRET: "segredo-fixo-de-teste-com-mais-de-32-caracteres",
   EMAIL_API_URL: "http://localhost:8028/api/v1/send",
   EMAIL_REMETENTE: "Central do Correspondente <nao-responda@localhost>",
+  // s3mock do compose (no CI, serviço do job); chaves quaisquer
+  S3_ENDPOINT: "http://localhost:9093",
+  S3_REGIAO: "us-east-1",
+  S3_BUCKET: "documentos",
+  S3_ACCESS_KEY_ID: "teste",
+  S3_SECRET_ACCESS_KEY: "teste-segredo",
 } satisfies Omit<Env, "ASSETS">;
 
 export const E2E_ENV = {
@@ -23,4 +29,6 @@ export const E2E_ENV = {
   DATABASE_URL_OWNER: URL_OWNER_E2E,
   BETTER_AUTH_SECRET: TEST_ENV.BETTER_AUTH_SECRET,
   EMAIL_API_URL: TEST_ENV.EMAIL_API_URL,
+  S3_ACCESS_KEY_ID: TEST_ENV.S3_ACCESS_KEY_ID,
+  S3_SECRET_ACCESS_KEY: TEST_ENV.S3_SECRET_ACCESS_KEY,
 };

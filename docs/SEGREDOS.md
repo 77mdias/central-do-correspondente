@@ -92,7 +92,7 @@ Os valores secretos (os quatro primeiros e o último, porque as strings de conex
 | `S3_REGIAO` | `vars` do `wrangler.jsonc` | `sa-east-1` |
 | `S3_BUCKET` | `vars` do `wrangler.jsonc` | `documentos` |
 | `S3_ACCESS_KEY_ID` · `S3_SECRET_ACCESS_KEY` | segredos do Worker | chave S3 do Supabase (*Storage → S3 Connection → New access key*). Ela dá acesso ao Storage inteiro: fica só no Worker |
-| `DATABASE_URL_OWNER` | só CriptEnv, nunca no Worker | conexão do papel `postgres` do Supabase, para `pnpm db:migrate` e `pnpm conta:liberar` |
+| `DATABASE_URL_OWNER` | só CriptEnv, nunca no Worker | conexão do papel `postgres` do Supabase pelo **Session pooler** (`postgres.tlpumcurfxwmalkarpjt@aws-…-sa-east-1.pooler.supabase.com:5432`), para `pnpm db:migrate` e `pnpm conta:liberar`. A *Direct connection* só responde por IPv6 e falha ("network is unreachable") em rede sem IPv6 |
 
 Para levar os valores ao Cloudflare:
 

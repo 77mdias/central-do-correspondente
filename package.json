@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "5.107.1",
+    "aws4fetch": "1.0.20",
     "better-auth": "1.7.16",
     "hono": "4.13.18",
     "pg": "8.23.1",
