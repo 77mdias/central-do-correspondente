@@ -40,8 +40,8 @@
       "vars": {
         // domínio ligado ao Worker pelo painel (aba Domains); o deploy não mexe em domínio que não está declarado aqui
         "APP_URL": "https://central-correspondente.wdias.tech",
-        // shortcut: remetente de teste da Resend, que só entrega para o e-mail do dono da conta; trocar pelo domínio verificado (P-09)
-        "EMAIL_REMETENTE": "Central do Correspondente <onboarding@resend.dev>"
+        // subdomínio verificado na Resend (D-38); sem a verificação a Resend recusa o envio (HTTP 403)
+        "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@central-correspondente.wdias.tech>"
       },
       // sem BETTER_AUTH_SECRET o Better Auth cai numa chave padrão pública: o deploy tem que falhar.
       // EMAIL_API_KEY é a chave da Resend: sem ela não há confirmação de cadastro nem convite.
