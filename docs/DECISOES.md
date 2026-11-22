@@ -95,7 +95,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-37 · Supabase fechado para a API dele** (19/11/2026): o Supabase dá por padrão ao papel `anon` (chave pública) acesso ao schema `public`, o que deixaria as tabelas do Better Auth legíveis. Em produção: `revoke usage on schema public from anon, authenticated`, privilégios padrão revogados e a Data API desligada. Os Hyperdrive (`cc-db-app` e `cc-db-system`) ficam **sem cache**: o acesso depende da sessão de cada pedido, e uma resposta guardada poderia ir para quem não deveria. SQL em [SEGREDOS.md](SEGREDOS.md).
 
-**D-38 · E-mail pela Resend** (19/11/2026, fecha a P-08): o Worker envia pela API HTTP da Resend quando existe o segredo `EMAIL_API_KEY`; sem ele (desenvolvimento, testes e e2e), pela API do Mailpit. Só texto, sem HTML. Até o domínio da P-09, o remetente é o de teste da Resend, que só entrega para o dono da conta.
+**D-38 · E-mail pela Resend** (19/11/2026, fecha a P-08): o Worker envia pela API HTTP da Resend quando existe o segredo `EMAIL_API_KEY`; sem ele (desenvolvimento, testes e e2e), pela API do Mailpit. Só texto, sem HTML. Remetente: `nao-responda@central-correspondente.wdias.tech`, subdomínio do app verificado na Resend (22/11/2026), para a reputação de envio não se misturar com a do `wdias.tech`.
 
 ---
 
