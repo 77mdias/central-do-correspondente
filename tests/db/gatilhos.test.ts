@@ -52,7 +52,6 @@ test("RN-14/15: anexos_apagar_em", async () => {
 });
 
 test("RF-23: anexar marca recebido e escreve o histórico com o nome", async () => {
-  await poolSystem.query("insert into tipos_documento (codigo, nome, grupo, ordem) values ('cpf', 'CPF', 'comprador', 2)");
   const anexar = (tipo: string, nome: string) =>
     como(s.c1A, "insert into arquivos (conta_id, cliente_id, tipo_documento, nome, caminho, tamanho, mime, enviado_por) values ($1, $2, $3, $4, $5, 10, 'image/jpeg', $6)",
       [s.contaA, s.cliente1A, tipo, nome, `${s.contaA}/${s.cliente1A}/${nome}`, s.c1A]);
