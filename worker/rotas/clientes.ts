@@ -5,7 +5,7 @@ import { DOCUMENTOS } from "../../src/regras/catalogo";
 import { dataCurta } from "../../src/regras/datas";
 import { esquemaClienteParcial, esquemaDocumento, esquemaNota, esquemaNovoCliente, esquemaRemuneracao } from "../../src/regras/esquemas";
 import { faltando, situacaoCobranca } from "../../src/regras/processo";
-import type { ClienteLista, Ficha } from "../../src/tipos-api";
+import type { AtualizacaoRecente, ClienteLista, Ficha } from "../../src/tipos-api";
 import { type AppTipos, exigirUsuario } from "../contexto";
 import { criarS3 } from "../s3";
 import { corpo, ehResposta, emTransacao, ErroRota, exigirEscritorio, ids, naoEncontrado, semPermissao } from "./comum";
@@ -55,6 +55,22 @@ async function origemTexto(db: PoolClient, conta: string, corretorId: string | n
 }
 
 // ── lista e cadastro ──────────────────────────────────────────────────────
+
+/** RF-05: as 7 últimas entradas de histórico de todos os clientes, para o Início. */
+rotasClientes.get("/contas/:contaId/historico", async (c) => {
+  const r = await emTransacao(c, async (db) => {
+    const [conta] = ids(c, "contaId");
+    await exigirEscritorio(db, conta!);
+    const q = await db.query<AtualizacaoRecente>(
+      `select h.id, h.cliente_id as "clienteId", c.nome, h.tipo, h.texto, h.criado_em as "criadoEm"
+         from historico h join clientes c on c.id = h.cliente_id and c.conta_id = h.conta_id
+        where h.conta_id = $1 order by h.criado_em desc, h.id limit 7`,
+      [conta],
+    );
+    return q.rows;
+  });
+  return ehResposta(r) ? r : c.json<AtualizacaoRecente[]>(r);
+});
 
 rotasClientes.get("/contas/:contaId/clientes", async (c) => {
   const r = await emTransacao(c, async (db) => {

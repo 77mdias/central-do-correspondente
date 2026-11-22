@@ -107,3 +107,18 @@ export function filtrar<T extends ClienteLista>(
     return true;
   });
 }
+
+export type LinhaOrigem = Resumo & { id: Origem; nome: string; casa: string };
+
+/** RF-04: tabela por origem (clientes diretos e cada corretor) com ativos; mais pendências primeiro; até 8. */
+export function porOrigem(lista: readonly ClienteLista[], corretores: readonly CorretorResumo[], hoje: string, agora: Date): LinhaOrigem[] {
+  const origens = [
+    { id: "diretos", nome: "Clientes diretos", casa: "" },
+    ...[...corretores].sort((a, b) => a.nome.localeCompare(b.nome)).map((k) => ({ id: k.id, nome: k.nome, casa: k.imobiliaria ?? "" })),
+  ];
+  return origens
+    .map((o) => ({ ...o, ...resumo(lista.filter((c) => daOrigem(c, o.id)), hoje, agora) }))
+    .filter((o) => o.ativos)
+    .sort((a, b) => b.hoje + b.pendentes + b.parados - (a.hoje + a.pendentes + a.parados) || b.ativos - a.ativos)
+    .slice(0, 8);
+}

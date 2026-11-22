@@ -165,3 +165,15 @@ test("conta pendente não grava (403), mas lê", async () => {
   expect((await e.req(`${base(e)}/${id}`, { method: "DELETE", cookie: e.g })).status).toBe(403);
   expect((await lista(e)).length).toBe(1);
 });
+
+test("últimas atualizações de todos os clientes, mais novas primeiro, até 7 (RF-05)", async () => {
+  const e = await escritorio();
+  const a = await novo(e, { nome: "Ana" });
+  const b = await novo(e, { nome: "Bia" });
+  for (let i = 0; i < 4; i++) await e.req(`${base(e)}/${a}/historico`, { body: { texto: `nota ${i}` }, cookie: e.g });
+  await e.req(`${base(e)}/${b}/historico`, { body: { texto: "última" }, cookie: e.f });
+  const r = await e.json<{ nome: string; texto: string }[]>(e.req(`/api/contas/${e.conta}/historico`, { cookie: e.f }));
+  expect(r).toHaveLength(7);
+  expect(r[0]).toMatchObject({ nome: "Bia", texto: "última" });
+  expect((await e.req(`/api/contas/${e.conta}/historico`, { cookie: e.outro })).status).toBe(404);
+});
