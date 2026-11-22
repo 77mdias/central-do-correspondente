@@ -48,7 +48,7 @@ export async function criarCliente(conta: string, nome: string, corretor: string
 
 /** Apaga tudo (como dono) e monta: conta A (com corretores, completa), conta B (só gestor) e conta Simples. */
 export async function criarCenario(): Promise<Cenario> {
-  await poolOwner.query(`truncate "user", "rateLimit", contas, tipos_documento restart identity cascade`);
+  await poolOwner.query(`truncate "user", "rateLimit", contas restart identity cascade`);
   const [contaA, contaB, contaSimples] = [await criarConta("com_corretores"), await criarConta("com_corretores"), await criarConta("simples")];
   const [gA, fA, c1A, c2A, gB, gS] = await Promise.all(
     ["ga@a.com", "fa@a.com", "c1@a.com", "c2@a.com", "gb@b.com", "gs@s.com"].map((e) => criarUsuario(e, e.split("@")[0])),
@@ -63,7 +63,6 @@ export async function criarCenario(): Promise<Cenario> {
   await criarMembro(contaSimples, gS, "gestor");
   const cliente1A = await criarCliente(contaA, "Cliente Um", corretor1A);
   // um registro de cada tabela ligada ao cliente, para os testes de leitura não passarem com tabela vazia
-  await poolSystem.query(`insert into tipos_documento (codigo, nome, grupo, ordem) values ('rg', 'RG', 'comprador', 1)`);
   await poolSystem.query(`insert into documentos (conta_id, cliente_id, tipo) values ($1, $2, 'rg')`, [contaA, cliente1A]);
   await poolSystem.query(
     `insert into arquivos (conta_id, cliente_id, nome, caminho, tamanho, mime) values ($1, $2, 'x.pdf', $3, 10, 'application/pdf')`,

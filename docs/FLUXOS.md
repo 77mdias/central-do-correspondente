@@ -112,7 +112,7 @@ sequenceDiagram
     end
 ```
 
-Sem WhatsApp cadastrado, o botão vira "Copiar mensagem" e a mesma pergunta aparece.
+Sem WhatsApp cadastrado, o botão vira "Copiar mensagem" e a mesma pergunta aparece. Se a pergunta ficar sem resposta (por exemplo, a pessoa fechou o app), o cliente aparece em Cobrar hoje como "Cobrança aberta: enviou?" até alguém responder (D-39).
 
 ---
 

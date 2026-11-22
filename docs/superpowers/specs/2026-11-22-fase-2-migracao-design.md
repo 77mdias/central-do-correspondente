@@ -164,11 +164,11 @@ O botão entra no menu do protótipo e baixa `central-AAAA-MM-DD.json` com o que
    - o percentual atual;
    - avisos: CPF ou telefone inválido (importados assim mesmo, com aviso na ficha), etapa ou modalidade desconhecida, cliente apontando para corretor inexistente (entra como cliente direto);
    - quantos anexos terão de ser reenviados.
-3. "Importar" envia o JSON para `POST …/importacao`. O Worker valida de novo e grava tudo numa transação, como `app_user` (a RLS vale). Ou entra tudo, ou nada.
+3. "Importar" envia o JSON para `POST …/importacao`. O Worker valida de novo, converte e chama a função `importar_prototipo(conta, dados)` sob `withUser`. A função é `security definer`, confere gestor, conta ativa, conta vazia e origem livre, e grava tudo numa transação. Ou entra tudo, ou nada. *Revisto no plano:* gravar como `app_user` exigiria afrouxar três políticas da fase 1 (histórico original e notas `sistema`, `historico_percentual` e campos de `contas`).
 
 **Condições:** a conta está ativa (`conta_ativa`), ainda não importou (`contas.importado_prototipo_em` nulo) e não tem clientes nem corretores. Assim não há o que mesclar. Além disso, **a mesma cópia do protótipo (`origem`) não entra em duas contas**: `contas.prototipo_origem` é único no banco. Uma segunda importação da mesma cópia, mesmo em outra conta, é recusada com a mensagem "Estes dados já foram importados em outro escritório". A importação grava `importado_prototipo_em`, uma nota do tipo `sistema` em cada cliente ("Importado do protótipo em dd/mm/aaaa") e uma linha de auditoria.
 
-**Gatilhos durante a importação:** a transação faz `set_config('app.importando', 'on', true)`. Com essa marca, os gatilhos de RN-07 (congelar percentual), RN-12 (`atualizado_em`), histórico automático e auditoria por linha não agem, e as datas e percentuais originais ficam preservados. Só a rota de importação liga a marca; o teste de banco prova que, sem ela, os gatilhos seguem valendo.
+**Gatilhos durante a importação:** a transação faz `set_config('app.importando', 'on', true)`. Com essa marca, os gatilhos de RN-07 (congelar percentual), RN-12 (`atualizado_em`), histórico automático e auditoria por linha não agem, e as datas e percentuais originais ficam preservados. Só a função `importar_prototipo` liga a marca; o teste de banco prova que, sem ela, os gatilhos seguem valendo.
 
 ### 10.3 Mapeamento (completa a seção 8 do MODELO-DE-DADOS)
 
@@ -214,7 +214,7 @@ A rotina é idempotente: rodar duas vezes no mesmo dia não manda dois avisos (m
 - Migration que **popula `tipos_documento`** com os 12 tipos da lista do MODELO-DE-DADOS (P-01).
 - Os gatilhos passam a respeitar `app.importando` (seção 10.2).
 - `arquivos.tamanho` com `check (tamanho <= 20971520)`; `arquivos.tipo_documento` aponta para `tipos_documento` ou vale `outros`.
-- `contas.prototipo_origem text unique`, gravado junto com `importado_prototipo_em` pela função `marcar_importacao(conta, origem)` (`security definer`; confere `meu_perfil(conta) = 'gestor'`), porque `app_user` não altera `contas` além do nome.
+- `contas.prototipo_origem text unique`, gravado junto com `importado_prototipo_em` pela função `importar_prototipo(conta, dados)` (`security definer`; seção 10.2), porque `app_user` não altera `contas` além do nome.
 - `anexos_aviso_em date` em `clientes`, para o aviso não ir duas vezes (seção 11).
 - Política de **insert em `auditoria`** para `app_user`, restrita a `acao in ('ver', 'baixar')`, à própria conta e a `usuario_id = meu_usuario_id()`. Leitura continua só do gestor.
 - Nenhuma mudança na RLS de `clientes`, `documentos`, `arquivos` e `historico`: elas já existem e têm teste. A fase acrescenta casos de teste (seção 13).

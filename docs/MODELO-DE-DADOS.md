@@ -57,6 +57,7 @@ create type acao_auditoria as enum ('ver', 'criar', 'alterar', 'excluir', 'baixa
 | asaas_customer_id | text | |
 | asaas_subscription_id | text | |
 | importado_prototipo_em | timestamptz | impede importar duas vezes |
+| prototipo_origem | text unique | cópia do protótipo importada (D-40): a mesma cópia não entra em duas contas |
 | criado_em | timestamptz default now() | |
 
 `plano`, `status_assinatura` e `ativa_ate` não têm permissão de update para `app_user`: só o comando `conta:liberar`, o webhook e as rotinas do sistema mudam esses campos.
@@ -154,6 +155,7 @@ Gatilho `tg_limite_convite` (RN-18): em conta `simples` recusa qualquer convite;
 | observacoes | text | |
 | finalizado_em | timestamptz | quando entrou em concluído/cancelado |
 | anexos_apagar_em | date | calculado (RN-14) |
+| anexos_aviso_em | date | dia em que saiu o aviso de exclusão (o aviso não vai duas vezes) |
 | criado_em | timestamptz | |
 | atualizado_em | timestamptz | RN-12 |
 
@@ -201,10 +203,10 @@ Lista copiada do protótipo (P-01). O `codigo` é a chave que o protótipo usa e
 |---|---|---|
 | id | uuid pk | |
 | conta_id, cliente_id | uuid | |
-| tipo_documento | text | código ou `outros` |
+| tipo_documento | text → tipos_documento | código; null = "Outros arquivos" |
 | nome | text | nome original |
 | caminho | text | `conta_id/cliente_id/id.ext` |
-| tamanho | integer | bytes |
+| tamanho | integer | bytes, de 1 a 20.971.520 (20 MB) |
 | mime | text | |
 | enviado_por | uuid → "user" | |
 | enviado_em | timestamptz | |
@@ -275,6 +277,11 @@ meu_corretor_id(conta uuid) returns uuid
 conta_ativa(conta uuid) returns boolean
 -- "hoje" no fuso do Brasil
 hoje_br() returns date  -- (now() at time zone 'America/Sao_Paulo')::date
+-- a transação está importando o protótipo? (current_setting('app.importando', true) = 'on')
+em_importacao() returns boolean
+-- importação do protótipo (RF-90, D-40): confere gestor, conta ativa, conta vazia, não importada e origem livre;
+-- liga app.importando e grava contas_config, historico_percentual, corretores, clientes, remuneração, documentos e histórico
+importar_prototipo(conta uuid, dados jsonb) returns jsonb
 ```
 
 ## 5. Políticas RLS (resumo)
@@ -292,7 +299,7 @@ hoje_br() returns date  -- (now() at time zone 'America/Sao_Paulo')::date
 | arquivos | como clientes | inserir: gestor, funcionária, corretor (próprios); apagar: gestor, funcionária |
 | historico | gestor, funcionária; corretor conforme P-03 | inserir: gestor, funcionária; gatilhos |
 | historico_percentual | gestor | gatilho ao mudar percentual |
-| auditoria | gestor | só gatilhos, RPC e Worker |
+| auditoria | gestor | gatilhos; `app_user` insere só `ver` e `baixar` em nome próprio, na conta em que é do escritório (ou, para `baixar`, no próprio cliente de corretor) |
 | push_inscricoes | o próprio usuário | o próprio usuário |
 | eventos_asaas | ninguém | só Worker |
 
@@ -311,6 +318,8 @@ Storage (`documentos`): inserir quando o primeiro segmento do caminho é uma con
 | `tg_limite_plano` | membros (insert/update) | Recusa funcionária e corretor ativos em conta do plano `simples` (RN-18) |
 | `tg_limite_convite` | convites (insert) | Recusa convite em conta `simples` e segundo convite/funcionária (RN-18) |
 
+Com `em_importacao()` verdadeiro (só dentro de `importar_prototipo`), os gatilhos de clientes não tocam em `atualizado_em`, `finalizado_em` e `data_assinatura` nem escrevem histórico, e `tg_atualizado_em`, `tg_auditoria` e `tg_percentual` não agem: as datas e os percentuais do protótipo ficam como estão. `anexos_apagar_em` continua calculado.
+
 ## 7. Views (só gestor)
 
 - `vw_remuneracao`: por cliente, percentual usado (RN-08), remuneração (RN-09), cota (RN-10), contratado (RN-05).
@@ -321,17 +330,9 @@ As views filtram por `meu_perfil(conta_id) = 'gestor'` (um único papel, `app_us
 
 ## 8. Mapeamento do protótipo (importador)
 
-| Protótipo | Novo |
-|---|---|
-| `clientes.telefone` | `clientes.whatsapp` |
-| `corretorId` | `corretor_id` (via mapa de ids importados) |
-| `valorImovel`, `valorFinanciado`, `valorAvaliacao` | `valor_imovel_centavos`, `valor_financiado_centavos`, `valor_avaliacao_centavos` (× 100) |
-| `fgtsUsado` | `fgts_centavos` (× 100) |
-| `contrato`, `dataContrato` | `numero_contrato`, `data_assinatura` |
-| `pctContrato`, `pctOverride`, `remRecebida` | `clientes_remuneracao.*` |
-| `docs` (data por documento) | linhas em `documentos` |
-| `arquivos` | **não importados** (arquivos do protótipo precisam ser reenviados, ou importados à parte se o storage do protótipo permitir exportar) |
-| `historico` | linhas em `historico` (tipo `nota`) |
-| `config/geral.percentual`, `historicoPct` | `contas_config.percentual_atual`, `historico_percentual` |
+O mapeamento campo a campo está na spec da fase 2 (`docs/superpowers/specs/2026-11-22-fase-2-migracao-design.md`, seção 10.3). Resumo:
 
-Gatilhos de RN-07 e RN-12 ficam desligados durante a importação, para preservar percentuais e datas originais.
+- O arquivo é o JSON do botão "Exportar JSON" do protótipo (`formato: "central-prototipo"`, `versao: 1`, `origem` = uuid da cópia; D-40).
+- O Worker converte o arquivo (`src/regras/importacao.ts`): reais viram centavos, os nomes de etapa e modalidade viram os enums, as datas ISO dos documentos viram o dia em Brasília e os ids do protótipo viram um mapa `idOrigem`.
+- A função `importar_prototipo(conta, dados)` grava tudo numa transação, com `app.importando` ligado (seção 6), e preserva as datas e os percentuais originais.
+- Os anexos (`arquivos`) não migram: são reenviados à mão.

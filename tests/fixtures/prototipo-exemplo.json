@@ -1,0 +1,49 @@
+{
+  "formato": "central-prototipo",
+  "versao": 1,
+  "origem": "4f0c8a3e-7d2b-4c19-a6e5-2b9d1c7e8f30",
+  "exportadoEm": "2026-11-22T12:00:00.000Z",
+  "config": {
+    "percentual": 1.2,
+    "atualizadoEm": "2026-06-01T13:00:00.000Z",
+    "historicoPct": [{ "t": "2026-01-10T13:00:00.000Z", "pct": 1 }, { "t": "2026-06-01T13:00:00.000Z", "pct": 1.2 }],
+    "origem": "4f0c8a3e-7d2b-4c19-a6e5-2b9d1c7e8f30"
+  },
+  "corretores": [
+    { "id": "kA", "nome": "Ana Exemplo", "imobiliaria": "Imobiliária Fictícia", "telefone": "(11) 98888-7777", "creci": "12345-F", "criadoEm": "2026-01-05T12:00:00.000Z" },
+    { "id": "kB", "nome": "Bruno Exemplo", "imobiliaria": "", "telefone": "", "creci": "", "criadoEm": "2026-02-01T12:00:00.000Z" }
+  ],
+  "clientes": [
+    {
+      "id": "c1", "nome": "Carla Inventada", "cpf": "529.982.247-25", "telefone": "+55 (11) 97777-6666", "email": "Carla@Exemplo.com",
+      "corretorId": "kA", "modalidade": "Minha Casa Minha Vida", "etapa": "Concluído",
+      "valor": 250000, "valorFinanciado": "200.000,00", "valorAvaliacao": 260000, "entrada": 50000, "fgtsUsado": 10000, "subsidio": 0,
+      "contrato": "8.4444.0000001-1", "dataContrato": "2026-03-10", "pctContrato": 1, "pctOverride": null, "remRecebida": true,
+      "docs": { "rg": "2026-01-16T14:00:00.000Z", "cpf": "2026-01-17T01:30:00.000Z", "civil": false },
+      "arquivos": { "rg": [{ "id": "a1", "nome": "rg.jpg" }], "outros": [{ "id": "a2", "nome": "simulacao.pdf" }] },
+      "historico": [
+        { "t": "2026-01-15T12:00:00.000Z", "txt": "Cliente cadastrado · Ana Exemplo (Imobiliária Fictícia)" },
+        { "t": "2026-04-01T23:30:00.000Z", "txt": "Remuneração recebida: R$ 2.000,00" }
+      ],
+      "obs": "Cliente de exemplo", "proximaCobranca": "2026-02-20", "intervalo": 3, "cobrancas": 4,
+      "ultimaCobranca": "2026-02-17T15:00:00.000Z", "criadoEm": "2026-01-15T12:00:00.000Z", "atualizadoEm": "2026-04-02T18:30:00.000Z"
+    },
+    {
+      "id": "c2", "nome": "Diego Inventado", "cpf": "1234567890", "telefone": "9999-1111", "email": "",
+      "corretorId": "kB", "modalidade": "SBPE", "etapa": "Documentação pendente",
+      "valorImovel": "400.000", "valorFinanciado": 300000,
+      "pctOverride": "1,5", "docs": {}, "historico": [],
+      "proximaCobranca": "2026-11-20", "intervalo": 5, "cobrancas": 1,
+      "criadoEm": "2026-10-01T12:00:00.000Z", "atualizadoEm": "2026-11-10T12:00:00.000Z"
+    },
+    {
+      "id": "c3", "nome": "Elisa Inventada", "corretorId": "kRemovido", "modalidade": "Consórcio", "etapa": "Reprovado / Cancelado",
+      "docs": { "resid": "2026-05-02T12:00:00.000Z" }, "historico": [{ "t": "2026-05-20T15:00:00.000Z", "txt": "Crédito reprovado" }],
+      "criadoEm": "2026-05-01T12:00:00.000Z", "atualizadoEm": "2026-05-20T15:00:00.000Z"
+    },
+    {
+      "id": "c4", "nome": "  ", "etapa": "Etapa Estranha", "intervalo": 4,
+      "criadoEm": "2026-11-01T12:00:00.000Z", "atualizadoEm": "2026-11-05T12:00:00.000Z"
+    }
+  ]
+}
