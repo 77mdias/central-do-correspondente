@@ -3,10 +3,15 @@ import { criarAuth } from "./auth";
 import type { AppTipos } from "./contexto";
 import { abrirPools } from "./db";
 import { criarEnvio, type Email, type EnviarEmail } from "./email";
+import { rotasArquivos } from "./rotas/arquivos";
 import { rotasCadastro } from "./rotas/cadastro";
+import { rotasClientes } from "./rotas/clientes";
 import { rotasConvites } from "./rotas/convites";
+import { rotasCorretores } from "./rotas/corretores";
 import { rotasEquipe } from "./rotas/equipe";
 import { rotasEu } from "./rotas/eu";
+import { rotasImportacao } from "./rotas/importacao";
+import { rotasVgv } from "./rotas/vgv";
 
 export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   const app = new Hono<AppTipos>();
@@ -41,6 +46,11 @@ export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   app.route("/api", rotasEu);
   app.route("/api", rotasEquipe);
   app.route("/api", rotasConvites);
+  app.route("/api", rotasClientes);
+  app.route("/api", rotasArquivos);
+  app.route("/api", rotasCorretores);
+  app.route("/api", rotasVgv);
+  app.route("/api", rotasImportacao);
 
   app.onError((err, c) => {
     console.error(err);

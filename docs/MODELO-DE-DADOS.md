@@ -318,7 +318,7 @@ Storage (`documentos`): inserir quando o primeiro segmento do caminho é uma con
 | `tg_limite_plano` | membros (insert/update) | Recusa funcionária e corretor ativos em conta do plano `simples` (RN-18) |
 | `tg_limite_convite` | convites (insert) | Recusa convite em conta `simples` e segundo convite/funcionária (RN-18) |
 
-Com `em_importacao()` verdadeiro (só dentro de `importar_prototipo`), os gatilhos de clientes não tocam em `atualizado_em`, `finalizado_em` e `data_assinatura` nem escrevem histórico, e `tg_atualizado_em`, `tg_auditoria` e `tg_percentual` não agem: as datas e os percentuais do protótipo ficam como estão. `anexos_apagar_em` continua calculado.
+Com `em_importacao()` verdadeiro (só dentro de `importar_prototipo` e da rotina diária de anexos, que também liga `app.importando`: apagar anexo pelo prazo ou marcar o aviso não é atualização do processo), os gatilhos de clientes não tocam em `atualizado_em`, `finalizado_em` e `data_assinatura` nem escrevem histórico, e `tg_atualizado_em`, `tg_auditoria` e `tg_percentual` não agem: as datas e os percentuais do protótipo ficam como estão. `anexos_apagar_em` continua calculado.
 
 ## 7. Views (só gestor)
 

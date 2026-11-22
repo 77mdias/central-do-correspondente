@@ -14,7 +14,11 @@
   ],
   "vars": {
     "APP_URL": "http://localhost:3002",
-    "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>"
+    "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>",
+    // s3mock do compose (as chaves, quaisquer, vêm do CriptEnv development)
+    "S3_ENDPOINT": "http://s3:9090",
+    "S3_REGIAO": "us-east-1",
+    "S3_BUCKET": "documentos"
   },
   "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_URL"] },
   "env": {
@@ -26,7 +30,10 @@
       ],
       "vars": {
         "APP_URL": "http://localhost:3102",
-        "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>"
+        "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@localhost>",
+        "S3_ENDPOINT": "http://localhost:9093",
+        "S3_REGIAO": "us-east-1",
+        "S3_BUCKET": "documentos"
       },
       "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_URL"] }
     },
@@ -34,18 +41,26 @@
     "production": {
       "name": "central-do-correspondente",
       "hyperdrive": [
-        { "binding": "DB_APP", "id": "0253d0f009b143da92d759659f2f8bfb" },
-        { "binding": "DB_SYSTEM", "id": "6c6763de2925460596be133ac22b09a6" }
+        // projeto Supabase em São Paulo (cc-db-app-sp e cc-db-system-sp, sem cache; D-37)
+        { "binding": "DB_APP", "id": "3f8ef317bd3347bd9bc322e65bbc32a0" },
+        { "binding": "DB_SYSTEM", "id": "c7735e8d027f487e8da7b7830cbc8552" }
       ],
       "vars": {
         // domínio ligado ao Worker pelo painel (aba Domains); o deploy não mexe em domínio que não está declarado aqui
         "APP_URL": "https://central-correspondente.wdias.tech",
         // subdomínio verificado na Resend (D-38); sem a verificação a Resend recusa o envio (HTTP 403)
-        "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@central-correspondente.wdias.tech>"
+        "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@central-correspondente.wdias.tech>",
+        // Supabase Storage pela API S3 (bucket privado; docs/SEGREDOS.md, "Anexos")
+        "S3_ENDPOINT": "https://uxxpbjfshtwgdtcuhrbc.storage.supabase.co/storage/v1/s3",
+        "S3_REGIAO": "sa-east-1", // a região do projeto Supabase (a assinatura S3 precisa bater)
+        "S3_BUCKET": "documentos"
       },
       // sem BETTER_AUTH_SECRET o Better Auth cai numa chave padrão pública: o deploy tem que falhar.
       // EMAIL_API_KEY é a chave da Resend: sem ela não há confirmação de cadastro nem convite.
-      "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_KEY"] }
+      // As chaves S3 do Supabase: sem elas não há anexos.
+      "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_KEY", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"] },
+      // rotina diária de anexos (RF-27): 6h UTC = 3h de Brasília
+      "triggers": { "crons": ["0 6 * * *"] }
     }
   }
 }

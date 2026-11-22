@@ -26,6 +26,11 @@ jobs:
         env: { POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres, POSTGRES_DB: central }
         ports: ["5435:5432"]
         options: --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 3s --health-retries 30
+      # anexos (fase 2): os testes de rota enviam e baixam do S3
+      s3:
+        image: adobe/s3mock:5.2.3
+        env: { COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: documentos }
+        ports: ["9093:9090"]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -47,6 +52,10 @@ jobs:
       mailpit:
         image: axllent/mailpit:v1.27
         ports: ["1028:1025", "8028:8025"]
+      s3:
+        image: adobe/s3mock:5.2.3
+        env: { COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: documentos }
+        ports: ["9093:9090"]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
