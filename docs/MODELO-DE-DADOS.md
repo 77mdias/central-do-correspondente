@@ -173,11 +173,28 @@ Gatilho `tg_limite_convite` (RN-18): em conta `simples` recusa qualquer convite;
 |---|---|---|
 | id | uuid pk | |
 | conta_id, cliente_id | uuid | |
-| tipo | text | código de um dos 12 (pendência P-01) |
+| tipo | text | código de um dos 12 (lista abaixo) |
 | recebido_em | date null | null = pendente |
 | marcado_por | uuid → "user" | |
 
 `unique (cliente_id, tipo)`. Os 12 tipos ficam numa tabela fixa `tipos_documento (codigo, nome, grupo, ordem)` para a lista ser igual em todo lugar.
+
+Lista copiada do protótipo (P-01). O `codigo` é a chave que o protótipo usa em `docs` e `arquivos`, para o importador não precisar de tradução. "Outros arquivos (simulação, laudo, contrato…)" não é um tipo: é `arquivos.tipo_documento = 'outros'`.
+
+| Grupo | Ordem | `codigo` | Nome |
+|---|---|---|---|
+| comprador | 1 | `rg` | RG ou CNH |
+| comprador | 2 | `cpf` | CPF |
+| comprador | 3 | `civil` | Certidão de nascimento ou casamento |
+| comprador | 4 | `resid` | Comprovante de residência |
+| comprador | 5 | `renda` | Comprovante de renda (3 últimos holerites) |
+| comprador | 6 | `ctps` | Carteira de trabalho |
+| comprador | 7 | `ir` | Declaração de Imposto de Renda |
+| comprador | 8 | `fgts` | Extrato do FGTS |
+| imovel_vendedor | 1 | `matr` | Matrícula atualizada do imóvel |
+| imovel_vendedor | 2 | `iptu` | Carnê do IPTU |
+| imovel_vendedor | 3 | `vend` | Documentos do vendedor |
+| imovel_vendedor | 4 | `form` | Formulários assinados |
 
 ### arquivos
 | Campo | Tipo | Nota |
