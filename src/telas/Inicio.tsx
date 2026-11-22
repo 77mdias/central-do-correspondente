@@ -180,7 +180,7 @@ function Contador({ para, valor, rotulo, tom = "neutro" }: { para: string; valor
 
 function Painel({ titulo, mais, children }: { titulo: string; mais?: { para: string; rotulo: string }; children: ReactNode }) {
   return (
-    <Cartao className="flex flex-col gap-2 p-5">
+    <Cartao className="flex min-w-0 flex-col gap-2 p-5">
       <div className="flex items-center justify-between gap-2 border-b border-borda pb-3">
         <h2 className="text-base font-medium text-texto">{titulo}</h2>
         {mais && (

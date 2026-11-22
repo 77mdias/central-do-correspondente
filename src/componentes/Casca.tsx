@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn";
 import { ROTULO_PERFIL } from "@/regras/rotulos";
 import type { Eu } from "@/tipos-api";
 import { AvisoConta } from "./AvisoConta";
+import { PainelFicha } from "@/telas/ficha/PainelFicha";
 import { ProvedorEnviou } from "./Enviou";
 import { Botao, Marca } from "./ui";
 
@@ -128,6 +129,7 @@ export function Casca({ eu }: { eu: Eu }) {
           <AvisoConta escritorio={escritorio} />
           <ProvedorEnviou escritorio={escritorio}>
             <Outlet context={escritorio} />
+            <PainelFicha escritorio={escritorio} />
           </ProvedorEnviou>
         </main>
       </div>
