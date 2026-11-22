@@ -42,6 +42,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 .side a .bd.hot{background:var(--accent);color:var(--accent-ink)}
 .side .grow{flex:1}
 .side .novo{width:100%;justify-content:center;background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.side .exportar{width:100%;justify-content:center;margin-top:8px}
 .side .pctbox{font-size:.78rem;opacity:.7;padding:8px 10px 0}
 .mtop{display:none}
 .sidescrim{position:fixed;inset:0;background:rgb(10 18 26/.45);z-index:14}
@@ -226,6 +227,7 @@ label.tg input{width:18px;height:18px;accent-color:var(--ok)}
   <a href="#vgv" data-nav="vgv">VGV e comissões</a>
   <div class="grow"></div>
   <button id="btnNovo" type="button" class="novo">+ Novo cliente</button>
+  <button id="btnExportar" type="button" class="exportar">Exportar JSON</button>
   <div class="pctbox" id="pctSide"></div>
 </aside>
 <div id="sideScrim" class="sidescrim" hidden></div>
@@ -579,6 +581,29 @@ function renderVGV(){
   </div>`;
 }
 
+/* ================= exportar (D-40): arquivo para o importador do app ================= */
+// Cada cópia do protótipo é um escritório: a primeira exportação sorteia uma origem e guarda em config/geral,
+// e o app recusa importar a mesma origem em dois escritórios.
+async function exportar(){
+  if(!db){toast("Abra a página logado no Claude para exportar os dados");return}
+  if(!S.loaded){toast("Os dados ainda estão carregando");return}
+  let origem=S.config.origem;
+  if(!origem){
+    origem=crypto.randomUUID();const body={...S.config,origem};
+    try{await db.doc("config/geral").set(body);S.config=body}catch(e){toast("Não foi possível preparar a exportação. Tente de novo.");return}
+  }
+  const dados={formato:"central-prototipo",versao:1,origem,exportadoEm:new Date().toISOString(),config:S.config,corretores:S.corretores,clientes:S.clientes};
+  S.exportacao=JSON.stringify(dados);
+  abrir("exportar");
+  baixarExportacao();
+}
+function baixarExportacao(){
+  if(!S.exportacao)return;
+  try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([S.exportacao],{type:"application/json"}));a.download=`central-${hoje()}.json`;
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+  catch(e){toast("O download não começou: use Copiar conteúdo")}
+}
+
 /* ================= mensagens ================= */
 function msgCliente(c){
   const f=faltando(c),pn=(c.nome||"").split(" ")[0]||"tudo bem";
@@ -607,6 +632,12 @@ function calcHTML(c){const vi=vImovel(c),vf=vFin(c),p=pctCliente(c),rm=remun(c);
 
 function renderDrawer(){
   const D=$("#drawer"),o=S.open;if(!o)return;
+  if(o.mode==="exportar"){const n=S.clientes.length,k=S.corretores.length;
+    D.innerHTML=`<div class="dhead"><div><h2>Exportar JSON</h2><p class="note">Para importar no app Central do Correspondente</p></div><button type="button" data-act="fechar">Fechar</button></div>
+    <div class="sec"><h3>${n} cliente${n===1?"":"s"} e ${k} corretor${k===1?"":"es"}</h3>
+      <p class="note">Baixe o arquivo e escolha-o na tela <b>Importar do protótipo</b> do app. Se o download não começar, copie o conteúdo e cole na mesma tela. Os anexos não vão no arquivo: reenvie pela ficha de cada cliente no app.</p>
+      <div class="actions"><button type="button" class="primary" data-act="baixarExp">Baixar arquivo</button><button type="button" data-act="copiarExp">Copiar conteúdo</button></div>
+      <textarea id="expTxt" readonly rows="8" style="width:100%;font-family:var(--f-mono);font-size:.75rem">${esc(S.exportacao||"")}</textarea></div>`;return}
   if(o.mode==="editcor"){const k=corDe(o.id);if(!k){fechar();return}const n=S.clientes.filter(c=>c.corretorId===k.id).length;
     D.innerHTML=`<div class="dhead"><h2>${esc(k.nome)}</h2><button type="button" data-act="fechar">Fechar</button></div>
     <div class="sec"><h3>Dados do corretor parceiro</h3>
@@ -709,7 +740,7 @@ addEventListener("hashchange",()=>setView(location.hash.slice(1)));
 
 /* ================= eventos ================= */
 document.addEventListener("click",async e=>{
-  const t=e.target.closest("[data-f].stat,[data-go],[data-wacli],[data-rmarq],[data-id],[data-act],[data-delcor],[data-ver],[data-editcor],[data-cobcor],[data-per],#btnNovo,#btnMenu,#sideScrim,#scrim");
+  const t=e.target.closest("[data-f].stat,[data-go],[data-wacli],[data-rmarq],[data-id],[data-act],[data-delcor],[data-ver],[data-editcor],[data-cobcor],[data-per],#btnNovo,#btnExportar,#btnMenu,#sideScrim,#scrim");
   if(!t)return;
   if(t.id==="btnMenu"){menu(!$("#side").classList.contains("open"));return}
   if(t.id==="sideScrim"){menu(false);return}
@@ -727,6 +758,9 @@ document.addEventListener("click",async e=>{
   if(t.matches(".stat")){S.filtro=S.filtro===t.dataset.f&&t.dataset.f!=="ativos"?"ativos":t.dataset.f;render();return}
   if(t.matches(".row[data-id]")){abrir("edit",t.dataset.id);return}
   if(t.id==="btnNovo"){abrir("novo");return}
+  if(t.id==="btnExportar"){exportar();return}
+  if(t.dataset.act==="baixarExp"){baixarExportacao();return}
+  if(t.dataset.act==="copiarExp"){copiar($("#expTxt"));return}
   if(t.id==="scrim"){fechar();return}
   if(t.dataset.delcor){if(!t.classList.contains("armed")){t.classList.add("armed");t.textContent="Clique de novo para remover";return}
     const id=t.dataset.delcor;fechar();await db.doc("corretores/"+id).delete().then(()=>toast("Corretor removido"),()=>toast("Não foi possível remover"));return}
@@ -797,7 +831,7 @@ document.addEventListener("submit",async e=>{
     const body={nome,imobiliaria:$("#corCasa").value.trim(),telefone:$("#corTel").value.trim(),creci:$("#corCreci").value.trim(),criadoEm:new Date().toISOString()};
     try{await db.collection("corretores").add(body);toast(`${nome} cadastrado`);e.target.reset()}catch(err){toast("Não foi possível cadastrar o corretor")}}
   if(e.target.id==="fPct"){const v=num($("#pctIn").value);if(v==null||v<0||v>100){toast("Digite um percentual válido, ex.: 1,2");return}
-    const now=new Date().toISOString();const body={percentual:v,atualizadoEm:now,historicoPct:[...(S.config.historicoPct||[]),{t:now,pct:v}].slice(-30)};
+    const now=new Date().toISOString();const body={...S.config,percentual:v,atualizadoEm:now,historicoPct:[...(S.config.historicoPct||[]),{t:now,pct:v}].slice(-30)};
     S.config={...S.config,...body};render();
     fila("config/geral",()=>db.doc("config/geral").set(body).then(()=>toast(`Percentual atualizado para ${P(v)}`)))}
 });

@@ -21,6 +21,7 @@ export function Casca({ eu }: { eu: Eu }) {
   const gaveta = useRef<HTMLDialogElement>(null);
   const navegar = useNavigate();
   const consultas = useQueryClient();
+  const clientes = useClientes(contaId ?? "");
 
   useEffect(() => {
     if (!escritorio) return;
@@ -38,11 +39,20 @@ export function Casca({ eu }: { eu: Eu }) {
   };
 
   const raiz = `/e/${escritorio.contaId}`;
+  // o atalho de importação some quando o escritório já tem clientes (só funciona em conta vazia)
+  const semClientes = clientes.data?.length === 0;
   const itens: { para: string; rotulo: string; fim: boolean; contador?: "clientes" | "cobrar" }[] = [
     { para: raiz, rotulo: "Início", fim: true },
     { para: `${raiz}/clientes`, rotulo: "Clientes", fim: false, contador: "clientes" },
     { para: `${raiz}/cobrar`, rotulo: "Cobrar hoje", fim: false, contador: "cobrar" },
-    ...(escritorio.perfil === "gestor" ? [{ para: `${raiz}/equipe`, rotulo: "Equipe e acessos", fim: false }] : []),
+    { para: `${raiz}/corretores`, rotulo: "Corretores parceiros", fim: false },
+    ...(escritorio.perfil === "gestor"
+      ? [
+          { para: `${raiz}/vgv`, rotulo: "VGV e comissões", fim: false },
+          ...(semClientes ? [{ para: `${raiz}/importar`, rotulo: "Importar do protótipo", fim: false }] : []),
+          { para: `${raiz}/equipe`, rotulo: "Equipe e acessos", fim: false },
+        ]
+      : []),
   ];
 
   const menu = (

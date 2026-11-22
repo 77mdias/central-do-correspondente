@@ -60,9 +60,16 @@ export function Inicio() {
         <Cartao className="flex flex-col items-start gap-3">
           <h2 className="text-lg font-medium">Nenhum cliente cadastrado ainda</h2>
           <p className="text-sm text-texto-2">Cadastre o primeiro processo para acompanhar documentos, cobranças e etapas.</p>
-          <Link to={`${raiz}/clientes?novo=1`} className="text-sm font-medium text-acento hover:underline">
-            Cadastrar primeiro cliente
-          </Link>
+          <div className="flex flex-wrap gap-4">
+            <Link to={`${raiz}/clientes?novo=1`} className="text-sm font-medium text-acento hover:underline">
+              Cadastrar primeiro cliente
+            </Link>
+            {escritorio.perfil === "gestor" && (
+              <Link to={`${raiz}/importar`} className="text-sm font-medium text-acento hover:underline">
+                Importar do protótipo
+              </Link>
+            )}
+          </div>
         </Cartao>
       ) : (
         <>
