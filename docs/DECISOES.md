@@ -103,7 +103,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 | # | Pendência | Proposta atual | Quem decide |
 |---|---|---|---|
-| P-01 | Nomes dos 12 documentos (8 do comprador, 4 do imóvel e vendedor) | Copiar do código do protótipo | Dev (precisa do código ou do JSON) |
+| ~~P-01~~ | ~~Nomes dos 12 documentos~~ | Resolvida: copiados do protótipo (22/11/2026), lista em [MODELO-DE-DADOS.md](MODELO-DE-DADOS.md) (`tipos_documento`) | — |
 | P-02 | Confirmação de envio do WhatsApp | Ao voltar para o app, perguntar "Enviou?"; só registra a cobrança se a resposta for sim | Dev + William |
 | P-03 | Corretor vê o histórico do cliente? | Vê mudanças de etapa e anexos; não vê observações internas | William |
 | P-04 | Como a correspondente nova se cadastra | Cadastro feito na fase 1 (D-33). Falta: página de venda → escolha do plano → cadastro → pagamento no Asaas → conta ativa | William |
@@ -113,3 +113,4 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 | ~~P-08~~ | ~~Provedor de e-mail~~ | Resolvida: Resend (D-38) | — |
 | ~~P-09~~ | ~~Domínio do app~~ | Resolvida: `central-correspondente.wdias.tech` (D-36) | — |
 | P-10 | Acordo por escrito entre os sócios (código, receita, saída) | — | Sócios |
+| P-11 | Como tirar os dados do protótipo para o importador (D-24): o protótipo não tem botão de exportar; os dados ficam no banco compartilhado do Artifact e os anexos no armazenamento de arquivos dele | Acrescentar ao protótipo um botão "Exportar JSON" que baixa `clientes`, `corretores` e `config/geral`; anexos reenviados à mão (MODELO-DE-DADOS §8) | Dev + William (a correspondente exporta) |
