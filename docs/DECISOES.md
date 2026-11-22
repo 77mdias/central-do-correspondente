@@ -69,7 +69,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 ## Técnica
 
-**D-25 · Banco e arquivos:** Postgres gerenciado e Storage privado no Supabase, região São Paulo, **só como hospedagem**: o login fica fora do Supabase (D-31) e não usamos o Realtime (D-32). Plano pago em produção (o gratuito pausa por inatividade e não tem backup diário). *Revista em 15/11/2026; antes incluía Supabase Auth e Realtime.*
+**D-25 · Banco e arquivos:** Postgres gerenciado e Storage privado no Supabase, região São Paulo, **só como hospedagem**: o login fica fora do Supabase (D-31) e não usamos o Realtime (D-32). Plano pago em produção (o gratuito pausa por inatividade e não tem backup diário). *Revista em 15/11/2026; antes incluía Supabase Auth e Realtime.* *Em 22/11/2026 descobriu-se que o primeiro projeto (`tlpumcurfxwmalkarpjt`) tinha sido criado em `us-west-2` (Oregon); ainda sem dados reais, foi substituído por um projeto novo em `sa-east-1` (`uxxpbjfshtwgdtcuhrbc`), com Hyperdrive novos.*
 
 **D-26 · Hospedagem:** **Cloudflare Workers**, não Vercel (o plano gratuito da Vercel não permite uso comercial).
 

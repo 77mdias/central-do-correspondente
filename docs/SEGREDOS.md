@@ -60,7 +60,7 @@ Os testes rodam no host e não precisam do CriptEnv: usam os valores fixos de `t
 
 ## Produção (a partir da fase 3)
 
-Os papéis `app_user` e `app_system` são criados à mão no Supabase, com senhas fortes, antes da primeira migration (as migrations dão grants a eles). No SQL Editor do Supabase (projeto `tlpumcurfxwmalkarpjt`, feito em 19/11/2026), com senhas de `openssl rand -hex 32` e o snippet apagado depois:
+Os papéis `app_user` e `app_system` são criados à mão no Supabase, com senhas fortes, antes da primeira migration (as migrations dão grants a eles). No SQL Editor do Supabase (projeto `uxxpbjfshtwgdtcuhrbc`, em São Paulo, feito em 22/11/2026; o primeiro projeto, `tlpumcurfxwmalkarpjt`, tinha sido criado por engano em `us-west-2` e foi substituído, ver D-25), com senhas de `openssl rand -hex 32` e o snippet apagado depois:
 
 ```sql
 create role app_user   login password '...' nobypassrls;
@@ -72,9 +72,9 @@ alter default privileges for role postgres in schema public revoke all on sequen
 alter default privileges for role postgres in schema public revoke all on functions from anon, authenticated;
 ```
 
-As migrations até `20261115120600` entraram pelo SQL Editor, num script gerado das partes `migrate:up` com a tabela `schema_migrations` do dbmate preenchida. As próximas vão por `pnpm db:migrate` com o `DATABASE_URL_OWNER` de produção.
+As migrations vão por `pnpm db:migrate` com o `DATABASE_URL_OWNER` de produção (Session pooler).
 
-As strings de conexão usam a *Direct connection* (`db.tlpumcurfxwmalkarpjt.supabase.co:5432`, banco `postgres`), trocando só usuário e senha. Pelo *Session pooler*, o usuário vira `app_user.tlpumcurfxwmalkarpjt`; o pooler de transação (6543) não serve. Os segredos de produção ficam no ambiente `production` do CriptEnv e vão para o Worker como segredos da Cloudflare. As conexões do Worker usam dois Hyperdrive (`DB_APP` e `DB_SYSTEM`), cada um com o papel dele.
+As strings de conexão usam a *Direct connection* (`db.uxxpbjfshtwgdtcuhrbc.supabase.co:5432`, banco `postgres`), trocando só usuário e senha. Pelo *Session pooler*, o usuário vira `app_user.uxxpbjfshtwgdtcuhrbc`; o pooler de transação (6543) não serve. Os segredos de produção ficam no ambiente `production` do CriptEnv e vão para o Worker como segredos da Cloudflare. As conexões do Worker usam dois Hyperdrive (`DB_APP` e `DB_SYSTEM`), cada um com o papel dele.
 
 ### Ambiente `production`
 
@@ -88,24 +88,24 @@ Os valores secretos (os quatro primeiros e o último, porque as strings de conex
 | `DB_SYSTEM` | Hyperdrive | string de conexão do Supabase com o papel `app_system` |
 | `APP_URL` | `vars` do `wrangler.jsonc` | domínio real com `https://` (base do Better Auth) |
 | `EMAIL_REMETENTE` | `vars` do `wrangler.jsonc` | `Central do Correspondente <nao-responda@…>`, com o domínio verificado no provedor |
-| `S3_ENDPOINT` | `vars` do `wrangler.jsonc` | `https://<projeto>.storage.supabase.co/storage/v1/s3` |
-| `S3_REGIAO` | `vars` do `wrangler.jsonc` | a região do projeto no Supabase (hoje `us-west-2`; ver *Storage → S3 Connection*) |
+| `S3_ENDPOINT` | `vars` do `wrangler.jsonc` | `https://uxxpbjfshtwgdtcuhrbc.storage.supabase.co/storage/v1/s3` |
+| `S3_REGIAO` | `vars` do `wrangler.jsonc` | a região do projeto no Supabase: `sa-east-1` (ver *Storage → S3 Connection*) |
 | `S3_BUCKET` | `vars` do `wrangler.jsonc` | `documentos` |
 | `S3_ACCESS_KEY_ID` · `S3_SECRET_ACCESS_KEY` | segredos do Worker | chave S3 do Supabase (*Storage → S3 Connection → New access key*). Ela dá acesso ao Storage inteiro: fica só no Worker |
-| `DATABASE_URL_OWNER` | só CriptEnv, nunca no Worker | conexão do papel `postgres` do Supabase pelo **Session pooler** (`postgres.tlpumcurfxwmalkarpjt@aws-…-us-west-2.pooler.supabase.com:5432`), para `pnpm db:migrate` e `pnpm conta:liberar`. A *Direct connection* só responde por IPv6 e falha ("network is unreachable") em rede sem IPv6 |
+| `DATABASE_URL_OWNER` | só CriptEnv, nunca no Worker | conexão do papel `postgres` do Supabase pelo **Session pooler** (`postgres.uxxpbjfshtwgdtcuhrbc@aws-…-sa-east-1.pooler.supabase.com:5432`), para `pnpm db:migrate` e `pnpm conta:liberar`. A *Direct connection* só responde por IPv6 e falha ("network is unreachable") em rede sem IPv6 |
 
 Para levar os valores ao Cloudflare:
 
 ```bash
-npx wrangler hyperdrive create cc-db-app --connection-string="<string do app_user>"
-npx wrangler hyperdrive create cc-db-system --connection-string="<string do app_system>"
+npx wrangler hyperdrive create cc-db-app-sp --connection-string="<string do app_user>" --caching-disabled
+npx wrangler hyperdrive create cc-db-system-sp --connection-string="<string do app_system>" --caching-disabled
 npx wrangler secret put BETTER_AUTH_SECRET --name central-do-correspondente
 npx wrangler secret put EMAIL_API_KEY --name central-do-correspondente
 ```
 
 Antes do primeiro deploy:
 
-- **Bloco de produção.** `env.production` no `wrangler.jsonc` já tem os ids reais do Hyperdrive (`cc-db-app` e `cc-db-system`, cache desligado). Com o plugin da Cloudflare no Vite, o ambiente é escolhido no build (`CLOUDFLARE_ENV`), não com `--env`: o deploy é `pnpm deploy:producao` (ou, no Workers Builds, build `CLOUDFLARE_ENV=production pnpm build` e deploy `npx wrangler deploy`). O Worker de produção se chama `central-do-correspondente` (https://central-correspondente.wdias.tech); o nome de topo é `central-do-correspondente-local`, para um deploy sem `CLOUDFLARE_ENV` não sobrescrever produção. O bloco exige `BETTER_AUTH_SECRET` e `EMAIL_API_KEY` (`secrets.required`): sem eles o deploy falha. Os dois ficam no painel do Worker (*Settings → Variables and Secrets*, tipo *Secret*). Num Worker novo, o primeiro deploy precisa de `--secrets-file` ou de tirar a linha temporariamente.
+- **Bloco de produção.** `env.production` no `wrangler.jsonc` já tem os ids reais do Hyperdrive (`cc-db-app-sp` e `cc-db-system-sp`, do projeto de São Paulo, cache desligado). Com o plugin da Cloudflare no Vite, o ambiente é escolhido no build (`CLOUDFLARE_ENV`), não com `--env`: o deploy é `pnpm deploy:producao` (ou, no Workers Builds, build `CLOUDFLARE_ENV=production pnpm build` e deploy `npx wrangler deploy`). O Worker de produção se chama `central-do-correspondente` (https://central-correspondente.wdias.tech); o nome de topo é `central-do-correspondente-local`, para um deploy sem `CLOUDFLARE_ENV` não sobrescrever produção. O bloco exige `BETTER_AUTH_SECRET` e `EMAIL_API_KEY` (`secrets.required`): sem eles o deploy falha. Os dois ficam no painel do Worker (*Settings → Variables and Secrets*, tipo *Secret*). Num Worker novo, o primeiro deploy precisa de `--secrets-file` ou de tirar a linha temporariamente.
 - **E-mail.** Enviado pela Resend (D-38), do remetente `nao-responda@central-correspondente.wdias.tech`. O subdomínio `central-correspondente.wdias.tech` precisa estar **verificado** na Resend (*Domains*, região São Paulo), com os registros DKIM (`resend._domainkey.central-correspondente`), SPF e MX de retorno (`send.central-correspondente`) na zona `wdias.tech` da Cloudflare; sem isso a Resend recusa o envio com HTTP 403 e ninguém recebe confirmação de cadastro nem convite. O subdomínio separa a reputação de envio do app da do `wdias.tech`. O remetente de teste da Resend (`onboarding@resend.dev`) só entrega para o dono da conta e não é mais usado.
 - **Ainda não existem no código** e entram com as fases seguintes: chaves do Asaas (assinatura), chaves VAPID (Web Push) e credenciais do storage S3 (anexos). Só criar quando o código que as lê chegar.
 
