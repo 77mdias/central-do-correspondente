@@ -8,7 +8,8 @@ import { TEST_ENV } from "../test-env";
 export const ctxDeTeste = { waitUntil: (p: Promise<unknown>) => void p.catch(() => undefined), passThroughOnException() {}, props: {} } as unknown as ExecutionContext;
 
 /** App com e-mails coletados em memória. `req` manda JSON, a origem certa e o cookie, se houver. */
-export function appDeTeste() {
+export function appDeTeste(envExtra: Partial<typeof TEST_ENV> = {}) {
+  const env = { ...TEST_ENV, ...envExtra };
   const emails: Email[] = [];
   const app = criarApp({ enviarEmail: async (e) => void emails.push(e) });
   const ip = `198.51.100.${Math.floor(Math.random() * 250) + 1}`; // um IP por app de teste: o limite de login é por IP
@@ -20,10 +21,13 @@ export function appDeTeste() {
         headers: { origin: TEST_ENV.APP_URL, "content-type": "application/json", "cf-connecting-ip": ip, ...(init.cookie ? { cookie: init.cookie } : {}) },
         body: init.body === undefined ? undefined : JSON.stringify(init.body),
       },
-      TEST_ENV,
+      env,
       ctxDeTeste,
     );
-  return { app, req, emails };
+  /** Envio multipart (anexos): sem content-type, o FormData define o limite. */
+  const enviar = (caminho: string, form: FormData, cookie: string) =>
+    app.request(caminho, { method: "POST", headers: { origin: env.APP_URL, "cf-connecting-ip": ip, cookie }, body: form }, env, ctxDeTeste);
+  return { app, req, enviar, emails };
 }
 
 // pool próprio do Better Auth nos testes: o poolSystem tem uma conexão só, e o Better Auth precisa de mais de uma
