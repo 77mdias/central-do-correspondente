@@ -1,0 +1,55 @@
+{
+  "origem": "9b1f6a52-3c0e-4d1a-9f57-0d2c3b4a5e61",
+  "percentual": 1.2,
+  "historicoPercentual": [
+    { "percentual": 1.0, "criadoEm": "2026-01-10T13:00:00.000Z" },
+    { "percentual": 1.2, "criadoEm": "2026-06-01T13:00:00.000Z" }
+  ],
+  "corretores": [
+    { "idOrigem": "cor-1", "nome": "Ana Corretora", "imobiliaria": "Casa Boa", "whatsapp": "11988887777", "creci": "12345-F", "email": "ana@exemplo.com", "criadoEm": "2026-01-05T12:00:00.000Z" },
+    { "idOrigem": "cor-2", "nome": "Bruno Corretor", "imobiliaria": null, "whatsapp": null, "creci": null, "email": null, "criadoEm": "2026-02-01T12:00:00.000Z" }
+  ],
+  "clientes": [
+    {
+      "idOrigem": "cli-1", "corretorIdOrigem": "cor-1",
+      "nome": "Carla Concluída", "cpf": "52998224725", "whatsapp": "11977776666", "email": "carla@exemplo.com",
+      "modalidade": "mcmv", "etapa": "concluido",
+      "valor_imovel_centavos": 25000000, "valor_financiado_centavos": 20000000, "valor_avaliacao_centavos": 26000000,
+      "entrada_centavos": 5000000, "fgts_centavos": 1000000, "subsidio_centavos": 0,
+      "numero_contrato": "8.4444.0000001-1", "data_assinatura": "2026-03-10",
+      "proxima_cobranca": "2026-02-20", "intervalo_cobranca": 3, "qtd_cobrancas": 4, "ultima_cobranca": "2026-02-17T15:00:00.000Z",
+      "observacoes": "Cliente antiga", "criado_em": "2026-01-15T12:00:00.000Z", "atualizado_em": "2026-04-02T18:30:00.000Z",
+      "remuneracao": { "pctContrato": 1.0, "pctProprio": null, "recebidaEm": "2026-04-01" },
+      "documentos": [{ "tipo": "rg", "recebidoEm": "2026-01-16" }, { "tipo": "cpf", "recebidoEm": "2026-01-16" }],
+      "historico": [
+        { "texto": "Cliente cadastrado · Ana Corretora (Casa Boa)", "criadoEm": "2026-01-15T12:00:00.000Z" },
+        { "texto": "Remuneração recebida: R$ 2.000,00", "criadoEm": "2026-04-01T12:00:00.000Z" }
+      ]
+    },
+    {
+      "idOrigem": "cli-2", "corretorIdOrigem": "cor-2",
+      "nome": "Diego Pendente", "cpf": null, "whatsapp": "1133334444", "email": null,
+      "modalidade": "sbpe", "etapa": "documentacao_pendente",
+      "valor_imovel_centavos": 40000000, "valor_financiado_centavos": 30000000,
+      "proxima_cobranca": "2026-11-20", "intervalo_cobranca": 5, "qtd_cobrancas": 1,
+      "criado_em": "2026-10-01T12:00:00.000Z", "atualizado_em": "2026-11-10T12:00:00.000Z",
+      "remuneracao": { "pctContrato": null, "pctProprio": 1.5, "recebidaEm": null },
+      "documentos": [], "historico": []
+    },
+    {
+      "idOrigem": "cli-3", "corretorIdOrigem": null,
+      "nome": "Elisa Cancelada", "modalidade": "outra", "etapa": "reprovado_cancelado",
+      "criado_em": "2026-05-01T12:00:00.000Z", "atualizado_em": "2026-05-20T15:00:00.000Z",
+      "remuneracao": { "pctContrato": null, "pctProprio": null, "recebidaEm": null },
+      "documentos": [{ "tipo": "resid", "recebidoEm": "2026-05-02" }],
+      "historico": [{ "texto": "Crédito reprovado", "criadoEm": "2026-05-20T15:00:00.000Z" }]
+    },
+    {
+      "idOrigem": "cli-4", "corretorIdOrigem": null,
+      "nome": "Fábio Direto", "modalidade": "pro_cotista", "etapa": "analise_credito",
+      "criado_em": "2026-11-01T12:00:00.000Z", "atualizado_em": "2026-11-05T12:00:00.000Z",
+      "remuneracao": { "pctContrato": null, "pctProprio": null, "recebidaEm": null },
+      "documentos": [], "historico": []
+    }
+  ]
+}
