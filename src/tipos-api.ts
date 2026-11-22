@@ -63,3 +63,16 @@ export type ClienteLista = {
 
 /** Corretor como as regras de tela precisam (nome e imobiliária). */
 export type CorretorResumo = { id: string; nome: string; imobiliaria: string | null };
+
+export type ArquivoResumo = { id: string; tipo: CodigoDocumento | "outros"; nome: string; tamanho: number; mime: string; enviadoEm: string };
+export type NotaHistorico = { id: string; tipo: "nota" | "etapa" | "cobranca" | "documento" | "contrato" | "sistema"; texto: string; criadoEm: string };
+/** Só para o gestor (RN-17). Percentuais em número (até 3 casas). */
+export type Remuneracao = {
+  pctUsado: number | null;
+  remuneracaoCentavos: number | null;
+  pctContrato: number | null;
+  pctProprio: number | null;
+  recebidaEm: string | null;
+};
+/** `GET …/clientes/:id`. `remuneracao` só existe na resposta do gestor. */
+export type Ficha = { cliente: ClienteLista; anexos: ArquivoResumo[]; historico: NotaHistorico[]; remuneracao?: Remuneracao };
