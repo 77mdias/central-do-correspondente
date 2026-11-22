@@ -7,6 +7,8 @@ import { ExigeSessao } from "./componentes/Sessao";
 import { sessaoProvavel, ultimoEscritorio, useEu } from "./consultas";
 import { destinoAposEntrar } from "./regras/destino";
 import { AceitarConvite } from "./telas/AceitarConvite";
+import { Clientes } from "./telas/Clientes";
+import { CobrarHoje } from "./telas/CobrarHoje";
 import { ConfirmeEmail } from "./telas/ConfirmeEmail";
 import { CriarEscritorio } from "./telas/CriarEscritorio";
 import { Entrar } from "./telas/Entrar";
@@ -44,6 +46,8 @@ export const rotas = createBrowserRouter([
     element: <ExigeSessao>{(eu) => <Casca eu={eu} />}</ExigeSessao>,
     children: [
       { index: true, element: <Inicio /> },
+      { path: "clientes", element: <Clientes /> },
+      { path: "cobrar", element: <CobrarHoje /> },
       { path: "equipe", element: <Equipe /> },
     ],
   },

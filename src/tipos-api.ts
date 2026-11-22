@@ -77,7 +77,10 @@ export type Remuneracao = {
 /** `GET …/clientes/:id`. `remuneracao` só existe na resposta do gestor. */
 export type Ficha = { cliente: ClienteLista; anexos: ArquivoResumo[]; historico: NotaHistorico[]; remuneracao?: Remuneracao };
 
-export type AcessoCorretor = "sem_acesso" | "convidado" | "ativo";
+/** RF-05: últimas entradas de histórico de todos os clientes. */
+export type AtualizacaoRecente = { id: string; clienteId: string; nome: string; tipo: NotaHistorico["tipo"]; texto: string; criadoEm: string };
+
+export type AcessoCorretor ="sem_acesso" | "convidado" | "ativo";
 export type Corretor = CorretorResumo & { whatsapp: string | null; creci: string | null; email: string | null; acesso: AcessoCorretor };
 
 /** Uma linha de `vw_remuneracao` (só gestor). */

@@ -1,6 +1,6 @@
 import type { ClienteLista, CorretorResumo } from "../tipos-api";
 import { DOCUMENTOS } from "./catalogo";
-import { ativo, contratado, faltando, type Filtro, filtrar, nomeOrigem, ordenar, parado, resumo, situacaoCobranca } from "./processo";
+import { ativo, contratado, faltando, type Filtro, filtrar, nomeOrigem, ordenar, parado, porOrigem, resumo, situacaoCobranca } from "./processo";
 
 const HOJE = "2026-11-22";
 const AGORA = new Date("2026-11-22T15:00:00Z");
@@ -122,4 +122,16 @@ test("nome da origem", () => {
   expect(nomeOrigem(null, corretores)).toBe("Cliente direto");
   expect(nomeOrigem("k1", corretores)).toBe("Ana Corretora");
   expect(nomeOrigem("sumiu", corretores)).toBe("Corretor removido");
+});
+
+test("tabela por origem: só quem tem ativos, mais pendências primeiro (RF-04)", () => {
+  const ks: CorretorResumo[] = [...corretores, { id: "k2", nome: "Bruno", imobiliaria: null }];
+  const lista = [
+    cliente({ corretorId: "k1", proximaCobranca: "2026-12-30" }),
+    cliente({ corretorId: "k2" }),
+    cliente({ corretorId: "k2" }),
+    cliente({ etapa: "concluido" }),
+  ];
+  const r = porOrigem(lista, ks, HOJE, AGORA);
+  expect(r.map((o) => [o.nome, o.ativos, o.hoje])).toEqual([["Bruno", 2, 2], ["Ana Corretora", 1, 0]]);
 });

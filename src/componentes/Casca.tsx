@@ -3,10 +3,15 @@ import { useEffect, useRef } from "react";
 import { Navigate, NavLink, Outlet, useNavigate, useParams } from "react-router";
 import { authCliente } from "@/auth-cliente";
 import { sessaoProvavel, ultimoEscritorio } from "@/consultas";
+import { useClientes } from "@/consultas-escritorio";
+import { hojeBr } from "@/regras/datas";
+import { resumo } from "@/regras/processo";
 import { cn } from "@/lib/cn";
 import { ROTULO_PERFIL } from "@/regras/rotulos";
 import type { Eu } from "@/tipos-api";
 import { AvisoConta } from "./AvisoConta";
+import { PainelFicha } from "@/telas/ficha/PainelFicha";
+import { ProvedorEnviou } from "./Enviou";
 import { Botao, Marca } from "./ui";
 
 /** Casca do escritório: menu lateral 240px (gaveta abaixo de 900 px), aviso de conta e tela da rota. */
@@ -32,9 +37,12 @@ export function Casca({ eu }: { eu: Eu }) {
     navegar("/entrar");
   };
 
-  const itens = [
-    { para: `/e/${escritorio.contaId}`, rotulo: "Início", fim: true },
-    ...(escritorio.perfil === "gestor" ? [{ para: `/e/${escritorio.contaId}/equipe`, rotulo: "Equipe e acessos", fim: false }] : []),
+  const raiz = `/e/${escritorio.contaId}`;
+  const itens: { para: string; rotulo: string; fim: boolean; contador?: "clientes" | "cobrar" }[] = [
+    { para: raiz, rotulo: "Início", fim: true },
+    { para: `${raiz}/clientes`, rotulo: "Clientes", fim: false, contador: "clientes" },
+    { para: `${raiz}/cobrar`, rotulo: "Cobrar hoje", fim: false, contador: "cobrar" },
+    ...(escritorio.perfil === "gestor" ? [{ para: `${raiz}/equipe`, rotulo: "Equipe e acessos", fim: false }] : []),
   ];
 
   const menu = (
@@ -54,7 +62,10 @@ export function Casca({ eu }: { eu: Eu }) {
             )
           }
         >
-          {i.rotulo}
+          <span className="flex items-center justify-between gap-2">
+            {i.rotulo}
+            {i.contador && <Contador conta={escritorio.contaId} tipo={i.contador} />}
+          </span>
         </NavLink>
       ))}
       {eu.escritorios.length > 1 && (
@@ -116,9 +127,31 @@ export function Casca({ eu }: { eu: Eu }) {
         </dialog>
         <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 min-[900px]:p-8">
           <AvisoConta escritorio={escritorio} />
-          <Outlet context={escritorio} />
+          <ProvedorEnviou escritorio={escritorio}>
+            <Outlet context={escritorio} />
+            <PainelFicha escritorio={escritorio} />
+          </ProvedorEnviou>
         </main>
       </div>
     </div>
+  );
+}
+
+/** Contadores do menu, como no protótipo: clientes ativos e cobranças do dia. */
+function Contador({ conta, tipo }: { conta: string; tipo: "clientes" | "cobrar" }) {
+  const clientes = useClientes(conta);
+  if (!clientes.data) return null;
+  const r = resumo(clientes.data, hojeBr(), new Date());
+  const n = tipo === "clientes" ? r.ativos : r.hoje;
+  if (tipo === "cobrar" && !n) return null;
+  return (
+    <span
+      className={cn(
+        "font-mono-tabular rounded-full px-2 py-0.5 text-[11px]",
+        tipo === "cobrar" ? "bg-aviso-fundo text-aviso-texto" : "bg-superficie-sutil text-texto-2",
+      )}
+    >
+      {n}
+    </span>
   );
 }

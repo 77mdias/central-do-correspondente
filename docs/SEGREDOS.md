@@ -32,7 +32,7 @@ As URLs apontam para a rede do compose (`postgres`, `mailpit`).
 
 Conferido em 15/11/2026 com wrangler 4.162.0 e `@cloudflare/vite-plugin` 1.69.1:
 
-- **Segredos:** `secrets.required` no `wrangler.jsonc` faz o `vite dev` ler `BETTER_AUTH_SECRET` e `EMAIL_API_URL` do `process.env` (log: "Using secrets defined in process.env"). Sem `.dev.vars`.
+- **Segredos:** `secrets.required` no `wrangler.jsonc` faz o `vite dev` ler `BETTER_AUTH_SECRET`, `EMAIL_API_URL`, `S3_ACCESS_KEY_ID` e `S3_SECRET_ACCESS_KEY` do `process.env` (segredo fora da lista não chega ao Worker) (log: "Using secrets defined in process.env"). Sem `.dev.vars`.
 - **Banco:** o Hyperdrive local usa `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_<BINDING>` (`DB_APP`, `DB_SYSTEM`). Sem essa variável, o `vite dev` não sobe.
 - Os valores não secretos (`APP_URL`, `EMAIL_REMETENTE`) ficam em `vars` no `wrangler.jsonc`.
 
