@@ -41,8 +41,9 @@
     "production": {
       "name": "central-do-correspondente",
       "hyperdrive": [
-        { "binding": "DB_APP", "id": "0253d0f009b143da92d759659f2f8bfb" },
-        { "binding": "DB_SYSTEM", "id": "6c6763de2925460596be133ac22b09a6" }
+        // projeto Supabase em São Paulo (cc-db-app-sp e cc-db-system-sp, sem cache; D-37)
+        { "binding": "DB_APP", "id": "3f8ef317bd3347bd9bc322e65bbc32a0" },
+        { "binding": "DB_SYSTEM", "id": "c7735e8d027f487e8da7b7830cbc8552" }
       ],
       "vars": {
         // domínio ligado ao Worker pelo painel (aba Domains); o deploy não mexe em domínio que não está declarado aqui
