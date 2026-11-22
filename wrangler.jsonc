@@ -51,7 +51,7 @@
         "EMAIL_REMETENTE": "Central do Correspondente <nao-responda@central-correspondente.wdias.tech>",
         // Supabase Storage pela API S3 (bucket privado; docs/SEGREDOS.md, "Anexos")
         "S3_ENDPOINT": "https://tlpumcurfxwmalkarpjt.storage.supabase.co/storage/v1/s3",
-        "S3_REGIAO": "sa-east-1",
+        "S3_REGIAO": "us-west-2", // a região do projeto Supabase (a assinatura S3 precisa bater)
         "S3_BUCKET": "documentos"
       },
       // sem BETTER_AUTH_SECRET o Better Auth cai numa chave padrão pública: o deploy tem que falhar.

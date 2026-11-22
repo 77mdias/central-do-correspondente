@@ -89,10 +89,10 @@ Os valores secretos (os quatro primeiros e o último, porque as strings de conex
 | `APP_URL` | `vars` do `wrangler.jsonc` | domínio real com `https://` (base do Better Auth) |
 | `EMAIL_REMETENTE` | `vars` do `wrangler.jsonc` | `Central do Correspondente <nao-responda@…>`, com o domínio verificado no provedor |
 | `S3_ENDPOINT` | `vars` do `wrangler.jsonc` | `https://<projeto>.storage.supabase.co/storage/v1/s3` |
-| `S3_REGIAO` | `vars` do `wrangler.jsonc` | `sa-east-1` |
+| `S3_REGIAO` | `vars` do `wrangler.jsonc` | a região do projeto no Supabase (hoje `us-west-2`; ver *Storage → S3 Connection*) |
 | `S3_BUCKET` | `vars` do `wrangler.jsonc` | `documentos` |
 | `S3_ACCESS_KEY_ID` · `S3_SECRET_ACCESS_KEY` | segredos do Worker | chave S3 do Supabase (*Storage → S3 Connection → New access key*). Ela dá acesso ao Storage inteiro: fica só no Worker |
-| `DATABASE_URL_OWNER` | só CriptEnv, nunca no Worker | conexão do papel `postgres` do Supabase pelo **Session pooler** (`postgres.tlpumcurfxwmalkarpjt@aws-…-sa-east-1.pooler.supabase.com:5432`), para `pnpm db:migrate` e `pnpm conta:liberar`. A *Direct connection* só responde por IPv6 e falha ("network is unreachable") em rede sem IPv6 |
+| `DATABASE_URL_OWNER` | só CriptEnv, nunca no Worker | conexão do papel `postgres` do Supabase pelo **Session pooler** (`postgres.tlpumcurfxwmalkarpjt@aws-…-us-west-2.pooler.supabase.com:5432`), para `pnpm db:migrate` e `pnpm conta:liberar`. A *Direct connection* só responde por IPv6 e falha ("network is unreachable") em rede sem IPv6 |
 
 Para levar os valores ao Cloudflare:
 
