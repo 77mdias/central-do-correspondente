@@ -57,7 +57,9 @@
       // sem BETTER_AUTH_SECRET o Better Auth cai numa chave padrão pública: o deploy tem que falhar.
       // EMAIL_API_KEY é a chave da Resend: sem ela não há confirmação de cadastro nem convite.
       // As chaves S3 do Supabase: sem elas não há anexos.
-      "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_KEY", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"] }
+      "secrets": { "required": ["BETTER_AUTH_SECRET", "EMAIL_API_KEY", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"] },
+      // rotina diária de anexos (RF-27): 6h UTC = 3h de Brasília
+      "triggers": { "crons": ["0 6 * * *"] }
     }
   }
 }

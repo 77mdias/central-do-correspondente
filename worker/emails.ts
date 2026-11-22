@@ -30,3 +30,14 @@ export function emailConvite(url: string, nomeEscritorio: string, perfil: keyof 
     texto: `Olá!\n\n${nomeEscritorio} convidou você para acessar o Central do Correspondente como ${NOME_PERFIL[perfil]}.\n\nPara aceitar, abra o link (vale 7 dias):\n${url}${assinatura}`,
   };
 }
+
+/** RF-27 / P-07: aviso a G e F antes de apagar os anexos pelo prazo (RN-14). */
+export function emailAvisoAnexos(nome: string, escritorio: string, clientes: { nome: string; data: string }[], urlClientes: string) {
+  const lista = clientes.map((c) => `• ${c.nome}: ${c.data}`).join("\n");
+  return {
+    assunto: `Anexos serão apagados em breve — ${escritorio}`,
+    texto:
+      `Olá, ${nome}!\n\nPelo prazo de 30 dias depois da assinatura (ou do cancelamento), os anexos destes processos de ${escritorio} serão apagados nas datas abaixo:\n\n${lista}\n\n` +
+      `Se precisar de algum arquivo, baixe antes na ficha do cliente:\n${urlClientes}\n\nA ficha e a marcação dos documentos recebidos continuam.${assinatura}`,
+  };
+}
