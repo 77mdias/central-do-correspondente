@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado atual
 
-Fase 1 (Base) em implementação: design em `docs/superpowers/specs/2026-11-15-fase-1-base-design.md`, plano em `docs/superpowers/plans/2026-11-15-fase-1-base.md`. O protótipo é a referência de telas e regras: um Artifact do Claude (https://claude.ai/artifact/VyQhFpjAr6aetT4nVkf6c6), com os dados no banco compartilhado do próprio Artifact (coleções `clientes`, `corretores` e o documento `config/geral`) e os anexos no armazenamento de arquivos dele. Cópia de referência em `docs/prototipo/prototipo.html` (ver o README da pasta). Os outros protótipos citados no Briefing não funcionam e não servem de referência. Briefing e Documentação do Produto originais (PDF, 03/11/2026) ficam fora do repo, em `../central-correspondente/`.
+Fase 1 (Base) concluída e no ar em https://central-correspondente.wdias.tech (spec `docs/superpowers/specs/2026-11-15-fase-1-base-design.md`, plano `docs/superpowers/plans/2026-11-15-fase-1-base.md`). Fase 2 (Migração) em desenho: spec `docs/superpowers/specs/2026-11-22-fase-2-migracao-design.md`, ainda sem plano. O protótipo é a referência de telas e regras: um Artifact do Claude (https://claude.ai/artifact/VyQhFpjAr6aetT4nVkf6c6), com os dados no banco compartilhado do próprio Artifact (coleções `clientes`, `corretores` e o documento `config/geral`) e os anexos no armazenamento de arquivos dele. Cópia de referência em `docs/prototipo/prototipo.html` (ver o README da pasta). Os outros protótipos citados no Briefing não funcionam e não servem de referência. Briefing e Documentação do Produto originais (PDF, 03/11/2026) ficam fora do repo, em `../central-correspondente/`.
 
-Precedência: spec da fase atual > `docs/DECISOES.md` > demais docs > Briefing/Documentação. Antes de implementar algo com pendência aberta (P-02 a P-11), perguntar em vez de inventar.
+Precedência: spec da fase atual > `docs/DECISOES.md` > demais docs > Briefing/Documentação. Antes de implementar algo com pendência aberta (P-03 a P-06, P-10), perguntar em vez de inventar.
 
 Toda a interface, o schema, os commits e a documentação são em **português** (RNF-12). Tabelas, campos e funções do banco em português `snake_case`, exceto as tabelas do Better Auth (nomes padrão dele: `user`, `session`, `account`, `verification`, `rateLimit`).
 
@@ -59,7 +59,7 @@ RLS comprovada por teste: para cada perfil e para um usuário de **outra conta**
 
 ## Mapa da documentação
 
-- `docs/DECISOES.md` — decisões D-01..D-38 e pendências P-01..P-11 (ler primeiro).
+- `docs/DECISOES.md` — decisões D-01..D-40 e pendências P-01..P-11 (ler primeiro).
 - `docs/SRS.md` — requisitos RF-xx, regras RN-xx, matriz de permissões, RNF. Citar esses códigos em tarefas, commits e testes.
 - `docs/MODELO-DE-DADOS.md` — tipos, tabelas, RLS, gatilhos, views e o mapeamento do JSON do protótipo para o importador (gatilhos RN-07/RN-12 desligados durante a importação).
 - `docs/ARQUITETURA.md` — rotas do Worker, crons, integrações (Asaas idempotente via `eventos_asaas`), ambientes.
