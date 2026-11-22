@@ -152,3 +152,17 @@ test("fora da importação os gatilhos continuam valendo", async () => {
   const a = await linha<{ n: number }>("select count(*)::int as n from auditoria where conta_id = $1 and entidade = 'cliente'", [conta]);
   expect(a.n).toBe(1);
 });
+
+test("o arquivo de exemplo, convertido pela SPA/Worker, entra no banco com as contagens da prévia", async () => {
+  const { converterPrototipo, esquemaArquivoPrototipo } = await import("../../src/regras/importacao");
+  const exemplo = JSON.parse(readFileSync(new URL("../fixtures/prototipo-exemplo.json", import.meta.url), "utf8"));
+  const { dados, previa } = converterPrototipo(esquemaArquivoPrototipo.parse(exemplo), new Date("2026-11-22T15:00:00Z"));
+  expect(await importar(gestor, conta, dados)).toEqual({
+    corretores: previa.corretores, clientes: previa.clientes, documentos: previa.documentos, notas: previa.notas,
+  });
+  const c = await linha<{ fone: string; vgv: string }>(
+    "select whatsapp as fone, valor_imovel_centavos::text as vgv from clientes where conta_id = $1 and nome = 'Carla Inventada'",
+    [conta],
+  );
+  expect(c).toEqual({ fone: "11977776666", vgv: "25000000" });
+});
