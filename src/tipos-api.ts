@@ -76,3 +76,23 @@ export type Remuneracao = {
 };
 /** `GET …/clientes/:id`. `remuneracao` só existe na resposta do gestor. */
 export type Ficha = { cliente: ClienteLista; anexos: ArquivoResumo[]; historico: NotaHistorico[]; remuneracao?: Remuneracao };
+
+export type AcessoCorretor = "sem_acesso" | "convidado" | "ativo";
+export type Corretor = CorretorResumo & { whatsapp: string | null; creci: string | null; email: string | null; acesso: AcessoCorretor };
+
+/** Uma linha de `vw_remuneracao` (só gestor). */
+export type LinhaRemuneracao = {
+  clienteId: string;
+  nome: string;
+  corretorId: string | null;
+  etapa: Etapa;
+  dataAssinatura: string | null;
+  valorImovelCentavos: number | null;
+  valorFinanciadoCentavos: number | null;
+  contratado: boolean;
+  pctUsado: number | null;
+  remuneracaoCentavos: number | null;
+  cota: number | null;
+  recebidaEm: string | null;
+};
+export type Vgv = { percentualAtual: number; historicoPercentual: { percentual: number; criadoEm: string }[]; linhas: LinhaRemuneracao[] };

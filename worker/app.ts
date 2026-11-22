@@ -7,8 +7,10 @@ import { rotasArquivos } from "./rotas/arquivos";
 import { rotasCadastro } from "./rotas/cadastro";
 import { rotasClientes } from "./rotas/clientes";
 import { rotasConvites } from "./rotas/convites";
+import { rotasCorretores } from "./rotas/corretores";
 import { rotasEquipe } from "./rotas/equipe";
 import { rotasEu } from "./rotas/eu";
+import { rotasVgv } from "./rotas/vgv";
 
 export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   const app = new Hono<AppTipos>();
@@ -45,6 +47,8 @@ export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   app.route("/api", rotasConvites);
   app.route("/api", rotasClientes);
   app.route("/api", rotasArquivos);
+  app.route("/api", rotasCorretores);
+  app.route("/api", rotasVgv);
 
   app.onError((err, c) => {
     console.error(err);
