@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado atual
 
-Fase 1 (Base) concluída e em produção (https://central-correspondente.wdias.tech): design em `docs/superpowers/specs/2026-11-15-fase-1-base-design.md`, plano em `docs/superpowers/plans/2026-11-15-fase-1-base.md`. Próxima: fase 2 (Rotina do escritório). **Não existe protótipo** nem dados a importar (D-24): telas e regras vêm do SRS e do Briefing, e o visual das telas é desenhado na fase 2. Briefing e Documentação do Produto originais (PDF, 03/11/2026) ficam fora do repo, em `../central-correspondente/`.
+Fase 1 (Base) em implementação: design em `docs/superpowers/specs/2026-11-15-fase-1-base-design.md`, plano em `docs/superpowers/plans/2026-11-15-fase-1-base.md`. Existe um protótipo separado que é a referência de telas e regras; o código dele **não está aqui** (pendência P-01 depende dele). Briefing e Documentação do Produto originais (PDF, 03/11/2026) ficam fora do repo, em `../central-correspondente/`.
 
 Precedência: spec da fase atual > `docs/DECISOES.md` > demais docs > Briefing/Documentação. Antes de implementar algo com pendência aberta (P-01 a P-10), perguntar em vez de inventar.
 
@@ -61,8 +61,8 @@ RLS comprovada por teste: para cada perfil e para um usuário de **outra conta**
 
 - `docs/DECISOES.md` — decisões D-01..D-38 e pendências P-01..P-10 (ler primeiro).
 - `docs/SRS.md` — requisitos RF-xx, regras RN-xx, matriz de permissões, RNF. Citar esses códigos em tarefas, commits e testes.
-- `docs/MODELO-DE-DADOS.md` — tipos, tabelas, RLS, gatilhos e views.
+- `docs/MODELO-DE-DADOS.md` — tipos, tabelas, RLS, gatilhos, views e o mapeamento do JSON do protótipo para o importador (gatilhos RN-07/RN-12 desligados durante a importação).
 - `docs/ARQUITETURA.md` — rotas do Worker, crons, integrações (Asaas idempotente via `eventos_asaas`), ambientes.
 - `docs/SEGREDOS.md` — CriptEnv, Docker e valores de teste.
 - `docs/FLUXOS.md` — jornada, mapa de telas e fluxos (cobrança com "Enviou?", convite, inadimplência).
-- `docs/PRD.md` — escopo, fora de escopo e fases (1 Base → 2 Rotina do escritório → 3 Portal do corretor → 4 Venda).
+- `docs/PRD.md` — escopo, fora de escopo e fases (1 Base → 2 Migração → 3 Portal do corretor → 4 Venda).

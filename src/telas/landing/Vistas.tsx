@@ -593,7 +593,7 @@ export function VistaGestor({ e }: { e: Estado }) {
 
 const ESCOPO = [
   { titulo: "Lembrete às 08:00", desc: "Web Push no app instalado e e-mail de reserva.", incluido: true },
-  { titulo: "Portal do corretor", desc: "No plano Com corretores, o corretor acompanha e anexa documentos dos clientes dele.", incluido: true },
+  { titulo: "Importador de JSON", desc: "Migração dos processos para quem vem do protótipo.", incluido: true },
   { titulo: "Download privado LGPD", desc: "Links temporários e auditados para anexos de clientes.", incluido: true },
   { titulo: "Sistemas do banco", desc: "Não integra com portais do banco nem simula crédito.", incluido: false },
   { titulo: "Envio automático no WhatsApp", desc: "Sem API oficial: você envia e confirma no \"Enviou?\".", incluido: false },

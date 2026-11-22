@@ -4,7 +4,7 @@ App web para o correspondente bancário Caixa controlar cada financiamento habit
 
 **Diferencial:** mostra o que fazer hoje (quem cobrar, o que está parado) e calcula sozinho quanto o correspondente vai receber.
 
-> Status: fase 1 (base) em produção em https://central-correspondente.wdias.tech (nov/2026); fase 2 (rotina do escritório) a seguir. O app é feito do zero: não há protótipo nem dados a migrar.
+> Status: planejamento da v1 (nov/2026). Existe um protótipo funcionando que serve de referência de telas e regras; esta é a versão final, com login, banco e armazenamento próprios.
 
 ## Para quem
 
@@ -85,7 +85,7 @@ E-mails locais: Mailpit em http://localhost:8028.
 ## Fases
 
 1. **Base:** login, cadastro aberto de escritório, contas, perfis, convites e banco com RLS.
-2. **Rotina do escritório:** clientes, ficha, documentos com anexos, cobrança, corretores e VGV.
+2. **Migração:** todas as telas do protótipo no banco novo, com anexos e importador do JSON do protótipo.
 3. **Portal do corretor e uso real:** acesso do corretor; teste com os 2 correspondentes atuais.
 4. **Venda:** assinatura Asaas, lembretes, relatórios e página de venda ligada ao cadastro.
 

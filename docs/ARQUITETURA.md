@@ -51,7 +51,7 @@ flowchart LR
 - Cliente do Better Auth (`better-auth/react`) só para sessão: entrar, sair, confirmar e-mail, recuperar senha.
 - **Zod** para validar formulários (CPF/CNPJ, telefone, e-mail) com os mesmos esquemas usados pelo Worker (`src/regras/esquemas.ts`).
 - `src/regras/`: funções puras das regras de exibição (ativo, parado, situação da cobrança, mensagens de WhatsApp, documentos, planos). Testadas com Vitest.
-- Visual: Tailwind v4 + shadcn/ui com tokens claro/escuro em variáveis CSS; as telas da fase 2 são desenhadas sobre esses tokens (não há protótipo, D-24).
+- Visual: Tailwind v4 + shadcn/ui com tokens claro/escuro em variáveis CSS; o visual do protótipo entra nesses tokens na fase 2.
 - **PWA:** manifest, ícones e service worker (cache do app + recebimento de push).
 - Redução de fotos acima de 2,5 MB no navegador (canvas → JPG 2.200 px). HEIC precisa de conversão por biblioteca no navegador, porque só o Safari decodifica HEIC nativamente.
 - Relatório de VGV: planilha (.xlsx) e PDF gerados no navegador a partir da view de remuneração, só para o gestor.
@@ -71,6 +71,7 @@ Um único Worker (Hono) serve a SPA e expõe a API inteira. A cada pedido ele ab
 | `POST /api/contas/:contaId/membros/:id/desativar` | Desativar acesso (a linha fica) | 1 |
 | `GET /api/convites/:token` · `POST /api/convites/:token/aceitar` | Ver e aceitar convite (públicas) | 1 |
 | `GET /api/arquivos/:id/link` | Confere permissão, grava auditoria, devolve link temporário (até 5 min) | 2 |
+| `POST /api/importar` | Importar JSON do protótipo (gestor) | 2 |
 | `POST /api/push/inscrever` | Salvar inscrição de push do aparelho | 4 |
 | `POST /api/assinatura` | Criar cliente e assinatura no Asaas no valor do plano (gestor) | 4 |
 | `POST /api/assinatura/plano` | Trocar de plano: atualiza o valor no Asaas e `contas.plano`; ao voltar para o Simples, desativa funcionária e corretores antes de mudar o plano (gestor) | 4 |

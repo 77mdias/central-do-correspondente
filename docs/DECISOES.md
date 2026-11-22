@@ -25,7 +25,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-06 · Gateway:** **Asaas**, assinatura recorrente (o William já tem conta). Status do pagamento chega por webhook.
 
-**D-07 · Sem teste grátis:** a venda é feita pelo William em conversa direta, e a demonstração substitui o teste. A conta ativa no primeiro pagamento. Para cortesias (ex.: as 2 primeiras correspondentes, na fase 3), o painel do sistema define à mão o plano e o campo "ativa até".
+**D-07 · Sem teste grátis:** a venda é feita pelo William em conversa direta, e a demonstração substitui o teste. A conta ativa no primeiro pagamento. Para cortesias (ex.: as 2 correspondentes que já usam o protótipo), o painel do sistema define à mão o plano e o campo "ativa até".
 
 **D-08 · Inadimplência:** 7 dias de tolerância depois do vencimento; em seguida a conta fica **somente leitura** até pagar. Nada é apagado por falta de pagamento.
 
@@ -65,7 +65,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 **D-23 · Lembretes:** notificação no celular por **Web Push** (app instalado como PWA) e **e-mail diário** de reserva. No iPhone o push só funciona com o app adicionado à tela de início.
 
-**D-24 · Sem migração de dados:** não existe protótipo nem sistema anterior com dados a importar. Os escritórios começam com a conta vazia e cadastram os clientes no app. As telas e regras vêm do SRS e do Briefing; o visual é desenhado na fase 2. *Revista em 22/11/2026; antes previa um importador do JSON de um protótipo, que nunca existiu.*
+**D-24 · Migração:** as correspondentes atuais criam contas novas; um importador lê o JSON exportado do protótipo e carrega os dados na conta nova (fase 2).
 
 ## Técnica
 
@@ -103,7 +103,7 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 
 | # | Pendência | Proposta atual | Quem decide |
 |---|---|---|---|
-| P-01 | Nomes dos 12 documentos (8 do comprador, 4 do imóvel e vendedor) | Lista proposta em [MODELO-DE-DADOS.md](MODELO-DE-DADOS.md) (`tipos_documento`), com os documentos usuais do financiamento habitacional da Caixa | William, conferindo com as correspondentes |
+| P-01 | Nomes dos 12 documentos (8 do comprador, 4 do imóvel e vendedor) | Copiar do código do protótipo | Dev (precisa do código ou do JSON) |
 | P-02 | Confirmação de envio do WhatsApp | Ao voltar para o app, perguntar "Enviou?"; só registra a cobrança se a resposta for sim | Dev + William |
 | P-03 | Corretor vê o histórico do cliente? | Vê mudanças de etapa e anexos; não vê observações internas | William |
 | P-04 | Como a correspondente nova se cadastra | Cadastro feito na fase 1 (D-33). Falta: página de venda → escolha do plano → cadastro → pagamento no Asaas → conta ativa | William |

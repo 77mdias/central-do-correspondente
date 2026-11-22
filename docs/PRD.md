@@ -56,7 +56,7 @@ Ainda não há metas numéricas.
 
 ## 6. Escopo da v1
 
-### Rotina do escritório (descrita no Briefing)
+### Vem do protótipo (migrar para o banco novo)
 
 | Módulo | O que faz |
 |---|---|
@@ -81,6 +81,7 @@ Ainda não há metas numéricas.
 | Assinatura no Asaas (2 planos e troca de plano) e bloqueio por inadimplência | Alta (fase 4) |
 | Lembrete das cobranças do dia (push + e-mail) | Média |
 | Exportar relatório de VGV e comissões (PDF e planilha) | Média |
+| Importador do JSON do protótipo | Média |
 | Painel do sistema (contas, status, cortesia) | Média |
 
 ### Fora do escopo da v1
@@ -99,7 +100,7 @@ Ainda não há metas numéricas.
 | Fase | Entrega | Pronto quando |
 |---|---|---|
 | 1. Base | Login (Better Auth), cadastro aberto de escritório, contas, membros, convites, schema com RLS e gatilhos | Usuários de 2 contas diferentes não enxergam dados um do outro; testes de RLS passando |
-| 2. Rotina do escritório | Telas da rotina (início, clientes, ficha, documentos, cobrança, corretores, VGV) + anexos | Correspondente consegue fazer a rotina diária inteira no app |
+| 2. Migração | Todas as telas do protótipo + anexos + importador | Correspondente consegue fazer a rotina diária inteira no app novo |
 | 3. Corretor e uso real | Portal do corretor; uso pelas 2 correspondentes atuais | 2 escritórios usando por 2 semanas sem bloqueio |
 | 4. Venda | Asaas, lembretes, relatórios, termos, página de venda ligada ao cadastro | Escritório novo assina e usa sem ajuda do dev |
 
