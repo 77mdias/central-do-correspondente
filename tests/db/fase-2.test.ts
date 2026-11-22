@@ -55,3 +55,9 @@ test("corretor registra 'baixar' só de arquivo do próprio cliente", async () =
   await expect(auditar(s.c2A, s.contaA, "baixar", s.c2A, arq)).rejects.toThrow(/row-level security/);
   await expect(auditar(s.c1A, s.contaA, "ver")).rejects.toThrow(/row-level security/);
 });
+
+test("a lista de documentos da SPA é igual à do banco", async () => {
+  const { DOCUMENTOS } = await import("../../src/regras/catalogo");
+  const r = await poolSystem.query<{ codigo: string; nome: string; grupo: string }>("select codigo, nome, grupo from tipos_documento order by grupo, ordem");
+  expect(r.rows).toEqual(DOCUMENTOS.map(({ codigo, nome, grupo }) => ({ codigo, nome, grupo })));
+});
