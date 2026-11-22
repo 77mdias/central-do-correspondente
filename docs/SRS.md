@@ -73,7 +73,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RF-33 | Mudar a data da próxima cobrança manualmente | Protótipo |
 | RF-34 | Copiar a mensagem quando não houver WhatsApp cadastrado | Protótipo |
 | RF-35 | Avisar G e F das cobranças do dia sem abrir o app: push (PWA) e e-mail diário | Novo |
-| RF-36 | Ao voltar do WhatsApp, perguntar "Enviou?"; registrar a cobrança só se sim (pendência P-02) | Novo |
+| RF-36 | Ao voltar do WhatsApp (ou depois de copiar a mensagem), perguntar "Enviou?"; registrar a cobrança só se sim. Sem resposta, o cliente fica com "Cobrança aberta" (D-39) | Novo |
 
 ### 1.6 Corretores parceiros
 
@@ -123,7 +123,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 
 | Código | Requisito | Origem |
 |---|---|---|
-| RF-90 | Importar o JSON do protótipo (clientes, corretores, percentual) para uma conta nova, só uma vez por conta, com prévia antes de gravar | Novo |
+| RF-90 | Importar o JSON do botão "Exportar JSON" do protótipo (clientes, corretores, percentual) para uma conta vazia, só uma vez por conta, com prévia antes de gravar. A mesma cópia do protótipo não entra em duas contas (D-40) | Novo |
 
 ---
 

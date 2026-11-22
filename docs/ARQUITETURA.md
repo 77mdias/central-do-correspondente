@@ -70,8 +70,16 @@ Um único Worker (Hono) serve a SPA e expõe a API inteira. A cada pedido ele ab
 | `POST /api/contas/:contaId/convites/:id/reenviar` · `DELETE …/convites/:id` | Reenviar (token novo) e cancelar convite | 1 |
 | `POST /api/contas/:contaId/membros/:id/desativar` | Desativar acesso (a linha fica) | 1 |
 | `GET /api/convites/:token` · `POST /api/convites/:token/aceitar` | Ver e aceitar convite (públicas) | 1 |
-| `GET /api/arquivos/:id/link` | Confere permissão, grava auditoria, devolve link temporário (até 5 min) | 2 |
-| `POST /api/importar` | Importar JSON do protótipo (gestor) | 2 |
+| `GET · POST /api/contas/:contaId/clientes` | Lista (todos os clientes da conta, com documentos) e cadastro | 2 |
+| `GET · PATCH · DELETE /api/contas/:contaId/clientes/:id` | Ficha (grava auditoria `ver`; remuneração só para G), salvamento automático e exclusão | 2 |
+| `PUT /api/contas/:contaId/clientes/:id/documentos/:tipo` | Marcar ou desmarcar documento | 2 |
+| `POST /api/contas/:contaId/clientes/:id/historico` · `…/cobrancas` | Nota livre; registrar cobrança depois do "Enviou?" (RN-13, D-39) | 2 |
+| `PATCH /api/contas/:contaId/clientes/:id/remuneracao` | Percentual próprio e remuneração recebida (G) | 2 |
+| `POST /api/contas/:contaId/clientes/:id/arquivos` | Anexar: grava a linha sob RLS, envia ao S3 e só então confirma | 2 |
+| `GET /api/contas/:contaId/arquivos/:id/link` · `DELETE …/arquivos/:id` | Link temporário (até 5 min, auditoria `baixar`); remover anexo | 2 |
+| `GET · POST · PATCH · DELETE /api/contas/:contaId/corretores…` | Corretores parceiros, com o status do acesso ao portal | 2 |
+| `GET /api/contas/:contaId/vgv` · `PUT …/percentual` | VGV e comissões e percentual atual (G) | 2 |
+| `POST /api/contas/:contaId/importacao` | Importar o JSON do protótipo pela função `importar_prototipo` (G, D-40) | 2 |
 | `POST /api/push/inscrever` | Salvar inscrição de push do aparelho | 4 |
 | `POST /api/assinatura` | Criar cliente e assinatura no Asaas no valor do plano (gestor) | 4 |
 | `POST /api/assinatura/plano` | Trocar de plano: atualiza o valor no Asaas e `contas.plano`; ao voltar para o Simples, desativa funcionária e corretores antes de mudar o plano (gestor) | 4 |
@@ -84,7 +92,7 @@ O `usuarioId` vem sempre da sessão, nunca do corpo do pedido. O escritório ati
 | Quando | Rotina |
 |---|---|
 | Diário 8h (11h UTC) | Lembrete das cobranças do dia: push + e-mail para G e F de cada conta ativa |
-| Diário 3h (6h UTC) | Exclusão programada de anexos (aviso no dia 25, exclusão no dia 30) |
+| Diário 3h (6h UTC) | Exclusão programada de anexos: aviso por e-mail a G e F 5 dias antes (P-07), exclusão no dia de `anexos_apagar_em` e limpeza de objetos sem linha |
 | Diário 4h (7h UTC) | Conferir contas em atraso há mais de 7 dias → suspensa |
 
 ### 2.3 Banco (Postgres) e arquivos
@@ -95,7 +103,7 @@ O `usuarioId` vem sempre da sessão, nunca do corpo do pedido. O escritório ati
 - **Gatilhos** para as regras de integridade: RN-06, RN-07, RN-11, RN-12, RN-18 (limite do plano), RF-23 (anexo marca recebido), histórico de etapa, auditoria de alterações.
 - **Views** de remuneração (RN-08 a RN-10) que só devolvem linhas ao gestor.
 - **Login:** Better Auth 1.7.16 nas tabelas dele (`user`, `session`, `account`, `verification`, `rateLimit`), acessadas como `app_system`. Escritórios, membros e convites são tabelas nossas (D-31).
-- **Storage (fase 2):** bucket `documentos` privado no Supabase Storage via API S3 (dados no Brasil). Caminho `conta_id/cliente_id/arquivo_id.ext`. Upload e download só pelo Worker, com link temporário.
+- **Storage (fase 2):** bucket `documentos` privado no Supabase Storage via API S3 (dados no Brasil), assinado no Worker (S3 v4). Caminho `conta_id/cliente_id/arquivo_id.ext`. O upload passa pelo Worker; o download é por link pré-assinado de até 5 minutos, gerado depois de conferir a permissão sob RLS. No desenvolvimento, s3mock.
 - **Produção:** Supabase em São Paulo, plano pago (o gratuito pausa por inatividade); backup diário incluso. Conferir o preço atual antes da fase 4. O Worker chega ao banco pelo Hyperdrive.
 
 ## 3. Multi-escritório e perfis

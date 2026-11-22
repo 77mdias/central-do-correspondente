@@ -88,6 +88,10 @@ Os valores secretos (os quatro primeiros e o último, porque as strings de conex
 | `DB_SYSTEM` | Hyperdrive | string de conexão do Supabase com o papel `app_system` |
 | `APP_URL` | `vars` do `wrangler.jsonc` | domínio real com `https://` (base do Better Auth) |
 | `EMAIL_REMETENTE` | `vars` do `wrangler.jsonc` | `Central do Correspondente <nao-responda@…>`, com o domínio verificado no provedor |
+| `S3_ENDPOINT` | `vars` do `wrangler.jsonc` | `https://<projeto>.storage.supabase.co/storage/v1/s3` |
+| `S3_REGIAO` | `vars` do `wrangler.jsonc` | `sa-east-1` |
+| `S3_BUCKET` | `vars` do `wrangler.jsonc` | `documentos` |
+| `S3_ACCESS_KEY_ID` · `S3_SECRET_ACCESS_KEY` | segredos do Worker | chave S3 do Supabase (*Storage → S3 Connection → New access key*). Ela dá acesso ao Storage inteiro: fica só no Worker |
 | `DATABASE_URL_OWNER` | só CriptEnv, nunca no Worker | conexão do papel `postgres` do Supabase, para `pnpm db:migrate` e `pnpm conta:liberar` |
 
 Para levar os valores ao Cloudflare:
@@ -104,3 +108,11 @@ Antes do primeiro deploy:
 - **Bloco de produção.** `env.production` no `wrangler.jsonc` já tem os ids reais do Hyperdrive (`cc-db-app` e `cc-db-system`, cache desligado). Com o plugin da Cloudflare no Vite, o ambiente é escolhido no build (`CLOUDFLARE_ENV`), não com `--env`: o deploy é `pnpm deploy:producao` (ou, no Workers Builds, build `CLOUDFLARE_ENV=production pnpm build` e deploy `npx wrangler deploy`). O Worker de produção se chama `central-do-correspondente` (https://central-correspondente.wdias.tech); o nome de topo é `central-do-correspondente-local`, para um deploy sem `CLOUDFLARE_ENV` não sobrescrever produção. O bloco exige `BETTER_AUTH_SECRET` e `EMAIL_API_KEY` (`secrets.required`): sem eles o deploy falha. Os dois ficam no painel do Worker (*Settings → Variables and Secrets*, tipo *Secret*). Num Worker novo, o primeiro deploy precisa de `--secrets-file` ou de tirar a linha temporariamente.
 - **E-mail.** Enviado pela Resend (D-38), do remetente `nao-responda@central-correspondente.wdias.tech`. O subdomínio `central-correspondente.wdias.tech` precisa estar **verificado** na Resend (*Domains*, região São Paulo), com os registros DKIM (`resend._domainkey.central-correspondente`), SPF e MX de retorno (`send.central-correspondente`) na zona `wdias.tech` da Cloudflare; sem isso a Resend recusa o envio com HTTP 403 e ninguém recebe confirmação de cadastro nem convite. O subdomínio separa a reputação de envio do app da do `wdias.tech`. O remetente de teste da Resend (`onboarding@resend.dev`) só entrega para o dono da conta e não é mais usado.
 - **Ainda não existem no código** e entram com as fases seguintes: chaves do Asaas (assinatura), chaves VAPID (Web Push) e credenciais do storage S3 (anexos). Só criar quando o código que as lê chegar.
+
+## Anexos (fase 2)
+
+Antes do merge que leva os anexos para produção:
+1. No Supabase, em *Storage*, criar o bucket `documentos` como **privado** (sem acesso público).
+2. Em *Storage → S3 Connection*, criar uma chave de acesso e gravar `S3_ACCESS_KEY_ID` e `S3_SECRET_ACCESS_KEY` como segredos do Worker e no CriptEnv (`production`).
+3. No ambiente `development` do CriptEnv, os valores do s3mock: endpoint `http://s3:9090` dentro do compose (`http://localhost:9093` no host), região `us-east-1`, bucket `documentos` e chaves quaisquer. Os testes usam os valores fixos de `tests/test-env.ts`.
+
