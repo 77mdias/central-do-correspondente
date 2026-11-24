@@ -46,7 +46,9 @@ test("escritório nasce, é liberado e recebe a funcionária", async ({ page, br
   await fp.getByLabel("Crie uma senha").fill("senha-forte-1");
   await fp.getByLabel(/Li e aceito/).check();
   await fp.getByRole("button", { name: "Aceitar convite" }).click();
-  await expect(fp.getByRole("heading", { name: "Souza Correspondente" })).toBeVisible();
+  // o título da tela do convite também tem o nome do escritório: esperar a chegada no escritório
+  await expect(fp).toHaveURL(/\/e\/[0-9a-f-]{36}$/);
+  await expect(fp.getByRole("heading", { name: "Souza Correspondente", exact: true })).toBeVisible();
   await outra.close();
 
   await page.reload();
