@@ -9,6 +9,9 @@ import { destinoAposEntrar } from "./regras/destino";
 import { AceitarConvite } from "./telas/AceitarConvite";
 import { Clientes } from "./telas/Clientes";
 import { CobrarHoje } from "./telas/CobrarHoje";
+import { Corretores } from "./telas/Corretores";
+import { Importar } from "./telas/Importar";
+import { Vgv } from "./telas/Vgv";
 import { ConfirmeEmail } from "./telas/ConfirmeEmail";
 import { CriarEscritorio } from "./telas/CriarEscritorio";
 import { Entrar } from "./telas/Entrar";
@@ -48,6 +51,9 @@ export const rotas = createBrowserRouter([
       { index: true, element: <Inicio /> },
       { path: "clientes", element: <Clientes /> },
       { path: "cobrar", element: <CobrarHoje /> },
+      { path: "corretores", element: <Corretores /> },
+      { path: "vgv", element: <Vgv /> },
+      { path: "importar", element: <Importar /> },
       { path: "equipe", element: <Equipe /> },
     ],
   },
