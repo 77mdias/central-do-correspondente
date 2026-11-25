@@ -13,7 +13,8 @@ export type EscritorioResumo = {
   ativa: boolean; // pode gravar (conta_ativa)
 };
 
-export type Eu = { usuario: { id: string; nome: string; email: string }; escritorios: EscritorioResumo[] };
+/** `termosPendentes`: a versão aceita dos termos não é a atual (RF-67); a SPA pede o novo aceite. */
+export type Eu = { usuario: { id: string; nome: string; email: string }; escritorios: EscritorioResumo[]; termosPendentes: boolean };
 
 export type Equipe = {
   membros: { id: string; nome: string; email: string; perfil: Perfil; status: "ativo" | "desativado" }[];

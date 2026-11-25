@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { TERMOS_VERSAO } from "../../src/regras/planos";
 import type { EscritorioResumo, Eu } from "../../src/tipos-api";
 import { type AppTipos, exigirUsuario } from "../contexto";
 import { withUser } from "../db";
@@ -16,5 +17,10 @@ rotasEu.get("/eu", exigirUsuario, async (c) => {
         order by c.nome_escritorio`,
     ),
   );
-  return c.json<Eu>({ usuario: { id: u.id, nome: u.nome, email: u.email }, escritorios: r.rows });
+  // "user" não tem leitura para app_user: lido como app_system, sempre pelo id da sessão
+  const t = await c.var.pools.system.query<{ pendentes: boolean }>(
+    `select "termosVersao" is distinct from $1 as pendentes from "user" where id = $2`,
+    [TERMOS_VERSAO, u.id],
+  );
+  return c.json<Eu>({ usuario: { id: u.id, nome: u.nome, email: u.email }, escritorios: r.rows, termosPendentes: t.rows[0]?.pendentes ?? true });
 });
