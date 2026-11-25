@@ -81,6 +81,8 @@ As rotas do escritório (`…/clientes`, `…/corretores`, `…/vgv`, `…/histo
 
   O texto entra como pendência **P-12**: precisa da revisão dos sócios, de preferência com um advogado, antes do uso real. Eu não sou essa revisão.
 - **Novo aceite.** `TERMOS_VERSAO` passa a `v1`. Quem entra com `termosVersao` diferente da atual cai na tela "Termos atualizados", que mostra os textos e o botão "Li e aceito". A nova rota `POST /api/termos/aceitar` grava versão e data como `app_system`, só para o usuário da sessão. Cadastro e convite já gravam a versão atual.
+- **Ordem de entrega (ajuste do plano).** O mecanismo do novo aceite entra antes do texto, com a versão ainda `rascunho-1`; os testes simulam uma versão antiga gravando outro valor no banco. O texto `v1` e a troca de `TERMOS_VERSAO` vão num PR próprio, mergeado só depois da revisão dos sócios (P-12). Assim, uma correção no texto revisado não obriga um segundo aceite.
+- **Onde o aceite é exigido (ajuste do plano).** O `GET /api/eu` diz `termosPendentes`, e a SPA mostra "Termos atualizados" antes de qualquer tela com sessão. As rotas de domínio não recusam quem está com o aceite pendente: o que o RF-67 pede é o registro de versão e data, e um bloqueio no Worker criaria mais um estado para testar em cada rota.
 
 ## 9. Roteiro do uso real
 
@@ -132,5 +134,5 @@ As rotas do escritório (`…/clientes`, `…/corretores`, `…/vgv`, `…/histo
 1. O corretor **não vê o CPF** nem os dados do contrato. O RF-81 fala em "dados de contato", e o CPF não é necessário para ele cobrar documentos (minimização, LGPD). Se o William quiser o CPF visível, é uma linha na rota.
 2. O corretor vê **todos os anexos** do próprio cliente, inclusive os que o escritório enviou, porque o checklist é um só (RF-81). Ele não remove nenhum.
 3. Novo aceite dos termos no próximo acesso para todos que aceitaram a versão provisória.
-4. Workers Logs ligados em produção. Os logs atuais registram só erros técnicos, nunca nome, CPF ou conteúdo de ficha. Um teste confere que as mensagens de erro do Worker não levam dados de cliente.
+4. Workers Logs ligados em produção. Os logs registram só erros técnicos, nunca nome, CPF ou conteúdo de ficha. Um teste confere que as mensagens de erro do Worker não levam dados de cliente. (Ajuste do plano: hoje o `onError` registra o erro inteiro, e o `detail` de um erro do Postgres traz os valores da linha; a tarefa 6 do plano troca isso por um registro só com nome, código, constraint e rota.)
 5. O texto dos termos: eu escrevo o rascunho, os sócios revisam (P-12).

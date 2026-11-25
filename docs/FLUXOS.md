@@ -150,7 +150,7 @@ sequenceDiagram
 2. Vê etapa, dias sem atualização e documentos pendentes de cada um.
 3. Abre a ficha e toca em **Anexar** no documento que recebeu do cliente.
 4. O documento fica recebido, o histórico registra "Anexado por [corretor]" e o processo conta como atualizado.
-5. O escritório vê a mudança em tempo real.
+5. O escritório vê a mudança na próxima atualização da lista (a cada 30 s, ao voltar para a aba ou ao abrir a ficha; D-32) e em "Últimas atualizações".
 
 ---
 

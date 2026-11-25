@@ -299,7 +299,7 @@ importar_prototipo(conta uuid, dados jsonb) returns jsonb
 | arquivos | como clientes | inserir: gestor, funcionária, corretor (próprios); apagar: gestor, funcionária |
 | historico | gestor, funcionária; corretor conforme P-03 | inserir: gestor, funcionária; gatilhos |
 | historico_percentual | gestor | gatilho ao mudar percentual |
-| auditoria | gestor | gatilhos; `app_user` insere só `ver` e `baixar` em nome próprio, na conta em que é do escritório (ou, para `baixar`, no próprio cliente de corretor) |
+| auditoria | gestor | gatilhos; `app_user` insere só `ver` e `baixar` em nome próprio, na conta em que é do escritório; o corretor registra `ver` (entidade `cliente`) e `baixar` só nos próprios clientes (fase 3) |
 | push_inscricoes | o próprio usuário | o próprio usuário |
 | eventos_asaas | ninguém | só Worker |
 

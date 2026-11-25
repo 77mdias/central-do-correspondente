@@ -22,7 +22,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RF-64 | Convidar pessoa por e-mail: o app cria o acesso e envia link para ela definir a senha. G convida F e C; F convida C. Só no plano Com corretores | Novo |
 | RF-65 | Reenviar convite e desativar acesso (o histórico da pessoa permanece) | Novo |
 | RF-66 | Uma pessoa pode pertencer a várias contas; ao entrar, escolhe o escritório e pode trocar depois | Novo |
-| RF-67 | Aceitar termo de uso e política de privacidade antes do primeiro uso; registrar versão e data do aceite. Na fase 1 o texto é provisório (versão `rascunho-1`); o texto real precisa existir antes do uso real da fase 3 | Novo |
+| RF-67 | Aceitar termo de uso e política de privacidade antes do primeiro uso; registrar versão e data do aceite. Na fase 1 o texto é provisório (versão `rascunho-1`). Na fase 3 entra o texto `v1`, revisado pelos sócios (P-12), e quem aceitou uma versão anterior aceita a nova no próximo acesso | Novo |
 | RF-68 | Painel do sistema (só administradores do sistema): listar contas, plano e status da assinatura; definir plano e "ativa até" para cortesia | Novo |
 
 ### 1.2 Início
@@ -106,7 +106,7 @@ Perfis: **G** gestor · **F** funcionária · **C** corretor.
 | RF-80 | Lista "Meus clientes" com busca, etapa, dias sem atualização e quantidade de documentos pendentes | Novo |
 | RF-81 | Ficha do cliente em leitura: dados de contato, modalidade, etapa, valor do imóvel, valor financiado e checklist | Novo |
 | RF-82 | Anexar arquivo em qualquer item do checklist dos próprios clientes (marca como recebido e entra no histórico com o nome dele) | Novo |
-| RF-83 | Ver histórico conforme pendência P-03 | Novo |
+| RF-83 | Ver no histórico só as mudanças de etapa e os anexos dos próprios clientes; não vê notas, observações nem cobranças (D-41) | Novo |
 | RF-84 | Trocar de escritório quando o corretor atende mais de uma correspondente | Novo |
 
 ### 1.9 Assinatura
