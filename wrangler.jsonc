@@ -40,6 +40,8 @@
     // produção: escolhida no build (pnpm deploy:producao); o nome bate com o Worker do painel
     "production": {
       "name": "central-do-correspondente",
+      // Workers Logs (fase 3): o Worker só registra erros sem dados pessoais (worker/log.ts); a query string sai dos logs
+      "observability": { "enabled": true, "head_sampling_rate": 1, "logs": { "enabled": true, "invocation_logs": true }, "redact_query_string": true },
       "hyperdrive": [
         // projeto Supabase em São Paulo (cc-db-app-sp e cc-db-system-sp, sem cache; D-37)
         { "binding": "DB_APP", "id": "3f8ef317bd3347bd9bc322e65bbc32a0" },

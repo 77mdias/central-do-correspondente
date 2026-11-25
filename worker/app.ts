@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { criarAuth } from "./auth";
 import type { AppTipos } from "./contexto";
 import { abrirPools } from "./db";
+import { registrarErro } from "./log";
 import { criarEnvio, type Email, type EnviarEmail } from "./email";
 import { rotasArquivos } from "./rotas/arquivos";
 import { rotasCadastro } from "./rotas/cadastro";
@@ -24,7 +25,7 @@ export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
     const pools = abrirPools(c.env);
     const enviarEmail = deps.enviarEmail ?? criarEnvio(c.env);
     const enviar = (e: Email) =>
-      c.executionCtx.waitUntil(enviarEmail(e).catch((err) => console.error("e-mail não enviado", e.assunto, err)));
+      c.executionCtx.waitUntil(enviarEmail(e).catch((err) => registrarErro("e-mail não enviado", err)));
     const auth = criarAuth(c.env, pools.system, enviar);
     c.set("pools", pools);
     c.set("enviar", enviar);
@@ -55,7 +56,8 @@ export function criarApp(deps: { enviarEmail?: EnviarEmail } = {}) {
   app.route("/api", rotasPortal);
 
   app.onError((err, c) => {
-    console.error(err);
+    // a rota é o padrão ("/api/contas/:contaId/..."), não o endereço: o do convite leva o token
+    registrarErro(`rota ${c.req.method} ${c.req.routePath}`, err);
     return c.json({ erro: "interno" }, 500);
   });
 

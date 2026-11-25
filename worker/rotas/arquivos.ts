@@ -3,6 +3,7 @@ import type { PoolClient } from "pg";
 import { DOCUMENTOS } from "../../src/regras/catalogo";
 import type { ArquivoResumo } from "../../src/tipos-api";
 import { type AppTipos, exigirUsuario } from "../contexto";
+import { registrarErro } from "../log";
 import { criarS3, ErroS3 } from "../s3";
 import { ehResposta, emTransacao, ErroRota, ids, naoEncontrado, semPermissao } from "./comum";
 
@@ -102,6 +103,6 @@ rotasArquivos.delete("/contas/:contaId/arquivos/:id", async (c) => {
     return a.caminho;
   });
   if (ehResposta(r)) return r;
-  c.executionCtx.waitUntil(criarS3(c.env).apagar(r).catch((e) => console.error("objeto não apagado; a rotina diária recolhe", e)));
+  c.executionCtx.waitUntil(criarS3(c.env).apagar(r).catch((e) => registrarErro("objeto não apagado; a rotina diária recolhe", e)));
   return c.body(null, 204);
 });
