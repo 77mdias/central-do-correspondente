@@ -1,9 +1,9 @@
 import { Hono } from "hono";
+import type { PoolClient } from "pg";
 import { DOCUMENTOS } from "../../src/regras/catalogo";
 import type { ArquivoResumo } from "../../src/tipos-api";
 import { type AppTipos, exigirUsuario } from "../contexto";
 import { criarS3, ErroS3 } from "../s3";
-import { lerCliente } from "./clientes";
 import { ehResposta, emTransacao, ErroRota, ids, naoEncontrado, semPermissao } from "./comum";
 
 export const rotasArquivos = new Hono<AppTipos>();
@@ -22,6 +22,12 @@ export function tipoPeloConteudo(b: Uint8Array): { mime: string; ext: string } |
   return null;
 }
 
+/** Só confirma que o cliente existe para quem pede (RLS); não lê colunas, que variam por perfil. */
+async function existeCliente(db: PoolClient, conta: string, id: string) {
+  const r = await db.query("select 1 from clientes where conta_id = $1 and id = $2", [conta, id]);
+  if (!r.rowCount) throw naoEncontrado();
+}
+
 const TIPOS = new Set<string>(DOCUMENTOS.map((d) => d.codigo));
 const nomeDoTipo = (t: string | null) => (t ? DOCUMENTOS.find((d) => d.codigo === t)!.nome : "Outros arquivos");
 
@@ -30,7 +36,7 @@ rotasArquivos.post("/contas/:contaId/clientes/:id/arquivos", async (c) => {
   const s3 = criarS3(c.env);
   const r = await emTransacao(c, async (db): Promise<ArquivoResumo> => {
     const [conta, cliente] = ids(c, "contaId", "id");
-    await lerCliente(db, conta!, cliente!); // 404 para quem não enxerga o cliente
+    await existeCliente(db, conta!, cliente!); // 404 para quem não enxerga o cliente (escritório ou corretor dele)
     const form = await c.req.formData().catch(() => null);
     const arquivo = form?.get("arquivo");
     const tipoForm = String(form?.get("tipo") ?? "");
@@ -63,7 +69,7 @@ rotasArquivos.post("/contas/:contaId/clientes/:id/arquivos", async (c) => {
 });
 
 type LinhaArquivo = { caminho: string; nome: string; tipo: string | null; cliente: string };
-async function lerArquivo(db: Parameters<typeof lerCliente>[0], conta: string, id: string): Promise<LinhaArquivo> {
+async function lerArquivo(db: PoolClient, conta: string, id: string): Promise<LinhaArquivo> {
   const r = await db.query<LinhaArquivo>(
     `select caminho, nome, tipo_documento as tipo, cliente_id as cliente from arquivos where conta_id = $1 and id = $2 and apagado_em is null`,
     [conta, id],
