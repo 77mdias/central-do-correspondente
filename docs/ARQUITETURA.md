@@ -64,7 +64,8 @@ Um único Worker (Hono) serve a SPA e expõe a API inteira. A cada pedido ele ab
 |---|---|---|
 | `/api/auth/*` | Better Auth: entrar, sair, confirmar e-mail, recuperar senha | 1 |
 | `POST /api/cadastro` | Cadastro aberto de escritório (conta nasce `pendente`) | 1 |
-| `GET /api/eu` | Usuário da sessão e os escritórios em que é membro ativo | 1 |
+| `GET /api/eu` | Usuário da sessão, os escritórios em que é membro ativo e `termosPendentes` (versão aceita diferente da atual, fase 3) | 1 |
+| `POST /api/termos/aceitar` | Novo aceite dos termos: grava a versão atual e a data só para o usuário da sessão, como `app_system` (RF-67) | 3 |
 | `GET /api/contas/:contaId/equipe` | Membros e convites pendentes | 1 |
 | `POST /api/contas/:contaId/convites` | Convidar funcionária/corretor; o banco aplica o limite do plano (RN-18) | 1 |
 | `POST /api/contas/:contaId/convites/:id/reenviar` · `DELETE …/convites/:id` | Reenviar (token novo) e cancelar convite | 1 |
@@ -80,6 +81,7 @@ Um único Worker (Hono) serve a SPA e expõe a API inteira. A cada pedido ele ab
 | `GET · POST · PATCH · DELETE /api/contas/:contaId/corretores…` | Corretores parceiros, com o status do acesso ao portal | 2 |
 | `GET /api/contas/:contaId/vgv` · `PUT …/percentual` | VGV e comissões e percentual atual (G) | 2 |
 | `POST /api/contas/:contaId/importacao` | Importar o JSON do protótipo pela função `importar_prototipo` (G, D-40) | 2 |
+| `GET /api/contas/:contaId/portal/clientes` · `…/portal/clientes/:id` | Portal do corretor: só os clientes dele (RLS) e só a lista fechada de campos (sem CPF, contrato, cobrança nem dinheiro); a ficha grava auditoria `ver`. 404 para quem não é corretor ativo da conta. O corretor anexa e abre arquivos pelas rotas de arquivos acima | 3 |
 | `POST /api/push/inscrever` | Salvar inscrição de push do aparelho | 4 |
 | `POST /api/assinatura` | Criar cliente e assinatura no Asaas no valor do plano (gestor) | 4 |
 | `POST /api/assinatura/plano` | Trocar de plano: atualiza o valor no Asaas e `contas.plano`; ao voltar para o Simples, desativa funcionária e corretores antes de mudar o plano (gestor) | 4 |
@@ -124,8 +126,9 @@ O `usuarioId` vem sempre da sessão, nunca do corpo do pedido. O escritório ati
 | Corretor só vê os seus | RLS por `clientes.corretor_id = meu_corretor_id(conta_id)` |
 | Campos de cobrança da conta | `plano`, `status_assinatura` e `ativa_ate` sem permissão de update para `app_user` |
 | Arquivos privados | Bucket privado, link temporário pelo Worker |
-| Registro de quem abriu, alterou ou baixou | Tabela `auditoria`: alterações por gatilho; abertura da ficha por RPC `registrar_visualizacao`; download pelo Worker |
-| Termos antes do uso | `termosVersao` e `termosAceitosEm` no usuário, gravados no cadastro e no aceite de convite |
+| Registro de quem abriu, alterou ou baixou | Tabela `auditoria`: alterações por gatilho; abertura da ficha (escritório e portal) e download gravados pelo Worker, sob a política `auditoria_registrar` |
+| Termos antes do uso | `termosVersao` e `termosAceitosEm` no usuário, gravados no cadastro, no aceite de convite e no novo aceite (`POST /api/termos/aceitar`) quando a versão muda |
+| Logs sem dados pessoais | Workers Logs em produção (fase 3). O Worker registra só nome do erro, código, constraint e rota: nunca nome, CPF, e-mail, telefone, nome de arquivo nem o `detail` de erro do Postgres |
 | Prazo dos anexos | Rotina diária (RN-14) |
 | Backup diário | Backup do plano pago do Supabase + exportação da conta pelo gestor |
 | Dados no Brasil | Postgres e Storage no Supabase em São Paulo |

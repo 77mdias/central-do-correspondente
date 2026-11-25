@@ -53,7 +53,7 @@ test("corretor registra 'baixar' só de arquivo do próprio cliente", async () =
   const arq = (await linha<{ id: string }>("select id from arquivos where cliente_id = $1", [s.cliente1A])).id;
   await auditar(s.c1A, s.contaA, "baixar", s.c1A, arq);
   await expect(auditar(s.c2A, s.contaA, "baixar", s.c2A, arq)).rejects.toThrow(/row-level security/);
-  await expect(auditar(s.c1A, s.contaA, "ver")).rejects.toThrow(/row-level security/);
+  await expect(auditar(s.c1A, s.contaA, "ver")).rejects.toThrow(/row-level security/); // "ver" sem cliente: só o do próprio cliente (fase 3)
 });
 
 test("a lista de documentos da SPA é igual à do banco", async () => {
