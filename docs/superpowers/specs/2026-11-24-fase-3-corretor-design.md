@@ -1,6 +1,6 @@
 # Fase 3 — Portal do corretor e uso real: design
 
-Central do Correspondente · 24/11/2026 · status: **rascunho, aguardando revisão do Jean**
+Central do Correspondente · 24/11/2026 · status: **aprovada pelo Jean em 24/11/2026** (merge do PR 25)
 
 Este documento manda sobre os outros de `docs/` onde eles divergem; a atualização deles faz parte da fase (seção 11).
 
