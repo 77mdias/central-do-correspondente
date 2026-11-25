@@ -1,6 +1,6 @@
 import type { ClienteLista, CorretorResumo } from "../tipos-api";
 import { DOCUMENTOS } from "./catalogo";
-import { ativo, contratado, faltando, type Filtro, filtrar, nomeOrigem, ordenar, parado, porOrigem, resumo, situacaoCobranca } from "./processo";
+import { ativo, contratado, faltando, type Filtro, filtrar, filtrarPortal, nomeOrigem, ordenar, ordenarPortal, parado, porOrigem, resumo, situacaoCobranca } from "./processo";
 
 const HOJE = "2026-11-22";
 const AGORA = new Date("2026-11-22T15:00:00Z");
@@ -134,4 +134,24 @@ test("tabela por origem: só quem tem ativos, mais pendências primeiro (RF-04)"
   ];
   const r = porOrigem(lista, ks, HOJE, AGORA);
   expect(r.map((o) => [o.nome, o.ativos, o.hoje])).toEqual([["Bruno", 2, 2], ["Ana Corretora", 1, 0]]);
+});
+
+// ── portal do corretor (fase 3) ──
+test("filtrarPortal busca por nome sem acento e sem caixa, e filtra por etapa (RF-80)", () => {
+  const lista = [cliente({ nome: "João Silva" }), cliente({ nome: "Maria Souza", etapa: "analise_credito" }), cliente({ nome: "Ana Joana" })];
+  expect(filtrarPortal(lista, { busca: "joao", etapa: "" }).map((c) => c.nome)).toEqual(["João Silva"]);
+  expect(filtrarPortal(lista, { busca: "  JOA ", etapa: "" }).map((c) => c.nome)).toEqual(["João Silva", "Ana Joana"]);
+  expect(filtrarPortal(lista, { busca: "", etapa: "analise_credito" }).map((c) => c.nome)).toEqual(["Maria Souza"]);
+  expect(filtrarPortal(lista, { busca: "maria", etapa: "documentacao_pendente" })).toEqual([]);
+});
+
+test("ordenarPortal: ativos primeiro, depois parados há mais tempo, depois por nome (RF-80)", () => {
+  const lista = [
+    cliente({ nome: "Zeca Concluído", etapa: "concluido", atualizadoEm: "2026-10-01T12:00:00Z" }),
+    cliente({ nome: "Bruno Hoje", atualizadoEm: "2026-11-22T12:00:00Z" }),
+    cliente({ nome: "Carla Parada", atualizadoEm: "2026-11-12T12:00:00Z" }),
+    cliente({ nome: "Ana Hoje", atualizadoEm: "2026-11-22T13:00:00Z" }),
+  ];
+  expect(ordenarPortal(lista, AGORA).map((c) => c.nome)).toEqual(["Carla Parada", "Ana Hoje", "Bruno Hoje", "Zeca Concluído"]);
+  expect(parado(lista[2]!, AGORA)).toBe(true);
 });

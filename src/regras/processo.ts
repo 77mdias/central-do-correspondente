@@ -1,6 +1,6 @@
 // Regras de exibição do processo, copiadas do protótipo regra por regra
 // (docs/prototipo/prototipo.html: ativo, faltando, cobranca, parado, contratado, visiveis, resumo).
-import type { ClienteLista, CorretorResumo } from "../tipos-api";
+import type { ClienteLista, ClientePortal, CorretorResumo } from "../tipos-api";
 import { DIAS_PARADO, DOCUMENTOS, ETAPAS_FIM } from "./catalogo";
 import { dataCurta, diasAte, diasDesde } from "./datas";
 
@@ -25,7 +25,7 @@ export function situacaoCobranca(c: Cliente, hoje: string): SituacaoCobranca | n
 }
 
 /** RN-03. */
-export const parado = (c: Cliente, agora: Date) => ativo(c) && diasDesde(c.atualizadoEm, agora) >= DIAS_PARADO;
+export const parado = (c: Pick<ClienteLista, "etapa" | "atualizadoEm">, agora: Date) => ativo(c) && diasDesde(c.atualizadoEm, agora) >= DIAS_PARADO;
 
 /** RN-05. */
 export const contratado = (c: Pick<ClienteLista, "dataAssinatura" | "etapa">) => !!c.dataAssinatura && c.etapa !== "reprovado_cancelado";
@@ -121,4 +121,25 @@ export function porOrigem(lista: readonly ClienteLista[], corretores: readonly C
     .filter((o) => o.ativos)
     .sort((a, b) => b.hoje + b.pendentes + b.parados - (a.hoje + a.pendentes + a.parados) || b.ativos - a.ativos)
     .slice(0, 8);
+}
+
+// ── Portal do corretor (fase 3) ───────────────────────────────────────────
+
+/** Minúsculas e sem acento, para "joao" achar "João". */
+const normalizar = (t: string) => t.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+
+/** RF-80: busca por nome e filtro por etapa. */
+export function filtrarPortal<T extends ClientePortal>(lista: readonly T[], f: { busca: string; etapa: string }): T[] {
+  const q = normalizar(f.busca);
+  return lista.filter((c) => (!f.etapa || c.etapa === f.etapa) && (!q || normalizar(c.nome).includes(q)));
+}
+
+/** RF-80: ativos primeiro, depois os parados há mais tempo, depois por nome. */
+export function ordenarPortal<T extends ClientePortal>(lista: readonly T[], agora: Date): T[] {
+  return [...lista].sort(
+    (a, b) =>
+      Number(ativo(b)) - Number(ativo(a)) ||
+      diasDesde(b.atualizadoEm, agora) - diasDesde(a.atualizadoEm, agora) ||
+      a.nome.localeCompare(b.nome, "pt-BR"),
+  );
 }
