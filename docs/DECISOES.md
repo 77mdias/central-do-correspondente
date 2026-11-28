@@ -119,5 +119,5 @@ Não há segunda funcionária na v1 (bloqueado, sem adicional pago).
 | ~~P-08~~ | ~~Provedor de e-mail~~ | Resolvida: Resend (D-38) | — |
 | ~~P-09~~ | ~~Domínio do app~~ | Resolvida: `central-correspondente.wdias.tech` (D-36) | — |
 | P-10 | Acordo por escrito entre os sócios (código, receita, saída) | — | Sócios |
-| P-12 | Texto real dos termos de uso e da política de privacidade (RF-67) | Rascunho escrito na fase 3 a partir de D-21, D-22 e do papel de operador; precisa de revisão (de preferência jurídica) antes do uso real | Sócios |
+| P-12 | Texto real dos termos de uso e da política de privacidade (RF-67) | Rascunho `v1` em `src/telas/TermosPrivacidade.tsx` (PR 5 da fase 3), a partir de D-05, D-07, D-08, D-21, D-22, D-41 e do papel de operador. Os trechos marcados "a preencher pelos sócios" são deles: razão social e CNPJ, guarda dos dados depois do cancelamento, limites de responsabilidade, contato, foro, encarregado, prazo dos backups e transferência internacional (LGPD, art. 33). Revisão de preferência jurídica antes do uso real | Sócios |
 | ~~P-11~~ | ~~Como tirar os dados do protótipo para o importador (D-24): o protótipo não tem botão de exportar; os dados ficam no banco compartilhado do Artifact e os anexos no armazenamento de arquivos dele~~ | Resolvida: D-40 | — |

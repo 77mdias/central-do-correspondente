@@ -1,3 +1,4 @@
+import { TERMOS_VERSAO } from "../../src/regras/planos";
 import { criarCenario, linha, poolSystem } from "../db/ajudantes";
 import type { Eu } from "../../src/tipos-api";
 import { emailContaExistente } from "../../worker/emails";
@@ -17,7 +18,7 @@ test("cadastro deslogado cria usuário, conta pendente e gestor", async () => {
   expect(r.status).toBe(200);
   expect(await r.json()).toEqual({ ok: true });
   const u = await linha(`select id, "emailVerified" as v, "termosVersao" as t from "user" where email = 'gestora@x.com'`);
-  expect(u).toMatchObject({ v: false, t: "rascunho-1" });
+  expect(u).toMatchObject({ v: false, t: TERMOS_VERSAO });
   const c = await linha(
     "select c.status_assinatura, c.plano, c.documento_titular, m.perfil, m.status from contas c join membros m on m.conta_id = c.id where m.usuario_id = $1",
     [u.id],

@@ -1,3 +1,4 @@
+import { TERMOS_VERSAO } from "../../src/regras/planos";
 import { criarCenario, criarCorretor, poolSystem } from "../db/ajudantes";
 import type { ConvitePublico, Equipe, Eu } from "../../src/tipos-api";
 import { TEST_ENV } from "../test-env";
@@ -104,7 +105,7 @@ test("aceitar sem conta cria usuário confirmado e entra", async () => {
   const { req, g, cookieF } = await cenarioComFuncionaria();
   expect(cookieF).toContain("better-auth.session_token");
   const u = await poolSystem.query(`select "emailVerified" as v, "termosVersao" as t from "user" where email = 'func@x.com'`);
-  expect(u.rows[0]).toEqual({ v: true, t: "rascunho-1" });
+  expect(u.rows[0]).toEqual({ v: true, t: TERMOS_VERSAO });
   const eu = await json<Eu>(await req("/api/eu", { cookie: cookieF }));
   expect(eu.escritorios).toEqual([expect.objectContaining({ contaId: g.contaId, perfil: "funcionaria" })]);
 });
