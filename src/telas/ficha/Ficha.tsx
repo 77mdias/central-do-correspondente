@@ -136,7 +136,13 @@ function Conteudo({ escritorio, ficha, aoExcluir }: { escritorio: EscritorioResu
         <CampoTexto {...campo("observacoes")} rotulo="Observações" multilinha valor={c.observacoes} aoMudar={texto("observacoes")} />
       </Secao>
 
-      <Documentos conta={conta} ficha={ficha} podeGravar={pode} />
+      <Documentos
+        conta={conta}
+        cliente={c}
+        anexos={ficha.anexos}
+        pode={{ marcar: pode, anexar: pode, remover: pode }}
+        recarregar={() => recarregarCliente(qc, conta, c.id)}
+      />
 
       <Secao titulo={f.length ? `Cobrança · faltam ${f.length}` : "Mensagem para o cliente"}>
         {cob && (

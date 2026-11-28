@@ -3,9 +3,10 @@ import { Navigate, useLocation } from "react-router";
 import { ErroApi } from "@/api";
 import { useEu } from "@/consultas";
 import type { Eu } from "@/tipos-api";
+import { TermosAtualizados } from "@/telas/TermosAtualizados";
 import { Carregando } from "./Esqueleto";
 
-/** Só mostra `children` com sessão; sem sessão, vai para /entrar e volta depois. */
+/** Só mostra `children` com sessão e termos aceitos; sem sessão, vai para /entrar e volta depois. */
 export function ExigeSessao({ children }: { children: (eu: Eu) => ReactNode }) {
   const eu = useEu();
   const local = useLocation();
@@ -13,5 +14,7 @@ export function ExigeSessao({ children }: { children: (eu: Eu) => ReactNode }) {
   if (eu.error instanceof ErroApi && eu.error.status === 401)
     return <Navigate to={`/entrar?volta=${encodeURIComponent(local.pathname)}`} replace />;
   if (eu.error) return <p className="p-6 text-perigo" role="alert">Não foi possível carregar. Tente de novo em instantes.</p>;
+  // RF-67: aceite da versão atual dos termos antes de qualquer tela com sessão
+  if (eu.data.termosPendentes) return <TermosAtualizados />;
   return <>{children(eu.data)}</>;
 }
