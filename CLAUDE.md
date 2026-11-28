@@ -66,3 +66,4 @@ RLS comprovada por teste: para cada perfil e para um usuário de **outra conta**
 - `docs/SEGREDOS.md` — CriptEnv, Docker e valores de teste.
 - `docs/FLUXOS.md` — jornada, mapa de telas e fluxos (cobrança com "Enviou?", convite, inadimplência).
 - `docs/PRD.md` — escopo, fora de escopo e fases (1 Base → 2 Migração → 3 Portal do corretor → 4 Venda).
+- `docs/USO-REAL.md` — roteiro da entrada das 2 correspondentes e do acompanhamento das 2 semanas (fase 3), com os Workers Logs.
