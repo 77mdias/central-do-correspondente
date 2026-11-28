@@ -56,7 +56,11 @@ export function AceitarConvite() {
   const termos = (
     <label className="flex items-start gap-3 text-sm">
       <input type="checkbox" name="aceitouTermos" className="mt-0.5 size-4 accent-marca" />
-      <span>Li e aceito os termos de uso e a política de privacidade (versão provisória).</span>
+      <span>
+        Li e aceito os{" "}
+        <a href="/termos" target="_blank" rel="noreferrer" className="underline underline-offset-2">termos de uso</a> e a{" "}
+        <a href="/privacidade" target="_blank" rel="noreferrer" className="underline underline-offset-2">política de privacidade</a>.
+      </span>
     </label>
   );
 

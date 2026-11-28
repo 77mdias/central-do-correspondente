@@ -28,8 +28,9 @@ export function TermosAtualizados() {
   return (
     <TelaSimples titulo="Termos atualizados">
       <p className="text-sm text-texto-2">
-        Os Termos de Uso e a Política de Privacidade da Central do Correspondente mudaram. Para continuar usando o app, leia a versão atual e
-        confirme o aceite.
+        Publicamos a versão definitiva dos Termos de Uso e da Política de Privacidade, no lugar da versão provisória. Ela explica quem é
+        responsável pelos dados dos clientes, o que o corretor parceiro vê, por quanto tempo os documentos ficam guardados e onde os dados
+        ficam. Para continuar usando o app, leia e confirme o aceite.
       </p>
       <ul className="flex flex-col gap-1 text-sm">
         <li>

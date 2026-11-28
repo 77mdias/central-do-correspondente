@@ -95,8 +95,7 @@ export function CriarEscritorio() {
               Li e aceito os{" "}
               <Link to="/termos" className="text-texto underline underline-offset-2">termos de uso</Link>{" "}
               e a{" "}
-              <Link to="/privacidade" className="text-texto underline underline-offset-2">política de privacidade</Link>{" "}
-              (versão provisória).
+              <Link to="/privacidade" className="text-texto underline underline-offset-2">política de privacidade</Link>.
             </span>
           </label>
           {erros.aceitouTermos && <p id="termos-erro" className="text-sm text-perigo">{erros.aceitouTermos}</p>}
