@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from "react-router";
 import { ErroApi } from "./api";
 import { Casca } from "./componentes/Casca";
 import { Carregando } from "./componentes/Esqueleto";
+import { Indice, SoEscritorio } from "./componentes/PorPerfil";
 import { ExigeSessao } from "./componentes/Sessao";
 import { sessaoProvavel, ultimoEscritorio, useEu } from "./consultas";
 import { destinoAposEntrar } from "./regras/destino";
@@ -18,7 +19,6 @@ import { Entrar } from "./telas/Entrar";
 import { Equipe } from "./telas/Equipe";
 import { EscolherEscritorio } from "./telas/EscolherEscritorio";
 import { EsqueciSenha } from "./telas/EsqueciSenha";
-import { Inicio } from "./telas/Inicio";
 import { Landing } from "./telas/Landing";
 import { NovaSenha } from "./telas/NovaSenha";
 import { Privacidade, Termos } from "./telas/TermosPrivacidade";
@@ -48,13 +48,13 @@ export const rotas = createBrowserRouter([
     path: "/e/:contaId",
     element: <ExigeSessao>{(eu) => <Casca eu={eu} />}</ExigeSessao>,
     children: [
-      { index: true, element: <Inicio /> },
-      { path: "clientes", element: <Clientes /> },
-      { path: "cobrar", element: <CobrarHoje /> },
-      { path: "corretores", element: <Corretores /> },
-      { path: "vgv", element: <Vgv /> },
-      { path: "importar", element: <Importar /> },
-      { path: "equipe", element: <Equipe /> },
+      { index: true, element: <Indice /> },
+      { path: "clientes", element: <SoEscritorio><Clientes /></SoEscritorio> },
+      { path: "cobrar", element: <SoEscritorio><CobrarHoje /></SoEscritorio> },
+      { path: "corretores", element: <SoEscritorio><Corretores /></SoEscritorio> },
+      { path: "vgv", element: <SoEscritorio><Vgv /></SoEscritorio> },
+      { path: "importar", element: <SoEscritorio><Importar /></SoEscritorio> },
+      { path: "equipe", element: <SoEscritorio><Equipe /></SoEscritorio> },
     ],
   },
   { path: "/criar-escritorio", element: <CriarEscritorio /> },

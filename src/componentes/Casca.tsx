@@ -5,12 +5,14 @@ import { authCliente } from "@/auth-cliente";
 import { sessaoProvavel, ultimoEscritorio } from "@/consultas";
 import { useClientes } from "@/consultas-escritorio";
 import { hojeBr } from "@/regras/datas";
-import { resumo } from "@/regras/processo";
+import { ativo, resumo } from "@/regras/processo";
+import { usePortalClientes } from "@/consultas-portal";
 import { cn } from "@/lib/cn";
 import { ROTULO_PERFIL } from "@/regras/rotulos";
 import type { Eu } from "@/tipos-api";
 import { AvisoConta } from "./AvisoConta";
 import { PainelFicha } from "@/telas/ficha/PainelFicha";
+import { PainelFichaPortal } from "@/telas/ficha/PainelFichaPortal";
 import { ProvedorEnviou } from "./Enviou";
 import { Botao, Marca } from "./ui";
 
@@ -21,7 +23,9 @@ export function Casca({ eu }: { eu: Eu }) {
   const gaveta = useRef<HTMLDialogElement>(null);
   const navegar = useNavigate();
   const consultas = useQueryClient();
-  const clientes = useClientes(contaId ?? "");
+  const ehCorretor = escritorio?.perfil === "corretor";
+  // a casca do corretor não chama as rotas do escritório (responderiam 404)
+  const clientes = useClientes(contaId ?? "", { ativo: !!escritorio && !ehCorretor });
 
   useEffect(() => {
     if (!escritorio) return;
@@ -41,7 +45,9 @@ export function Casca({ eu }: { eu: Eu }) {
   const raiz = `/e/${escritorio.contaId}`;
   // o atalho de importação some quando o escritório já tem clientes (só funciona em conta vazia)
   const semClientes = clientes.data?.length === 0;
-  const itens: { para: string; rotulo: string; fim: boolean; contador?: "clientes" | "cobrar" }[] = [
+  const itens: { para: string; rotulo: string; fim: boolean; contador?: "clientes" | "cobrar" | "portal" }[] = ehCorretor
+    ? [{ para: raiz, rotulo: "Meus clientes", fim: true, contador: "portal" }]
+    : [
     { para: raiz, rotulo: "Início", fim: true },
     { para: `${raiz}/clientes`, rotulo: "Clientes", fim: false, contador: "clientes" },
     { para: `${raiz}/cobrar`, rotulo: "Cobrar hoje", fim: false, contador: "cobrar" },
@@ -53,7 +59,7 @@ export function Casca({ eu }: { eu: Eu }) {
           { para: `${raiz}/equipe`, rotulo: "Equipe e acessos", fim: false },
         ]
       : []),
-  ];
+      ];
 
   const menu = (
     <nav aria-label="Menu principal" className="flex flex-col gap-1">
@@ -74,7 +80,11 @@ export function Casca({ eu }: { eu: Eu }) {
         >
           <span className="flex items-center justify-between gap-2">
             {i.rotulo}
-            {i.contador && <Contador conta={escritorio.contaId} tipo={i.contador} />}
+            {i.contador === "portal" ? (
+              <ContadorPortal conta={escritorio.contaId} />
+            ) : (
+              i.contador && <Contador conta={escritorio.contaId} tipo={i.contador} />
+            )}
           </span>
         </NavLink>
       ))}
@@ -137,10 +147,17 @@ export function Casca({ eu }: { eu: Eu }) {
         </dialog>
         <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 min-[900px]:p-8">
           <AvisoConta escritorio={escritorio} />
-          <ProvedorEnviou escritorio={escritorio}>
-            <Outlet context={escritorio} />
-            <PainelFicha escritorio={escritorio} />
-          </ProvedorEnviou>
+          {ehCorretor ? (
+            <>
+              <Outlet context={escritorio} />
+              <PainelFichaPortal escritorio={escritorio} />
+            </>
+          ) : (
+            <ProvedorEnviou escritorio={escritorio}>
+              <Outlet context={escritorio} />
+              <PainelFicha escritorio={escritorio} />
+            </ProvedorEnviou>
+          )}
         </main>
       </div>
     </div>
@@ -148,6 +165,15 @@ export function Casca({ eu }: { eu: Eu }) {
 }
 
 /** Contadores do menu, como no protótipo: clientes ativos e cobranças do dia. */
+const classeContador = "font-mono-tabular rounded-full px-2 py-0.5 text-[11px]";
+
+/** Corretor: quantos clientes dele estão com processo ativo. */
+function ContadorPortal({ conta }: { conta: string }) {
+  const clientes = usePortalClientes(conta);
+  if (!clientes.data) return null;
+  return <span className={cn(classeContador, "bg-superficie-sutil text-texto-2")}>{clientes.data.filter(ativo).length}</span>;
+}
+
 function Contador({ conta, tipo }: { conta: string; tipo: "clientes" | "cobrar" }) {
   const clientes = useClientes(conta);
   if (!clientes.data) return null;
@@ -157,7 +183,7 @@ function Contador({ conta, tipo }: { conta: string; tipo: "clientes" | "cobrar" 
   return (
     <span
       className={cn(
-        "font-mono-tabular rounded-full px-2 py-0.5 text-[11px]",
+        classeContador,
         tipo === "cobrar" ? "bg-aviso-fundo text-aviso-texto" : "bg-superficie-sutil text-texto-2",
       )}
     >

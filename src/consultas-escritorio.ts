@@ -12,8 +12,14 @@ export const chavesEscritorio = {
 
 const LISTA = { refetchInterval: 30_000 } as const;
 
-export const useClientes = (conta: string) =>
-  useQuery({ queryKey: chavesEscritorio.clientes(conta), queryFn: () => api<ClienteLista[]>(`/api/contas/${conta}/clientes`), ...LISTA });
+/** `ativo: false` desliga a consulta (a casca do corretor não chama as rotas do escritório). */
+export const useClientes = (conta: string, { ativo = true }: { ativo?: boolean } = {}) =>
+  useQuery({
+    queryKey: chavesEscritorio.clientes(conta),
+    queryFn: () => api<ClienteLista[]>(`/api/contas/${conta}/clientes`),
+    enabled: ativo,
+    ...LISTA,
+  });
 
 export const useCorretores = (conta: string) =>
   useQuery({ queryKey: chavesEscritorio.corretores(conta), queryFn: () => api<Corretor[]>(`/api/contas/${conta}/corretores`), ...LISTA });

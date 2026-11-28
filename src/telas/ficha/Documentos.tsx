@@ -2,12 +2,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { api, enviarArquivo, ErroApi } from "@/api";
 import { Aviso } from "@/componentes/ui";
-import { atualizarNaLista, recarregarCliente } from "@/consultas-escritorio";
+import { atualizarNaLista } from "@/consultas-escritorio";
 import { cn } from "@/lib/cn";
 import { prepararArquivo } from "@/lib/preparar-arquivo";
 import { DOCUMENTOS, NOME_GRUPO, OUTROS_ARQUIVOS } from "@/regras/catalogo";
 import { dataBr } from "@/regras/datas";
-import type { ArquivoResumo, ClienteLista, Ficha } from "@/tipos-api";
+import type { ArquivoResumo, ClienteLista } from "@/tipos-api";
 
 const ERROS_ANEXO: Record<string, string> = {
   arquivo_grande: "Arquivo grande demais (máx. 20 MB).",
@@ -18,10 +18,26 @@ const ERROS_ANEXO: Record<string, string> = {
 
 const tamanho = (b: number) => (b >= 1048576 ? `${(b / 1048576).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} MB` : `${Math.ceil(b / 1024)} KB`);
 
-/** Checklist dos 12 documentos e "Outros arquivos" (RF-20 a RF-24, RF-26). */
-export function Documentos({ conta, ficha, podeGravar }: { conta: string; ficha: Ficha; podeGravar: boolean }) {
+export type Permissoes = { marcar: boolean; anexar: boolean; remover: boolean };
+
+/**
+ * Checklist dos 12 documentos e "Outros arquivos" (RF-20 a RF-24, RF-26). O escritório marca, anexa e remove;
+ * o corretor só anexa e abre (RF-82). `recarregar` atualiza as consultas de quem está vendo.
+ */
+export function Documentos({
+  conta,
+  cliente: c,
+  anexos,
+  pode,
+  recarregar,
+}: {
+  conta: string;
+  cliente: Pick<ClienteLista, "id" | "documentos">;
+  anexos: ArquivoResumo[];
+  pode: Permissoes;
+  recarregar: () => void;
+}) {
   const qc = useQueryClient();
-  const c = ficha.cliente;
   const [enviando, setEnviando] = useState<string | null>(null);
   const [erro, setErro] = useState("");
   const [removendo, setRemovendo] = useState<string | null>(null);
@@ -33,7 +49,7 @@ export function Documentos({ conta, ficha, podeGravar }: { conta: string; ficha:
     try {
       const novo = await api<ClienteLista>(`${base}/clientes/${c.id}/documentos/${tipo}`, { method: "PUT", body: { recebido } });
       atualizarNaLista(qc, conta, novo);
-      recarregarCliente(qc, conta, c.id);
+      recarregar();
     } catch {
       setErro("Não foi possível marcar o documento.");
     }
@@ -55,7 +71,7 @@ export function Documentos({ conta, ficha, podeGravar }: { conta: string; ficha:
       }
     }
     setEnviando(null);
-    recarregarCliente(qc, conta, c.id);
+    recarregar();
   }
 
   async function abrir(a: ArquivoResumo) {
@@ -75,23 +91,25 @@ export function Documentos({ conta, ficha, podeGravar }: { conta: string; ficha:
     setRemovendo(null);
     try {
       await api(`${base}/arquivos/${a.id}`, { method: "DELETE" });
-      recarregarCliente(qc, conta, c.id);
+      recarregar();
     } catch {
       setErro("Não foi possível remover o arquivo.");
     }
   }
 
   const itens = [...DOCUMENTOS.map((d) => ({ codigo: d.codigo as string, nome: d.nome, grupo: NOME_GRUPO[d.grupo] })), { codigo: "outros", nome: OUTROS_ARQUIVOS, grupo: "Outros" }];
-  const totalArquivos = ficha.anexos.length;
+  const totalArquivos = anexos.length;
 
   return (
     <Secao titulo={`Documentos · ${recebidos}/${DOCUMENTOS.length} recebidos${totalArquivos ? ` · ${totalArquivos} arquivo${totalArquivos === 1 ? "" : "s"}` : ""}`}>
-      <p className="text-xs text-texto-2">Use Anexar para guardar a foto ou o PDF de cada documento. Ao anexar, o item já fica marcado como recebido.</p>
+      {pode.anexar && (
+        <p className="text-xs text-texto-2">Use Anexar para guardar a foto ou o PDF de cada documento. Ao anexar, o item já fica marcado como recebido.</p>
+      )}
       {erro && <Aviso tom="erro">{erro}</Aviso>}
       <div className="flex flex-col">
         {itens.map((d, i) => {
           const recebidoEm = d.codigo === "outros" ? null : c.documentos[d.codigo as keyof typeof c.documentos];
-          const arqs = ficha.anexos.filter((a) => a.tipo === d.codigo);
+          const arqs = anexos.filter((a) => a.tipo === d.codigo);
           return (
             <div key={d.codigo}>
               {(i === 0 || itens[i - 1]!.grupo !== d.grupo) && (
@@ -106,14 +124,14 @@ export function Documentos({ conta, ficha, podeGravar }: { conta: string; ficha:
                       type="checkbox"
                       className="size-4 shrink-0 accent-[var(--acento)]"
                       checked={!!recebidoEm}
-                      disabled={!podeGravar}
+                      disabled={!pode.marcar}
                       onChange={(e) => void marcar(d.codigo, e.target.checked)}
                     />
                     <span className={cn("min-w-0", recebidoEm ? "text-texto" : "text-texto")}>{d.nome}</span>
                     {recebidoEm && <small className="font-mono-tabular shrink-0 text-xs text-ok-texto">recebido {dataBr(recebidoEm).slice(0, 5)}</small>}
                   </label>
                 )}
-                {podeGravar && (
+                {pode.anexar && (
                   <label className="relative inline-flex min-h-9 shrink-0 cursor-pointer items-center rounded-lg border border-borda bg-superficie px-3 text-xs font-medium hover:bg-superficie-sutil">
                     {enviando === d.codigo ? "Enviando…" : "Anexar"}
                     <input
@@ -139,7 +157,7 @@ export function Documentos({ conta, ficha, podeGravar }: { conta: string; ficha:
                       <button type="button" className="max-w-48 truncate text-acento hover:underline" title={`${a.nome} · ${tamanho(a.tamanho)}`} onClick={() => void abrir(a)}>
                         {a.nome}
                       </button>
-                      {podeGravar && (
+                      {pode.remover && (
                         <button
                           type="button"
                           className={cn("rounded px-1", removendo === a.id ? "bg-perigo text-white" : "text-texto-2 hover:text-perigo")}
