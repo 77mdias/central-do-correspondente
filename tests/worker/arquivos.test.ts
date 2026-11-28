@@ -1,7 +1,7 @@
 import type { ArquivoResumo, ClienteLista, Ficha } from "../../src/tipos-api";
 import { tipoPeloConteudo } from "../../worker/rotas/arquivos";
 import { criarCenario, poolSystem } from "../db/ajudantes";
-import { escritorio, hojeBanco } from "./cenario";
+import { corretorLogado, escritorio, hojeBanco } from "./cenario";
 
 beforeEach(async () => {
   await criarCenario();
@@ -132,4 +132,71 @@ test("conta pendente não anexa nem remove (403)", async () => {
   await poolSystem.query("update contas set ativa_ate = null, status_assinatura = 'pendente' where id = $1", [e.conta]);
   expect((await anexar(e, id, form("cpf", PDF))).status).toBe(403);
   expect((await e.req(`/api/contas/${e.conta}/arquivos/${a.id}`, { method: "DELETE", cookie: e.g })).status).toBe(403);
+});
+
+// ── corretor (fase 3, RF-82) ──
+
+async function comCorretor() {
+  const e = await escritorio();
+  const k = await corretorLogado(e, { conta: e.conta, gestora: e.g, nome: "Ana Corretora" });
+  const novo = async (corretorId: string | null) =>
+    ((await (await e.req(`/api/contas/${e.conta}/clientes`, { body: { nome: "Cliente", corretorId }, cookie: e.g })).json()) as { id: string }).id;
+  const outroK = ((await (await e.req(`/api/contas/${e.conta}/corretores`, { body: { nome: "Outro" }, cookie: e.g })).json()) as { id: string }).id;
+  return { e, k, meu: await novo(k.corretorId), deOutro: await novo(outroK) };
+}
+const desativar = async (e: E, usuarioId: string) => {
+  const m = (await poolSystem.query<{ id: string }>("select id from membros where usuario_id = $1 and conta_id = $2", [usuarioId, e.conta])).rows[0]!.id;
+  expect((await e.req(`/api/contas/${e.conta}/membros/${m}/desativar`, { body: {}, cookie: e.g })).status).toBe(200);
+};
+
+test("corretor anexa no próprio cliente: documento marcado e 'Anexado por {nome}' (RF-82)", async () => {
+  const { e, k, meu } = await comCorretor();
+  const r = await anexar(e, meu, form("rg", PDF), k.cookie);
+  expect(r.status).toBe(201);
+  const f = await ficha(e, meu);
+  expect(f.cliente.documentos.rg).toBe(await hojeBanco());
+  expect(f.anexos).toEqual([expect.objectContaining({ tipo: "rg", nome: "rg.pdf" })]);
+  expect(f.historico.find((h) => h.tipo === "documento")?.texto).toBe("Anexado por Ana Corretora: RG ou CNH (rg.pdf)");
+});
+
+test("corretor não anexa em cliente de outro corretor (404)", async () => {
+  const { e, k, deOutro } = await comCorretor();
+  expect((await anexar(e, deOutro, form("rg", PDF), k.cookie)).status).toBe(404);
+  expect((await poolSystem.query("select 1 from arquivos where cliente_id = $1", [deOutro])).rowCount).toBe(0);
+});
+
+test("corretor não remove anexo, nem o que ele mesmo enviou (403)", async () => {
+  const { e, k, meu } = await comCorretor();
+  const dele = (await (await anexar(e, meu, form("rg", PDF), k.cookie)).json()) as ArquivoResumo;
+  const doEscritorio = (await (await anexar(e, meu, form("cpf", PDF, "cpf.pdf"), e.f)).json()) as ArquivoResumo;
+  for (const a of [dele, doEscritorio]) {
+    expect((await e.req(`/api/contas/${e.conta}/arquivos/${a.id}`, { method: "DELETE", cookie: k.cookie })).status).toBe(403);
+  }
+  expect((await ficha(e, meu)).anexos).toHaveLength(2);
+});
+
+test("corretor abre o link de anexo do próprio cliente e grava 'baixar'", async () => {
+  const { e, k, meu } = await comCorretor();
+  const a = (await (await anexar(e, meu, form("rg", PDF), e.f)).json()) as ArquivoResumo;
+  const r = await e.req(`/api/contas/${e.conta}/arquivos/${a.id}/link`, { cookie: k.cookie });
+  expect(r.status).toBe(200);
+  expect(((await r.json()) as { url: string }).url).toMatch(/^http/);
+  const aud = await poolSystem.query("select acao from auditoria where usuario_id = $1 and entidade_id = $2", [k.usuarioId, a.id]);
+  expect(aud.rows).toEqual([{ acao: "baixar" }]);
+});
+
+test("corretor desativado: anexar e link dão 404, sem auditoria", async () => {
+  const { e, k, meu } = await comCorretor();
+  const a = (await (await anexar(e, meu, form("rg", PDF), e.f)).json()) as ArquivoResumo;
+  await desativar(e, k.usuarioId);
+  expect((await anexar(e, meu, form("cpf", PDF), k.cookie)).status).toBe(404);
+  expect((await e.req(`/api/contas/${e.conta}/arquivos/${a.id}/link`, { cookie: k.cookie })).status).toBe(404);
+  expect((await poolSystem.query("select 1 from auditoria where usuario_id = $1", [k.usuarioId])).rowCount).toBe(0);
+});
+
+test("conta pendente: corretor lê o portal, mas anexar dá 403", async () => {
+  const { e, k, meu } = await comCorretor();
+  await poolSystem.query("update contas set ativa_ate = null, status_assinatura = 'pendente' where id = $1", [e.conta]);
+  expect((await e.req(`/api/contas/${e.conta}/portal/clientes`, { cookie: k.cookie })).status).toBe(200);
+  expect((await anexar(e, meu, form("rg", PDF), k.cookie)).status).toBe(403);
 });

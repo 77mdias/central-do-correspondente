@@ -13,7 +13,8 @@ export type EscritorioResumo = {
   ativa: boolean; // pode gravar (conta_ativa)
 };
 
-export type Eu = { usuario: { id: string; nome: string; email: string }; escritorios: EscritorioResumo[] };
+/** `termosPendentes`: a versão aceita dos termos não é a atual (RF-67); a SPA pede o novo aceite. */
+export type Eu = { usuario: { id: string; nome: string; email: string }; escritorios: EscritorioResumo[]; termosPendentes: boolean };
 
 export type Equipe = {
   membros: { id: string; nome: string; email: string; perfil: Perfil; status: "ativo" | "desativado" }[];
@@ -79,6 +80,22 @@ export type Ficha = { cliente: ClienteLista; anexos: ArquivoResumo[]; historico:
 
 /** RF-05: últimas entradas de histórico de todos os clientes. */
 export type AtualizacaoRecente = { id: string; clienteId: string; nome: string; tipo: NotaHistorico["tipo"]; texto: string; criadoEm: string };
+
+// ── Fase 3: portal do corretor ────────────────────────────────────────────
+
+/**
+ * Lista fechada do que o corretor recebe de um cliente (spec da fase 3, §6). A rota do portal seleciona
+ * exatamente estas chaves; nada de CPF, contrato, cobrança, observações nem dinheiro do escritório.
+ */
+export const CAMPOS_PORTAL = [
+  "id", "nome", "whatsapp", "email", "modalidade", "etapa", "valorImovelCentavos", "valorFinanciadoCentavos",
+  "criadoEm", "atualizadoEm", "documentos", "anexos",
+] as const satisfies readonly (keyof ClienteLista)[];
+
+export type ClientePortal = Pick<ClienteLista, (typeof CAMPOS_PORTAL)[number]>;
+
+/** Ficha do portal: o histórico já vem filtrado pela RLS (só etapa e documento, D-41). */
+export type FichaPortal = { cliente: ClientePortal; anexos: ArquivoResumo[]; historico: NotaHistorico[] };
 
 export type AcessoCorretor ="sem_acesso" | "convidado" | "ativo";
 export type Corretor = CorretorResumo & { whatsapp: string | null; creci: string | null; email: string | null; acesso: AcessoCorretor };

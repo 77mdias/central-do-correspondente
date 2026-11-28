@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { logAuth } from "./log";
 import type { Pool } from "pg";
 import type { Email } from "./email";
 import { emailContaExistente, emailRecuperarSenha, emailVerificacao } from "./emails";
@@ -15,6 +16,8 @@ export function criarAuth(env: Pick<Env, "APP_URL" | "BETTER_AUTH_SECRET">, syst
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins: [app],
     database: system,
+    // os avisos e erros do Better Auth passam pela limpeza dos logs (nada de e-mail nem dados da linha)
+    logger: { level: "warn", log: logAuth },
     advanced: {
       database: { generateId: "uuid" },
       // no Worker, o IP do cliente vem da Cloudflare neste cabeçalho; sem IP, o limite viraria um balde só para todos

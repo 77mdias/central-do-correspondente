@@ -45,6 +45,12 @@ export async function exigirEscritorio(db: PoolClient, conta: string): Promise<"
   return p;
 }
 
+/** Portal (fase 3): 404 se não é corretor ativo da conta (desativado já não tem perfil). */
+export async function exigirCorretor(db: PoolClient, conta: string): Promise<void> {
+  const r = await db.query<{ perfil: string | null }>("select meu_perfil($1)::text as perfil", [conta]);
+  if (r.rows[0]?.perfil !== "corretor") throw naoEncontrado();
+}
+
 /** Roda a rota numa transação sob RLS e converte os erros conhecidos em resposta. */
 export async function emTransacao<T>(c: Context<AppTipos>, fn: (db: PoolClient) => Promise<T>): Promise<T | Response> {
   try {

@@ -1,6 +1,7 @@
 import type { Pool, PoolClient } from "pg";
 import type { EnviarEmail } from "../email";
 import { emailAvisoAnexos } from "../emails";
+import { registrarErro } from "../log";
 import type { S3 } from "../s3";
 
 /** P-07: aviso 5 dias antes de apagar. */
@@ -84,7 +85,7 @@ async function apagarVencidos(db: PoolClient, s3: S3): Promise<{ apagados: numbe
     try {
       await s3.apagar(a.caminho);
     } catch (e) {
-      console.error("anexo vencido não apagado; tenta de novo amanhã", a.id, e);
+      registrarErro("anexo vencido não apagado; tenta de novo amanhã", e, { arquivo: a.id });
       falhas++;
       continue;
     }
@@ -109,7 +110,7 @@ async function recolherOrfaos(pool: Pool, s3: S3, agora: Date): Promise<number> 
     const vivos = await pool.query<{ caminho: string }>("select caminho from arquivos where caminho = any($1) and apagado_em is null", [lote]);
     const manter = new Set(vivos.rows.map((x) => x.caminho));
     for (const caminho of lote.filter((c) => !manter.has(c))) {
-      await s3.apagar(caminho).then(() => n++, (e) => console.error("órfão não apagado", caminho, e));
+      await s3.apagar(caminho).then(() => n++, (e) => registrarErro("órfão não apagado", e));
     }
   }
   return n;
